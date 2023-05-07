@@ -1,3 +1,4 @@
+import { AuthTokensDto } from 'src/modules/auth/dtos/auth-tokens.dto';
 import { IssuedRefreshToken } from 'src/modules/auth/entities/issued-refresh-token.entity';
 import { User } from 'src/modules/user/entities/user.entity';
 
@@ -8,7 +9,7 @@ export abstract class IAuthService {
      * @param user User object
      * @param clientIP client's remote IP address
      */
-    abstract login(user: User, remoteIp: string): Promise<IssuedRefreshToken>;
+    abstract login(user: User, remoteIp: string): Promise<AuthTokensDto>;
 
     /**
      * Invalidates old and creates new refresh token.
@@ -19,21 +20,21 @@ export abstract class IAuthService {
     abstract refreshTokens(
         issuedRefreshToken: IssuedRefreshToken,
         clientIP: string,
-    );
+    ): Promise<AuthTokensDto>;
 
     /**
      * Invalidates User's auth and refresh token.
      *
      * @param issuedRefreshToken current refresh token
      */
-    abstract logout(issuedRefreshToken: IssuedRefreshToken);
+    abstract logout(issuedRefreshToken: IssuedRefreshToken): Promise<void>;
 
     /**
      * Invalidates all User's auth and refresh tokens.
      *
      * @param userId User's id
      */
-    abstract logoutFromAllDevices(userId: number);
+    abstract logoutFromAllDevices(userId: number): Promise<void>;
 
     /**
      * Fetches user with given email address,

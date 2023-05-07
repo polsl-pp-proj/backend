@@ -20,7 +20,10 @@ export abstract class IAuthTokenService {
      * @param remoteIp IP address of client sending request
      * @returns AuthTokensDto containing new auth and refresh token
      */
-    abstract createTokenPairForLogin(user: User, remoteIp: string);
+    abstract createTokenPairForLogin(
+        user: User,
+        remoteIp: string,
+    ): Promise<AuthTokensDto>;
     /**
      * Creates auth and refresh token pair and removes old refresh token.
      *
@@ -31,21 +34,23 @@ export abstract class IAuthTokenService {
     abstract createTokenPairForRefresh(
         issuedRefreshToken: IssuedRefreshToken,
         remoteIp: string,
-    );
+    ): Promise<AuthTokensDto>;
 
     /**
      * Invalidates auth and refresh token.
      *
      * @param issuedRefreshToken refresh token to invalidate
      */
-    abstract invalidateTokenPair(issuedRefreshToken: IssuedRefreshToken);
+    abstract invalidateTokenPair(
+        issuedRefreshToken: IssuedRefreshToken,
+    ): Promise<void>;
 
     /**
      * Invalidates all auth and refresh tokens for user.
      *
      * @param userId ID of user to invalidate tokens for
      */
-    abstract invalidateAllTokensForUser(userId: number);
+    abstract invalidateAllTokensForUser(userId: number): Promise<void>;
 
     /**
      * Fetches issued refresh token with associated user.

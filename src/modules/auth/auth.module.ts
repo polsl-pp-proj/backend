@@ -15,6 +15,9 @@ import { IssuedRefreshTokenRepository } from './repositories/issued-refresh-toke
 import { AuthTokenStrategy } from './strategies/auth-token.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
+import { PasswordService } from './services/password/password.service';
+import { CredentialRepository } from './repositories/credential.repository';
+import { IPasswordService } from 'src/interfaces/password.service.interface';
 
 @Module({
     imports: [
@@ -34,6 +37,8 @@ import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
         AuthTokenStrategy,
         LocalStrategy,
         RefreshTokenStrategy,
+        { provide: IPasswordService, useClass: PasswordService },
+        CredentialRepository,
     ],
 })
 export class AuthModule {}

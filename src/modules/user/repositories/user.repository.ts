@@ -21,7 +21,6 @@ export class UserRepository extends Repository<User> {
     }): Promise<User> {
         const userEntity: User = this.create({
             ...userData,
-            lastVerifiedAsStudent: new Date(),
             isActive: false,
         });
         return await this.save(userEntity, { reload: true });

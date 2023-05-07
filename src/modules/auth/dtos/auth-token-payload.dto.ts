@@ -7,6 +7,7 @@ export class AuthTokenPayloadDto {
     firstName: string;
     lastName: string;
     role: UserRole;
+    lastVerifiedAsStudent: number | null;
     isVerifiedStudent: boolean;
     isActive: boolean;
 

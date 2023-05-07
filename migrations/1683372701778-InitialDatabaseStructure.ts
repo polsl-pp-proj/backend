@@ -166,8 +166,8 @@ export class InitialDatabaseStructure1683372701778
             `CREATE TABLE IF NOT EXISTS public.issued_refresh_tokens
                 (
                     id serial NOT NULL,
-                    uuid character varying(32) NOT NULL,
-                    for_auth_token_uuid character varying(32) NOT NULL,
+                    uuid character varying(36) NOT NULL,
+                    for_auth_token_uuid character varying(36) NOT NULL,
                     expiry timestamp with time zone NOT NULL,
                     ip_address character varying(39) NOT NULL,
                     user_id integer NOT NULL,
@@ -186,7 +186,7 @@ export class InitialDatabaseStructure1683372701778
             `CREATE TABLE IF NOT EXISTS public.one_time_tokens
                 (
                     id serial NOT NULL,
-                    uuid character varying(32) NOT NULL,
+                    uuid character varying(36) NOT NULL,
                     type one_time_token_type NOT NULL,
                     expiry timestamp with time zone NOT NULL,
                     is_active boolean NOT NULL DEFAULT false,

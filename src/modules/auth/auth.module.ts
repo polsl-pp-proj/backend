@@ -18,6 +18,10 @@ import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
 import { PasswordService } from './services/password/password.service';
 import { CredentialRepository } from './repositories/credential.repository';
 import { IPasswordService } from 'src/interfaces/password.service.interface';
+import { SignupController } from './controllers/signup/signup.controller';
+import { SignupService } from './services/signup/signup.service';
+import { ISignupService } from 'src/interfaces/signup.service.interface';
+import { SignupRepository } from './repositories/signup.repository';
 
 @Module({
     imports: [
@@ -29,7 +33,7 @@ import { IPasswordService } from 'src/interfaces/password.service.interface';
         ]),
         JwtModule.register(jwtModuleConfig),
     ],
-    controllers: [AuthController],
+    controllers: [AuthController, SignupController],
     providers: [
         { provide: IAuthService, useClass: AuthService },
         { provide: IAuthTokenService, useClass: AuthTokenService },
@@ -39,6 +43,8 @@ import { IPasswordService } from 'src/interfaces/password.service.interface';
         RefreshTokenStrategy,
         { provide: IPasswordService, useClass: PasswordService },
         CredentialRepository,
+        SignupRepository,
+        { provide: ISignupService, useClass: SignupService },
     ],
 })
 export class AuthModule {}

@@ -25,7 +25,7 @@ export class IssuedRefreshToken {
     ipAddress: string;
 
     @Column({ name: 'user_id' })
-    userId: string;
+    userId: number;
 
     @ManyToOne(() => User)
     @JoinColumn()

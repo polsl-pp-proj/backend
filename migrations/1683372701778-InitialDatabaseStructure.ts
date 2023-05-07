@@ -15,7 +15,7 @@ export class InitialDatabaseStructure1683372701778
                     email_address character varying NOT NULL,
                     first_name character varying NOT NULL,
                     last_name character varying NOT NULL,
-                    last_verified_as_student timestamp with time zone,
+                    last_verified_as_student timestamp with time zone DEFAULT NULL,
                     role user_role NOT NULL,
                     is_active boolean NOT NULL DEFAULT false,
                     PRIMARY KEY (id)

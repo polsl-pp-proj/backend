@@ -19,6 +19,7 @@ export class User {
         name: 'last_verified_as_student',
         type: 'timestamp with time zone',
         nullable: true,
+        default: null,
     })
     lastVerifiedAsStudent: Date | null;
 

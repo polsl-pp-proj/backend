@@ -36,6 +36,6 @@ export class OneTimeToken {
     userId: number;
 
     @ManyToOne(() => User, { onDelete: 'CASCADE' })
-    @JoinColumn()
+    @JoinColumn({ name: 'user_id' })
     user: User;
 }

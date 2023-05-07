@@ -28,6 +28,6 @@ export class Credential {
     userId: number;
 
     @ManyToOne(() => User)
-    @JoinColumn()
+    @JoinColumn({ name: 'user_id' })
     user: User;
 }

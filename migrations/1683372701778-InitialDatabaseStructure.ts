@@ -206,7 +206,7 @@ export class InitialDatabaseStructure1683372701778
         await queryRunner.query(
             `CREATE TABLE IF NOT EXISTS public.organization_notifications
                 (
-                    id integer NOT NULL,
+                    id serial NOT NULL,
                     subject character varying(150) NOT NULL,
                     message text NOT NULL,
                     project_id integer NOT NULL,

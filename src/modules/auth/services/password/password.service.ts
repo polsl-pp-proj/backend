@@ -5,10 +5,15 @@ import { CredentialType } from '../../enums/credential-type.enum';
 import { argon2Options } from '../../configs/argon2.config';
 import * as argon2 from 'argon2';
 import { CredentialRepository } from '../../repositories/credential.repository';
+import { OneTimeTokenType } from '../../enums/one-time-token-type.enum';
+import { IOneTimeTokenService } from 'src/interfaces/one-time-token.service.interface';
 
 @Injectable()
 export class PasswordService implements IPasswordService {
-    constructor(private readonly credentialRepository: CredentialRepository) {}
+    constructor(
+        private readonly credentialRepository: CredentialRepository,
+        private readonly oneTimeTokenService: IOneTimeTokenService,
+    ) {}
 
     async validateAndGetUser(
         emailAddress: string,
@@ -31,15 +36,32 @@ export class PasswordService implements IPasswordService {
         return null;
     }
 
-    changePassword(userId: number, newPassword: string): Promise<void> {
-        throw new Error('Method not implemented.');
+    async changePassword(userId: number, newPassword: string): Promise<void> {
+        return await this.credentialRepository.updateCredential(
+            userId,
+            await this.createPasswordHash(newPassword),
+            CredentialType.Password,
+        );
     }
-    resetPassword(
+
+    async requestPasswordReset(emailAddress: string): Promise<string> {
+        return await this.oneTimeTokenService.generateOneTimeToken(
+            emailAddress,
+            OneTimeTokenType.PasswordReset,
+        );
+    }
+
+    async resetPassword(
         emailAddress: string,
         oneTimeToken: string,
         newPassword: string,
     ) {
-        throw new Error('Method not implemented.');
+        return await this.credentialRepository.resetCredential(
+            emailAddress,
+            oneTimeToken,
+            await this.createPasswordHash(newPassword),
+            CredentialType.Password,
+        );
     }
 
     async createPasswordHash(password: string) {

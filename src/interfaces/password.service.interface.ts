@@ -21,6 +21,13 @@ export abstract class IPasswordService {
     abstract changePassword(userId: number, newPassword: string): Promise<void>;
 
     /**
+     * Sends password resetting email to user with given email address.
+     *
+     * @param emailAddress user's email address
+     */
+    abstract requestPasswordReset(emailAddress: string): Promise<string>;
+
+    /**
      * Sets new password for authorized user.
      *
      * @param emailAddress user's email address
@@ -31,7 +38,7 @@ export abstract class IPasswordService {
         emailAddress: string,
         oneTimeToken: string,
         newPassword: string,
-    );
+    ): Promise<void>;
 
     /**
      * Hashes password for database storage.

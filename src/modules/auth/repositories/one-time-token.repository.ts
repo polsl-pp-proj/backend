@@ -5,6 +5,7 @@ import { UserRepository } from 'src/modules/user/repositories/user.repository';
 import { Repository, DataSource, EntityManager } from 'typeorm';
 import { OneTimeToken } from '../entities/one-time-token.entity';
 import { OneTimeTokenType } from '../enums/one-time-token-type.enum';
+import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
 
 @Injectable()
 export class OneTimeTokenRepository extends Repository<OneTimeToken> {
@@ -33,16 +34,21 @@ export class OneTimeTokenRepository extends Repository<OneTimeToken> {
             const user = await userRepository.findOne({
                 where: { emailAddress },
             });
-            const oneTimeToken = oneTimeTokenRepository.create({
-                expiry,
-                isActive: true,
-                type,
-                user,
-                userId: user.id,
-                uuid: randomUUID(),
-            });
-            await oneTimeTokenRepository.save(oneTimeToken);
-            return oneTimeToken.uuid;
+            if (user) {
+                const oneTimeToken = oneTimeTokenRepository.create({
+                    expiry,
+                    isActive: true,
+                    type,
+                    user,
+                    userId: user.id,
+                    uuid: randomUUID(),
+                });
+                await oneTimeTokenRepository.save(oneTimeToken);
+                return oneTimeToken.uuid;
+            }
+            throw new RecordNotFoundException(
+                'user_with_email_address_does_not_exist',
+            );
         });
     }
 }

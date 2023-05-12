@@ -96,6 +96,7 @@ export class CredentialRepository extends Repository<Credential> {
                 await credentialRepository.updateCredential(
                     tokenEntry.userId,
                     newCredential,
+                    credentialType,
                 );
                 await oneTimeTokenRepository.save({
                     id: tokenEntry.id,

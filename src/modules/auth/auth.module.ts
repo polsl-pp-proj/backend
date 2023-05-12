@@ -22,6 +22,8 @@ import { SignupController } from './controllers/signup/signup.controller';
 import { SignupService } from './services/signup/signup.service';
 import { ISignupService } from 'src/interfaces/signup.service.interface';
 import { SignupRepository } from './repositories/signup.repository';
+import { OneTimeTokenService } from './services/one-time-token/one-time-token.service';
+import { IOneTimeTokenService } from 'src/interfaces/one-time-token.service.interface';
 
 @Module({
     imports: [
@@ -45,6 +47,7 @@ import { SignupRepository } from './repositories/signup.repository';
         CredentialRepository,
         SignupRepository,
         { provide: ISignupService, useClass: SignupService },
+        { provide: IOneTimeTokenService, useClass: OneTimeTokenService },
     ],
 })
 export class AuthModule {}

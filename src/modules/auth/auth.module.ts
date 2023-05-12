@@ -24,6 +24,7 @@ import { ISignupService } from 'src/interfaces/signup.service.interface';
 import { SignupRepository } from './repositories/signup.repository';
 import { OneTimeTokenService } from './services/one-time-token/one-time-token.service';
 import { IOneTimeTokenService } from 'src/interfaces/one-time-token.service.interface';
+import { OneTimeTokenRepository } from './repositories/one-time-token.repository';
 
 @Module({
     imports: [
@@ -47,6 +48,7 @@ import { IOneTimeTokenService } from 'src/interfaces/one-time-token.service.inte
         CredentialRepository,
         SignupRepository,
         { provide: ISignupService, useClass: SignupService },
+        OneTimeTokenRepository,
         { provide: IOneTimeTokenService, useClass: OneTimeTokenService },
     ],
 })

@@ -14,23 +14,23 @@ export class SignupService implements ISignupService {
         private readonly signupMailerService: SignupMailerService,
     ) {}
 
-    async signup(signupDto: SignupDto): Promise<string> {
+    async signup(signupDto: SignupDto): Promise<void> {
         const hashedPassword = await this.passwordService.createPasswordHash(
             signupDto.password,
         );
 
         try {
-            const accountActivationToken = await this.signupRepository.signup(
+            const { token } = await this.signupRepository.signup(
                 signupDto,
                 hashedPassword,
             );
 
             await this.signupMailerService.sendConfirmSignupMail({
                 ...signupDto,
-                accountActivationToken,
+                accountActivationToken: token,
             });
 
-            return accountActivationToken;
+            return;
         } catch (ex) {
             if (ex instanceof UniqueConstraintViolationException) {
                 throw new ConflictException(ex.message);

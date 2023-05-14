@@ -43,7 +43,7 @@ export abstract class IAuthService {
      *
      * @param emailAddress User's email address
      */
-    abstract requestPasswordReset(emailAddress: string): Promise<string>;
+    abstract requestPasswordReset(emailAddress: string): Promise<void>;
 
     /**
      * Sets new password for User

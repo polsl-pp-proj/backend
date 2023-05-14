@@ -9,7 +9,6 @@ import {
 } from '@nestjs/common';
 import { validationConfig } from 'src/configs/validation.config';
 import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
-import { base64UrlEncode } from 'src/helpers/base64url.helper';
 import { EmailTokenParamsDto } from '../../dtos/email-token-params.dto';
 import { SignupDto } from '../../dtos/signup.dto';
 import { ISignupService } from 'src/interfaces/signup.service.interface';
@@ -22,11 +21,8 @@ export class SignupController {
     async signup(
         @Body(new ValidationPipe(validationConfig)) signupDto: SignupDto,
     ) {
-        const uuid = await this.signupService.signup(signupDto);
-        // TODO: remove return
-        return {
-            tempToken: `/${base64UrlEncode(signupDto.emailAddress)}/${uuid}`,
-        };
+        await this.signupService.signup(signupDto);
+        return;
     }
 
     @Patch('confirm/:emailAddress/:oneTimeToken')

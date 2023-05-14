@@ -25,7 +25,9 @@ export abstract class IPasswordService {
      *
      * @param emailAddress user's email address
      */
-    abstract requestPasswordReset(emailAddress: string): Promise<string>;
+    abstract requestPasswordReset(
+        emailAddress: string,
+    ): Promise<{ token: string; user: User }>;
 
     /**
      * Sets new password for authorized user.

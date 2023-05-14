@@ -5,9 +5,8 @@ export abstract class ISignupService {
      * Creates User and their related Credential.
      *
      * @param signupDto DTO with data of user to create
-     * @returns UUID of account activation OneTimeToken
      */
-    abstract signup(signupDto: SignupDto): Promise<string>;
+    abstract signup(signupDto: SignupDto): Promise<void>;
 
     /**
      * Confirms signup and activates account.

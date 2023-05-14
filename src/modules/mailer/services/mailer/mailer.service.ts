@@ -11,4 +11,8 @@ export class MailerService {
     async sendMail(sendMailOptions: ISendMailOptions) {
         return await this.mailerService.sendMail(sendMailOptions);
     }
+
+    getEmailAddress(emailName: string) {
+        return `${emailName}@${process.env['MAIL_VISIBLE_DOMAIN']}`;
+    }
 }

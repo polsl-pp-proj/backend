@@ -1,4 +1,5 @@
 import { OneTimeTokenType } from 'src/modules/auth/enums/one-time-token-type.enum';
+import { User } from 'src/modules/user/entities/user.entity';
 
 export abstract class IOneTimeTokenService {
     /**
@@ -10,5 +11,5 @@ export abstract class IOneTimeTokenService {
     abstract generateOneTimeToken(
         emailAddress: string,
         type: OneTimeTokenType,
-    ): Promise<string>;
+    ): Promise<{ token: string; user: User }>;
 }

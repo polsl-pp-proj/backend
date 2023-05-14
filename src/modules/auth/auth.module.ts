@@ -25,6 +25,7 @@ import { SignupRepository } from './repositories/signup.repository';
 import { OneTimeTokenService } from './services/one-time-token/one-time-token.service';
 import { IOneTimeTokenService } from 'src/interfaces/one-time-token.service.interface';
 import { OneTimeTokenRepository } from './repositories/one-time-token.repository';
+import { AuthMailerModule } from './modules/auth-mailer/auth-mailer.module';
 import { SignupMailerModule } from './modules/signup-mailer/signup-mailer.module';
 
 @Module({
@@ -36,6 +37,7 @@ import { SignupMailerModule } from './modules/signup-mailer/signup-mailer.module
             OneTimeToken,
         ]),
         JwtModule.register(jwtModuleConfig),
+        AuthMailerModule,
         SignupMailerModule,
     ],
     controllers: [AuthController, SignupController],

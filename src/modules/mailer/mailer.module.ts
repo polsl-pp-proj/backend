@@ -19,5 +19,6 @@ import { MailerService } from './services/mailer/mailer.service';
         }),
     ],
     providers: [MailerService],
+    exports: [MailerService],
 })
 export class MailerModule {}

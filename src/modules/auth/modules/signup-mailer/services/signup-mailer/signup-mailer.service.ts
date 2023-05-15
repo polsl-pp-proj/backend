@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { MailerService } from 'src/modules/mailer/services/mailer/mailer.service';
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 import { base64UrlEncode } from 'src/helpers/base64url.helper';
 dotenv.config();
 

@@ -13,6 +13,8 @@ import { validationConfig } from 'src/configs/validation.config';
 import { CreateOrganizationDto } from '../dtos/create-organization.dto';
 import { AddMemberDto } from '../dtos/add-member.dto';
 import { IOrganizationService } from '../interfaces/organization.service.intarface';
+import { AuthTokenPayload } from 'src/modules/auth/decorators/param/user.decorator';
+import { AuthTokenPayloadDto } from 'src/modules/auth/dtos/auth-token-payload.dto';
 
 @Controller({ path: 'org', version: '1' })
 export class OrganizationControllerController {
@@ -33,25 +35,30 @@ export class OrganizationControllerController {
 
     @Post()
     async createOrganization(
+        @AuthTokenPayload() organizationOwner: AuthTokenPayloadDto,
         @Body(new ValidationPipe(validationConfig))
         createOrganizationDto: CreateOrganizationDto,
     ): Promise<void> {
         await this.organizationService.createOrganization(
+            organizationOwner,
             createOrganizationDto,
         );
     }
 
-    @Post('member')
+    @Post('member/:organizationId')
     async addOrganizationMembers(
-        @Body(new ValidationPipe(validationConfig)) addMemberDto: AddMemberDto,
+        @Param('organizationId', ParseIntPipe) organizationId: number,
+        @Body(new ValidationPipe(validationConfig))
+        addMemberDto: AddMemberDto[],
     ): Promise<void> {
-        await this.organizationService.addMembers(addMemberDto);
+        await this.organizationService.addMembers(organizationId, addMemberDto);
     }
 
-    @Delete(':memberId')
+    @Delete('member/:organizationId')
     async deleteOrganizationMember(
-        @Param('memberId', ParseIntPipe) memberId: number,
+        @Param('organizationId', ParseIntPipe) organizationId: number,
+        @Body(new ValidationPipe(validationConfig)) memberId: number,
     ): Promise<void> {
-        await this.organizationService.deleteMember(memberId);
+        await this.organizationService.deleteMember(organizationId, memberId);
     }
 }

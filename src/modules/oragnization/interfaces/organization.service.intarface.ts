@@ -1,3 +1,4 @@
+import { AuthTokenPayloadDto } from 'src/modules/auth/dtos/auth-token-payload.dto';
 import { AddMemberDto } from '../dtos/add-member.dto';
 import { CreateOrganizationDto } from '../dtos/create-organization.dto';
 import { OrganizationDto } from '../dtos/organization.dto';
@@ -24,6 +25,7 @@ export abstract class IOrganizationService {
      * @param createOrganizationDto New organization data
      */
     abstract createOrganization(
+        organizationOwner: AuthTokenPayloadDto,
         createOrganizationDto: CreateOrganizationDto,
     ): Promise<void>;
 
@@ -32,12 +34,18 @@ export abstract class IOrganizationService {
      *
      * @param usersIds Ids of users to add to the organization
      */
-    abstract addMembers(addMemberDto: AddMemberDto): Promise<void>;
+    abstract addMembers(
+        organizationId: number,
+        addMemberDto: AddMemberDto[],
+    ): Promise<void>;
 
     /**
      * Deletes memeber from organization
      *
      * @param memberId Id of the organization member to delete
      */
-    abstract deleteMember(memberId: number): Promise<void>;
+    abstract deleteMember(
+        organizationId: number,
+        memberId: number,
+    ): Promise<void>;
 }

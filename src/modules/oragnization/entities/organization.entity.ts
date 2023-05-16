@@ -1,10 +1,4 @@
-import {
-    Column,
-    Entity,
-    OneToMany,
-    PrimaryGeneratedColumn,
-    Unique,
-} from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { OrganizationUser } from './organization-user.entity';
 
 @Entity({ name: 'organizations' })

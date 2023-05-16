@@ -1,7 +1,9 @@
 import { AuthTokenPayloadDto } from 'src/modules/auth/dtos/auth-token-payload.dto';
-import { AddMemberDto } from '../dtos/add-member.dto';
-import { CreateOrganizationDto } from '../dtos/create-organization.dto';
-import { OrganizationDto } from '../dtos/organization.dto';
+import { MemberDto } from '../modules/oragnization/dtos/member.dto';
+import { CreateOrganizationDto } from '../modules/oragnization/dtos/create-organization.dto';
+import { OrganizationDto } from '../modules/oragnization/dtos/organization.dto';
+import { AddMembersDto } from '../modules/oragnization/dtos/add-members.dto';
+import { RemoveMembersDto } from '../modules/oragnization/dtos/remove-members.dto';
 
 export abstract class IOrganizationService {
     /**
@@ -25,7 +27,7 @@ export abstract class IOrganizationService {
      * @param createOrganizationDto New organization data
      */
     abstract createOrganization(
-        organizationOwner: AuthTokenPayloadDto,
+        organizationOwnerId: number,
         createOrganizationDto: CreateOrganizationDto,
     ): Promise<void>;
 
@@ -35,8 +37,9 @@ export abstract class IOrganizationService {
      * @param usersIds Ids of users to add to the organization
      */
     abstract addMembers(
+        userId: number,
         organizationId: number,
-        addMemberDto: AddMemberDto[],
+        addMembersDto: AddMembersDto,
     ): Promise<void>;
 
     /**
@@ -44,8 +47,9 @@ export abstract class IOrganizationService {
      *
      * @param memberId Id of the organization member to delete
      */
-    abstract deleteMember(
+    abstract removeMembers(
+        userId: number,
         organizationId: number,
-        memberId: number,
+        removeMembersDto: RemoveMembersDto,
     ): Promise<void>;
 }

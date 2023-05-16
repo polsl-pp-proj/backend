@@ -156,6 +156,6 @@ export class OrganizationRepository extends Repository<Organization> {
             where: { userId, organizationId },
             relations: { organization: { organizationUsers: true } },
         });
-        return organizationMember.organization;
+        return organizationMember?.organization;
     }
 }

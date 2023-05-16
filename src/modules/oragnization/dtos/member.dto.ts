@@ -9,7 +9,7 @@ import {
 } from 'class-validator';
 import { OrganizationMemberRole } from '../enums/organization-member-role.enum';
 
-export class AddMemberDto {
+export class MemberDto {
     @IsNotEmpty({ message: 'not_defined' })
     @IsEmail({}, { message: 'not_an_emial_or_empty' })
     emailAddress: string;

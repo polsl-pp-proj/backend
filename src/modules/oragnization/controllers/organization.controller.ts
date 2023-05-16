@@ -4,6 +4,7 @@ import {
     Delete,
     ForbiddenException,
     Get,
+    NotFoundException,
     NotImplementedException,
     Param,
     ParseIntPipe,
@@ -20,6 +21,7 @@ import { AuthTokenPayloadDto } from 'src/modules/auth/dtos/auth-token-payload.dt
 import { AddMembersDto } from '../dtos/add-members.dto';
 import { RemoveMembersDto } from '../dtos/remove-members.dto';
 import { AuthTokenGuard } from 'src/modules/auth/guards/auth-token.guard';
+import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
 
 @Controller({ path: 'organization', version: '1' })
 export class OrganizationController {
@@ -43,19 +45,33 @@ export class OrganizationController {
         @AuthTokenPayload() user: AuthTokenPayloadDto,
         @Param('organizationId', ParseIntPipe) organizationId: number,
     ): Promise<OrganizationDto> {
-        return await this.organizationService.getFullOrganizationById(
-            user.userId,
-            organizationId,
-        );
+        try {
+            return await this.organizationService.getFullOrganizationById(
+                user.userId,
+                organizationId,
+            );
+        } catch (ex) {
+            if (ex instanceof RecordNotFoundException) {
+                throw new NotFoundException(ex.message);
+            }
+            throw ex;
+        }
     }
 
     @Get(':organizationId')
     async getOrganizationById(
         @Param('organizationId', ParseIntPipe) organizationId: number,
     ): Promise<OrganizationDto> {
-        return await this.organizationService.getOrganizationById(
-            organizationId,
-        );
+        try {
+            return await this.organizationService.getOrganizationById(
+                organizationId,
+            );
+        } catch (ex) {
+            if (ex instanceof RecordNotFoundException) {
+                throw new NotFoundException(ex.message);
+            }
+            throw ex;
+        }
     }
 
     @Post()
@@ -83,11 +99,18 @@ export class OrganizationController {
         @Body(new ValidationPipe(validationConfig))
         addMembersDto: AddMembersDto,
     ): Promise<void> {
-        await this.organizationService.addMembers(
-            user.userId,
-            organizationId,
-            addMembersDto,
-        );
+        try {
+            await this.organizationService.addMembers(
+                user.userId,
+                organizationId,
+                addMembersDto,
+            );
+        } catch (ex) {
+            if (ex instanceof RecordNotFoundException) {
+                throw new NotFoundException(ex.message);
+            }
+            throw ex;
+        }
     }
 
     @Delete(':organizationId/member')
@@ -98,10 +121,17 @@ export class OrganizationController {
         @Body(new ValidationPipe(validationConfig))
         removeMembersDto: RemoveMembersDto,
     ): Promise<void> {
-        await this.organizationService.removeMembers(
-            user.userId,
-            organizationId,
-            removeMembersDto,
-        );
+        try {
+            await this.organizationService.removeMembers(
+                user.userId,
+                organizationId,
+                removeMembersDto,
+            );
+        } catch (ex) {
+            if (ex instanceof RecordNotFoundException) {
+                throw new NotFoundException(ex.message);
+            }
+            throw ex;
+        }
     }
 }

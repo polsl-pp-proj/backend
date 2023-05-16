@@ -128,7 +128,19 @@ export class OrganizationRepository extends Repository<Organization> {
         });
     }
 
-    async deleteMember(organizationId: number, memberId: number) {
-        // To implement
+    async deleteMember(organizationId: number, memberIds: number[]) {
+        const organizationUserRepository = new OrganizationUserRepository(
+            this.entityManager.connection,
+            this.entityManager,
+        );
+
+        const deleteMembersPromise = memberIds.map((memberId) => {
+            return organizationUserRepository.delete({
+                userId: memberId,
+                organizationId: organizationId,
+            });
+        });
+
+        await Promise.all(deleteMembersPromise);
     }
 }

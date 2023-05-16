@@ -44,7 +44,9 @@ export class PasswordService implements IPasswordService {
         );
     }
 
-    async requestPasswordReset(emailAddress: string): Promise<string> {
+    async requestPasswordReset(
+        emailAddress: string,
+    ): Promise<{ token: string; user: User }> {
         return await this.oneTimeTokenService.generateOneTimeToken(
             emailAddress,
             OneTimeTokenType.PasswordReset,

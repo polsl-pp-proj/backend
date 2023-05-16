@@ -6,6 +6,7 @@ import { Repository, DataSource, EntityManager } from 'typeorm';
 import { OneTimeToken } from '../entities/one-time-token.entity';
 import { OneTimeTokenType } from '../enums/one-time-token-type.enum';
 import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
+import { User } from 'src/modules/user/entities/user.entity';
 
 @Injectable()
 export class OneTimeTokenRepository extends Repository<OneTimeToken> {
@@ -20,7 +21,7 @@ export class OneTimeTokenRepository extends Repository<OneTimeToken> {
         emailAddress: string,
         type: OneTimeTokenType,
         expiry: Date,
-    ): Promise<string> {
+    ): Promise<{ token: string; user: User }> {
         return await this.manager.transaction(async (manager) => {
             const oneTimeTokenRepository = new OneTimeTokenRepository(
                 manager.connection,
@@ -44,7 +45,7 @@ export class OneTimeTokenRepository extends Repository<OneTimeToken> {
                     uuid: randomUUID(),
                 });
                 await oneTimeTokenRepository.save(oneTimeToken);
-                return oneTimeToken.uuid;
+                return { token: oneTimeToken.uuid, user };
             }
             throw new RecordNotFoundException(
                 'user_with_email_address_does_not_exist',

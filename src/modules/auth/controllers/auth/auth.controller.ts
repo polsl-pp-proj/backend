@@ -72,15 +72,9 @@ export class AuthController {
         @Body(new ValidationPipe(validationConfig))
         { emailAddress }: RequestPasswordResetDto,
     ) {
-        // TODO: after mailer is implemented,
-        //       swap object returns with void returns
         try {
-            const uuid = await this.authService.requestPasswordReset(
-                emailAddress,
-            );
-            return {
-                tempToken: `/${base64UrlEncode(emailAddress)}/${uuid}`,
-            };
+            await this.authService.requestPasswordReset(emailAddress);
+            return;
         } catch (ex) {
             if (ex instanceof RecordNotFoundException) {
                 return {

@@ -88,6 +88,7 @@ export class SignupRepository {
                     expiry: MoreThan(new Date()),
                     type: OneTimeTokenType.Signup,
                 },
+                relations: { user: true },
             });
             if (tokenEntry) {
                 await userRepository.save({
@@ -98,7 +99,7 @@ export class SignupRepository {
                     id: tokenEntry.id,
                     isActive: false,
                 });
-                return;
+                return tokenEntry.user;
             }
             throw new NotFoundException(
                 'invalid_token_or_email_address_provided',

@@ -4,27 +4,33 @@ import { SignupDto } from '../../dtos/signup.dto';
 import { IPasswordService } from 'src/interfaces/password.service.interface';
 import { UniqueConstraintViolationException } from 'src/exceptions/unique-constraint-violation.exception';
 import { SignupRepository } from '../../repositories/signup.repository';
+import { SignupMailerService } from '../../modules/signup-mailer/services/signup-mailer/signup-mailer.service';
 
 @Injectable()
 export class SignupService implements ISignupService {
     constructor(
         private readonly signupRepository: SignupRepository,
         private readonly passwordService: IPasswordService,
+        private readonly signupMailerService: SignupMailerService,
     ) {}
 
-    async signup(signupDto: SignupDto): Promise<string> {
+    async signup(signupDto: SignupDto): Promise<void> {
         const hashedPassword = await this.passwordService.createPasswordHash(
             signupDto.password,
         );
 
         try {
-            const accountActivationToken = await this.signupRepository.signup(
+            const { token } = await this.signupRepository.signup(
                 signupDto,
                 hashedPassword,
             );
-            // TODO: send signup confirmation email
 
-            return accountActivationToken;
+            await this.signupMailerService.sendConfirmSignupMail({
+                ...signupDto,
+                accountActivationToken: token,
+            });
+
+            return;
         } catch (ex) {
             if (ex instanceof UniqueConstraintViolationException) {
                 throw new ConflictException(ex.message);
@@ -37,6 +43,10 @@ export class SignupService implements ISignupService {
         emailAddress: string,
         oneTimeToken: string,
     ): Promise<void> {
-        await this.signupRepository.confirmSingup(emailAddress, oneTimeToken);
+        const user = await this.signupRepository.confirmSingup(
+            emailAddress,
+            oneTimeToken,
+        );
+        await this.signupMailerService.sendSignupConfirmedMail(user);
     }
 }

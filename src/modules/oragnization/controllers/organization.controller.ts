@@ -4,6 +4,7 @@ import {
     Delete,
     ForbiddenException,
     Get,
+    NotImplementedException,
     Param,
     ParseIntPipe,
     Post,
@@ -26,6 +27,26 @@ export class OrganizationController {
     @Get()
     async getAllOrganizations(): Promise<OrganizationDto[]> {
         return await this.organizationService.getAllOrganizations();
+    }
+
+    @Get('own')
+    @UseGuards(AuthTokenGuard)
+    async getOwnOrganizations(
+        @AuthTokenPayload() user: AuthTokenPayloadDto,
+    ): Promise<OrganizationDto> {
+        throw new NotImplementedException();
+    }
+
+    @Get(':organizationId/full')
+    @UseGuards(AuthTokenGuard)
+    async getOwnOrganizationById(
+        @AuthTokenPayload() user: AuthTokenPayloadDto,
+        @Param('organizationId', ParseIntPipe) organizationId: number,
+    ): Promise<OrganizationDto> {
+        return await this.organizationService.getFullOrganizationById(
+            user.userId,
+            organizationId,
+        );
     }
 
     @Get(':organizationId')

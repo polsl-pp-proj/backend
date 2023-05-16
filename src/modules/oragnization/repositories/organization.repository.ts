@@ -31,10 +31,6 @@ export class OrganizationRepository extends Repository<Organization> {
                 entityManager.connection,
                 entityManager,
             );
-            const userRepository = new UserRepository(
-                entityManager.connection,
-                entityManager,
-            );
 
             const newOrganization = organizationRepository.create({
                 name: createOrganizationDto.name,
@@ -58,10 +54,6 @@ export class OrganizationRepository extends Repository<Organization> {
         addMemberDto: MemberDto[],
     ) {
         await this.entityManager.transaction(async (entityManager) => {
-            const organizationRepository = new OrganizationRepository(
-                entityManager.connection,
-                entityManager,
-            );
             const organizationUserRepository = new OrganizationUserRepository(
                 entityManager.connection,
                 entityManager,
@@ -150,5 +142,20 @@ export class OrganizationRepository extends Repository<Organization> {
         });
 
         await Promise.all(deleteMembersPromise);
+    }
+
+    async getOrganizationWithUsersContainingUser(
+        userId: number,
+        organizationId: number,
+    ) {
+        const organizationUserRepository = new OrganizationUserRepository(
+            this.dataSource,
+            this.entityManager,
+        );
+        const organizationMember = await organizationUserRepository.findOne({
+            where: { userId, organizationId },
+            relations: { organization: { organizationUsers: true } },
+        });
+        return organizationMember.organization;
     }
 }

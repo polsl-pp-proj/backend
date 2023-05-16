@@ -4,8 +4,8 @@ import { OrganizationDto } from '../dtos/organization.dto';
 import { convertOrganizationToOrganizationDto } from '../helpers/organization-to-organization-dto.helper';
 import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
 import { CreateOrganizationDto } from '../dtos/create-organization.dto';
-import { AddMemberDto } from '../dtos/add-member.dto';
-import { AuthTokenPayloadDto } from 'src/modules/auth/dtos/auth-token-payload.dto';
+import { MemberDto } from '../dtos/member.dto';
+import { RemoveMembersDto } from '../dtos/remove-members.dto';
 
 @Injectable()
 export class OrganizationService {
@@ -36,22 +36,36 @@ export class OrganizationService {
     }
 
     async createOrganization(
-        organizationOwner: AuthTokenPayloadDto,
+        organizationOwnerId: number,
         createOrganizationDto: CreateOrganizationDto,
     ) {
-        this.organizationRepository.createOrganization(
-            organizationOwner,
+        await this.organizationRepository.createOrganization(
+            organizationOwnerId,
             createOrganizationDto,
         );
     }
 
     async addMembers(
+        userId: number,
         organizationId: number,
-        addMemberDto: AddMemberDto,
-    ): Promise<void> {}
+        addMemberDto: MemberDto[],
+    ): Promise<void> {
+        await this.organizationRepository.addMembers(
+            userId,
+            organizationId,
+            addMemberDto,
+        );
+    }
 
-    async deleteMember(
+    async removeMembers(
+        userId: number,
         organizationId: number,
-        memberId: number,
-    ): Promise<void> {}
+        removeMembersDto: RemoveMembersDto,
+    ): Promise<void> {
+        await this.organizationRepository.removeMembers(
+            userId,
+            organizationId,
+            removeMembersDto.memberIds,
+        );
+    }
 }

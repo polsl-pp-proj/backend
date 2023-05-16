@@ -2,22 +2,26 @@ import {
     Body,
     Controller,
     Delete,
+    ForbiddenException,
     Get,
     Param,
     ParseIntPipe,
     Post,
+    UseGuards,
     ValidationPipe,
 } from '@nestjs/common';
 import { OrganizationDto } from '../dtos/organization.dto';
 import { validationConfig } from 'src/configs/validation.config';
 import { CreateOrganizationDto } from '../dtos/create-organization.dto';
-import { AddMemberDto } from '../dtos/add-member.dto';
-import { IOrganizationService } from '../interfaces/organization.service.intarface';
+import { IOrganizationService } from '../../../interfaces/organization.service.interface';
 import { AuthTokenPayload } from 'src/modules/auth/decorators/param/user.decorator';
 import { AuthTokenPayloadDto } from 'src/modules/auth/dtos/auth-token-payload.dto';
+import { AddMembersDto } from '../dtos/add-members.dto';
+import { RemoveMembersDto } from '../dtos/remove-members.dto';
+import { AuthTokenGuard } from 'src/modules/auth/guards/auth-token.guard';
 
-@Controller({ path: 'org', version: '1' })
-export class OrganizationControllerController {
+@Controller({ path: 'organization', version: '1' })
+export class OrganizationController {
     constructor(private readonly organizationService: IOrganizationService) {}
     @Get()
     async getAllOrganizations(): Promise<OrganizationDto[]> {
@@ -34,31 +38,49 @@ export class OrganizationControllerController {
     }
 
     @Post()
+    @UseGuards(AuthTokenGuard)
     async createOrganization(
-        @AuthTokenPayload() organizationOwner: AuthTokenPayloadDto,
+        @AuthTokenPayload() user: AuthTokenPayloadDto,
         @Body(new ValidationPipe(validationConfig))
         createOrganizationDto: CreateOrganizationDto,
     ): Promise<void> {
-        await this.organizationService.createOrganization(
-            organizationOwner,
-            createOrganizationDto,
+        if (user.isVerifiedStudent) {
+            await this.organizationService.createOrganization(
+                user.userId,
+                createOrganizationDto,
+            );
+            return;
+        }
+        throw new ForbiddenException('user_not_student');
+    }
+
+    @Post(':organizationId/member')
+    @UseGuards(AuthTokenGuard)
+    async addOrganizationMembers(
+        @AuthTokenPayload() user: AuthTokenPayloadDto,
+        @Param('organizationId', ParseIntPipe) organizationId: number,
+        @Body(new ValidationPipe(validationConfig))
+        addMembersDto: AddMembersDto,
+    ): Promise<void> {
+        await this.organizationService.addMembers(
+            user.userId,
+            organizationId,
+            addMembersDto,
         );
     }
 
-    @Post('member/:organizationId')
-    async addOrganizationMembers(
+    @Delete(':organizationId/member')
+    @UseGuards(AuthTokenGuard)
+    async deleteOrganizationMembers(
+        @AuthTokenPayload() user: AuthTokenPayloadDto,
         @Param('organizationId', ParseIntPipe) organizationId: number,
         @Body(new ValidationPipe(validationConfig))
-        addMemberDto: AddMemberDto[],
+        removeMembersDto: RemoveMembersDto,
     ): Promise<void> {
-        await this.organizationService.addMembers(organizationId, addMemberDto);
-    }
-
-    @Delete('member/:organizationId')
-    async deleteOrganizationMember(
-        @Param('organizationId', ParseIntPipe) organizationId: number,
-        @Body(new ValidationPipe(validationConfig)) memberId: number,
-    ): Promise<void> {
-        await this.organizationService.deleteMember(organizationId, memberId);
+        await this.organizationService.removeMembers(
+            user.userId,
+            organizationId,
+            removeMembersDto,
+        );
     }
 }

@@ -6,9 +6,8 @@ import { CreateOrganizationDto } from '../dtos/create-organization.dto';
 import { OrganizationUserRepository } from './organization-user.repository';
 import { UserRepository } from 'src/modules/user/repositories/user.repository';
 import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
-import { AuthTokenPayloadDto } from 'src/modules/auth/dtos/auth-token-payload.dto';
 import { OrganizationMemberRole } from '../enums/organization-member-role.enum';
-import { AddMemberDto } from '../dtos/add-member.dto';
+import { MemberDto } from '../dtos/member.dto';
 
 @Injectable()
 export class OrganizationRepository extends Repository<Organization> {
@@ -20,7 +19,7 @@ export class OrganizationRepository extends Repository<Organization> {
     }
 
     async createOrganization(
-        organizationOwner: AuthTokenPayloadDto,
+        organizationOwnerId: number,
         createOrganizationDto: CreateOrganizationDto,
     ) {
         await this.entityManager.transaction(async (entityManager) => {
@@ -42,40 +41,22 @@ export class OrganizationRepository extends Repository<Organization> {
             });
             await organizationRepository.save(newOrganization);
 
-            //Add organization owner to members
-            const members = createOrganizationDto.members;
-            members.push({
-                emailAddress: organizationOwner.emailAddress,
-                memberRole: OrganizationMemberRole.Owner,
+            const ownerMember = organizationUserRepository.create({
+                organizationId: newOrganization.id,
+                organization: newOrganization,
+                userId: organizationOwnerId,
+                user: { id: organizationOwnerId },
+                role: OrganizationMemberRole.Owner,
             });
-
-            const organizationUsersPromise = members.map(async (member) => {
-                const user = await userRepository.findOne({
-                    where: { emailAddress: member.emailAddress },
-                });
-
-                if (!user) {
-                    throw new RecordNotFoundException(
-                        'user_with_email_address_not_found',
-                    );
-                }
-
-                return organizationUserRepository.create({
-                    organizationId: newOrganization.id,
-                    organization: newOrganization,
-                    userId: user.id,
-                    user,
-                });
-            });
-
-            const organizationUsers = await Promise.all(
-                organizationUsersPromise,
-            );
-            await organizationUserRepository.save(organizationUsers);
+            await organizationUserRepository.save(ownerMember);
         });
     }
 
-    async addMembers(organizationId: number, addMemberDto: AddMemberDto[]) {
+    async addMembers(
+        userId: number,
+        organizationId: number,
+        addMemberDto: MemberDto[],
+    ) {
         await this.entityManager.transaction(async (entityManager) => {
             const organizationRepository = new OrganizationRepository(
                 entityManager.connection,
@@ -90,13 +71,19 @@ export class OrganizationRepository extends Repository<Organization> {
                 entityManager,
             );
 
-            const organization = await organizationRepository.findOne({
-                where: { id: organizationId },
-            });
+            const organizationOwnerMember =
+                await organizationUserRepository.findOne({
+                    where: {
+                        organizationId,
+                        userId,
+                        role: OrganizationMemberRole.Owner,
+                    },
+                    relations: { organization: true },
+                });
 
-            if (!organization) {
+            if (!organizationOwnerMember) {
                 throw new RecordNotFoundException(
-                    'organization_with_id_not_found',
+                    'organization_with_owner_and_id_not_found',
                 );
             }
 
@@ -114,9 +101,10 @@ export class OrganizationRepository extends Repository<Organization> {
 
                     return organizationUserRepository.create({
                         organizationId,
-                        organization,
+                        organization: organizationOwnerMember.organization,
                         userId: user.id,
                         user,
+                        role: OrganizationMemberRole.Member,
                     });
                 },
             );
@@ -128,16 +116,36 @@ export class OrganizationRepository extends Repository<Organization> {
         });
     }
 
-    async deleteMember(organizationId: number, memberIds: number[]) {
+    async removeMembers(
+        userId: number,
+        organizationId: number,
+        memberIds: number[],
+    ) {
         const organizationUserRepository = new OrganizationUserRepository(
             this.entityManager.connection,
             this.entityManager,
         );
 
+        const organizationOwnerMember =
+            await organizationUserRepository.findOne({
+                where: {
+                    organizationId,
+                    userId,
+                    role: OrganizationMemberRole.Owner,
+                },
+                relations: { organization: true },
+            });
+
+        if (!organizationOwnerMember) {
+            throw new RecordNotFoundException(
+                'organization_with_owner_and_id_not_found',
+            );
+        }
+
         const deleteMembersPromise = memberIds.map((memberId) => {
             return organizationUserRepository.delete({
                 userId: memberId,
-                organizationId: organizationId,
+                organizationId,
             });
         });
 

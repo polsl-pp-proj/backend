@@ -10,7 +10,6 @@ export class Organization {
     name: string;
 
     @OneToMany(() => OrganizationUser, (user) => user.organization, {
-        eager: true,
         cascade: true,
     })
     organizationUsers: OrganizationUser[];

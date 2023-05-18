@@ -1,17 +1,8 @@
-import {
-    IsArray,
-    IsDefined,
-    IsEmpty,
-    IsNumber,
-    IsString,
-    ValidateNested,
-} from 'class-validator';
-import { OrganizationMemberRole } from '../enums/organization-member-role.enum';
-import { MemberDto } from './member.dto';
-import { Type } from 'class-transformer';
+import { IsEmpty, IsString, MaxLength } from 'class-validator';
 
 export class CreateOrganizationDto {
     @IsString({ message: 'not_string' })
     @IsEmpty({ message: 'empty' })
+    @MaxLength(50, { message: 'name_too_long' })
     name: string;
 }

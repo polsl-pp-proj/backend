@@ -1,8 +1,8 @@
-import { CreateOrganizationDto } from '../modules/oragnization/dtos/create-organization.dto';
-import { OrganizationDto } from '../modules/oragnization/dtos/organization.dto';
-import { AddMembersDto } from '../modules/oragnization/dtos/add-members.dto';
-import { RemoveMembersDto } from '../modules/oragnization/dtos/remove-members.dto';
-import { FullOrganizationDto } from 'src/modules/oragnization/dtos/full-organization.dto';
+import { CreateOrganizationDto } from '../modules/organization/dtos/create-organization.dto';
+import { OrganizationDto } from '../modules/organization/dtos/organization.dto';
+import { AddMembersDto } from '../modules/organization/dtos/add-members.dto';
+import { RemoveMembersDto } from '../modules/organization/dtos/remove-members.dto';
+import { FullOrganizationDto } from 'src/modules/organization/dtos/full-organization.dto';
 
 export abstract class IOrganizationService {
     /**

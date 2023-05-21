@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 #deployment action
-      - name: Upload from public_html via FTP
+      - name: Upload repository via FTP
         uses: airvzxf/ftp-deployment-action@latest
         with:
           server:   ${{ secrets.CICD_FTP_SERVER }}
@@ -18,7 +18,7 @@ jobs:
           remote_dir: "./public_nodejs"
           delete: "false"
 #invoke patch request
-      - name: Invoke PATCH request
+      - name: Invoke PATCH request to build and deploy website
         env:
           CICD_API_KEY: ${{ secrets.CICD_API_KEY }}
         run: |

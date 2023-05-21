@@ -22,4 +22,4 @@ jobs:
         env:
           CICD_API_KEY: ${{ secrets.CICD_API_KEY }}
         run: |
-          curl -X PATCH -H "Authorization: Bearer $CICD_API_KEY" ${{ variables.CICD_PROD_URL }}
+          curl -X PATCH -H "Authorization: Bearer $CICD_API_KEY" ${{ vars.CICD_PROD_URL }}

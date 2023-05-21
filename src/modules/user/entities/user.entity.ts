@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { UserRole } from '../enums/user-role.enum';
+import { OrganizationUser } from 'src/modules/oragnization/entities/organization-user.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -34,4 +35,10 @@ export class User {
         name: 'is_active',
     })
     isActive: boolean;
+
+    @OneToMany(
+        () => OrganizationUser,
+        (organizationUser) => organizationUser.user,
+    )
+    userOrganizations: OrganizationUser[];
 }

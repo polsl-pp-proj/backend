@@ -24,7 +24,7 @@ export class PasswordService implements IPasswordService {
                 user: { emailAddress: emailAddress },
                 type: CredentialType.Password,
             },
-            relations: { user: true },
+            relations: { user: { userOrganizations: true } },
         });
 
         if (

@@ -113,35 +113,44 @@ export class OrganizationRepository extends Repository<Organization> {
         organizationId: number,
         memberIds: number[],
     ) {
-        const organizationUserRepository = new OrganizationUserRepository(
-            this.entityManager.connection,
-            this.entityManager,
-        );
-
-        const organizationOwnerMember =
-            await organizationUserRepository.findOne({
-                where: {
-                    organizationId,
-                    userId,
-                    role: OrganizationMemberRole.Owner,
-                },
-                relations: { organization: true },
-            });
-
-        if (!organizationOwnerMember) {
-            throw new RecordNotFoundException(
-                'organization_with_owner_and_id_not_found',
+        this.entityManager.transaction(async (entityManager) => {
+            const organizationUserRepository = new OrganizationUserRepository(
+                entityManager.connection,
+                entityManager,
             );
-        }
 
-        const deleteMembersPromise = memberIds.map((memberId) => {
-            return organizationUserRepository.delete({
-                userId: memberId,
-                organizationId,
+            const organizationOwnerMember =
+                await organizationUserRepository.findOne({
+                    where: {
+                        organizationId,
+                        userId,
+                        role: OrganizationMemberRole.Owner,
+                    },
+                    relations: { organization: true },
+                });
+
+            if (!organizationOwnerMember) {
+                throw new RecordNotFoundException(
+                    'organization_with_owner_and_id_not_found',
+                );
+            }
+
+            const deleteMembersPromise = memberIds.map(async (memberId) => {
+                const deleteResult = await organizationUserRepository.delete({
+                    userId: memberId,
+                    organizationId,
+                });
+
+                if (deleteResult.affected === 0) {
+                    throw new RecordNotFoundException(
+                        `member_with_id_not_found: ${memberId}`,
+                    );
+                }
+                return;
             });
-        });
 
-        await Promise.all(deleteMembersPromise);
+            await Promise.allSettled(deleteMembersPromise);
+        });
     }
 
     async getOrganizationWithUsersContainingUser(

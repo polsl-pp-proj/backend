@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      # Here is the deployment action
+#deployment action
       - name: Upload from public_html via FTP
         uses: airvzxf/ftp-deployment-action@latest
         with:
@@ -17,12 +17,9 @@ jobs:
           password: ${{ secrets.CICD_FTP_PASS_PROD }}
           remote_dir: "./public_nodejs"
           delete: "false"
-          
-  invoke_patch_request:
-    runs-on: ubuntu-latest
-    steps:
+#invoke patch request
       - name: Invoke PATCH request
         env:
           CICD_API_KEY: ${{ secrets.CICD_API_KEY }}
         run: |
-          curl -X PATCH -H "Authorization: Bearer $CICD_API_KEY" ${{ env.CICD_DEV_URL }}
+          curl -X PATCH -H "Authorization: Bearer $CICD_API_KEY" $CICD_PROD_URL

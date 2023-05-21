@@ -12,9 +12,9 @@ export class InitialDatabaseStructure1683372701778
             `CREATE TABLE IF NOT EXISTS public.users
                 (
                     id serial NOT NULL,
-                    email_address character varying NOT NULL,
-                    first_name character varying NOT NULL,
-                    last_name character varying NOT NULL,
+                    email_address character varying(255) NOT NULL,
+                    first_name character varying(100) NOT NULL,
+                    last_name character varying(100) NOT NULL,
                     last_verified_as_student timestamp with time zone DEFAULT NULL,
                     role user_role NOT NULL,
                     is_active boolean NOT NULL DEFAULT false,
@@ -38,7 +38,7 @@ export class InitialDatabaseStructure1683372701778
                 (
                     id serial NOT NULL,
                     project_id integer NOT NULL,
-                    name character varying NOT NULL,
+                    name character varying(100) NOT NULL,
                     description character varying(200) NOT NULL,
                     requirements jsonb NOT NULL DEFAULT '[]',
                     PRIMARY KEY (id)
@@ -74,8 +74,8 @@ export class InitialDatabaseStructure1683372701778
             `CREATE TABLE IF NOT EXISTS public.assets
                 (
                     id serial NOT NULL,
-                    title character varying NOT NULL,
-                    url character varying NOT NULL,
+                    title character varying(100) NOT NULL,
+                    url character varying(255) NOT NULL,
                     type asset_type NOT NULL,
                     PRIMARY KEY (id)
                 )`,
@@ -132,7 +132,7 @@ export class InitialDatabaseStructure1683372701778
             `CREATE TABLE IF NOT EXISTS public.organizations
                 (
                     id serial NOT NULL,
-                    name character varying NOT NULL,
+                    name character varying(50) NOT NULL,
                     PRIMARY KEY (id)
                 )`,
         );
@@ -231,7 +231,7 @@ export class InitialDatabaseStructure1683372701778
                 (
                     id serial NOT NULL,
                     project_draft_id integer NOT NULL,
-                    name character varying NOT NULL,
+                    name character varying(100) NOT NULL,
                     description character varying(200) NOT NULL,
                     requirements jsonb NOT NULL DEFAULT '[]',
                     PRIMARY KEY (id)

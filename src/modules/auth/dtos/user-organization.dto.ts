@@ -1,4 +1,4 @@
-import { OrganizationMemberRole } from 'src/modules/oragnization/enums/organization-member-role.enum';
+import { OrganizationMemberRole } from 'src/modules/organization/enums/organization-member-role.enum';
 
 export class UserOrganizationDto {
     organizationId: number;

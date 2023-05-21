@@ -4,7 +4,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './modules/user/user.module';
 import * as dotenv from 'dotenv';
-import { OrganizationModule } from './modules/oragnization/organization.module';
+import { OrganizationModule } from './modules/organization/organization.module';
 dotenv.config();
 
 @Module({

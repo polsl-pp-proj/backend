@@ -18,7 +18,7 @@ import {
 } from '../../configs/jwt-sign.config';
 import { IssuedRefreshTokenRepository } from '../../repositories/issued-refresh-token.repository';
 import { UserOrganizationDto } from '../../dtos/user-organization.dto';
-import { OrganizationUser } from 'src/modules/oragnization/entities/organization-user.entity';
+import { OrganizationUser } from 'src/modules/organization/entities/organization-user.entity';
 
 const sixMonthsInMs = 13046400;
 

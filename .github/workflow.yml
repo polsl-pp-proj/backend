@@ -1,4 +1,4 @@
-name: Deployment repo files into ftp server
+name: DEV Deployment repo files into ftp server
 on:
   push:
     branches:

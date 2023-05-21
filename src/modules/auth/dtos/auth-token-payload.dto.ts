@@ -1,4 +1,5 @@
 import { UserRole } from 'src/modules/user/enums/user-role.enum';
+import { UserOrganizationDto } from './user-organization.dto';
 
 export class AuthTokenPayloadDto {
     userId: number;
@@ -10,6 +11,7 @@ export class AuthTokenPayloadDto {
     lastVerifiedAsStudent: number | null;
     isVerifiedStudent: boolean;
     isActive: boolean;
+    organizations: UserOrganizationDto[];
 
     constructor(partialAuthTokenPayloadDto: Partial<AuthTokenPayloadDto> = {}) {
         Object.assign(this, partialAuthTokenPayloadDto);

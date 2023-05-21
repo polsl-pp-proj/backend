@@ -17,6 +17,8 @@ import {
     jwtRefreshTokenConfig,
 } from '../../configs/jwt-sign.config';
 import { IssuedRefreshTokenRepository } from '../../repositories/issued-refresh-token.repository';
+import { UserOrganizationDto } from '../../dtos/user-organization.dto';
+import { OrganizationUser } from 'src/modules/oragnization/entities/organization-user.entity';
 
 const sixMonthsInMs = 13046400;
 
@@ -127,7 +129,7 @@ export class AuthTokenService implements IAuthTokenService {
                     expiry: MoreThanOrEqual(new Date()),
                 },
                 relations: {
-                    user: true,
+                    user: { userOrganizations: true },
                 },
             });
         return issuedRefreshToken;
@@ -148,6 +150,14 @@ export class AuthTokenService implements IAuthTokenService {
                 ? user.lastVerifiedAsStudent.valueOf()
                 : null,
             role: user.role,
+            organizations:
+                user.userOrganizations?.map(
+                    (userOrganization) =>
+                        new UserOrganizationDto({
+                            organizationId: userOrganization.organizationId,
+                            role: userOrganization.role,
+                        }),
+                ) ?? [],
         });
     }
 
@@ -160,6 +170,16 @@ export class AuthTokenService implements IAuthTokenService {
             isActive: authTokenPayload.isActive,
             lastVerifiedAsStudent: authTokenPayload.lastVerifiedAsStudent,
             role: authTokenPayload.role,
+            userOrganizations: authTokenPayload.organizations.map(
+                (userOrganization) =>
+                    Object.assign(new OrganizationUser(), {
+                        organization: { id: userOrganization.organizationId },
+                        organizationId: userOrganization.organizationId,
+                        role: userOrganization.role,
+                        user: { id: authTokenPayload.userId },
+                        userId: authTokenPayload.userId,
+                    }),
+            ),
         });
     }
 

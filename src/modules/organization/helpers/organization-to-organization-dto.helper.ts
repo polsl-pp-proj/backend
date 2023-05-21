@@ -17,7 +17,7 @@ export const convertOrganizationToFullOrganizationDto = (
     const organizationMembers = organization.organizationUsers.map(
         (organizationUser) => {
             return {
-                id: organizationUser.id,
+                id: organizationUser.userId,
                 firstName: organizationUser.user.firstName,
                 lastName: organizationUser.user.lastName,
                 emailAddress: organizationUser.user.emailAddress,

@@ -4,7 +4,7 @@ on:
     branches:
      - main
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -17,3 +17,12 @@ jobs:
           password: ${{ secrets.CICD_FTP_PASS_PROD }}
           remote_dir: "./public_nodejs"
           delete: "false"
+          
+  invoke_patch_request:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Invoke PATCH request
+        env:
+          CICD_API_KEY: ${{ secrets.CICD_API_KEY }}
+        run: |
+          curl -X PATCH -H "Authorization: Bearer $CICD_API_KEY" ${{ secrets.CICD_DEV_URL }}

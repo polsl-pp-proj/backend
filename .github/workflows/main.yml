@@ -1,0 +1,25 @@
+name: PROD Deployment repo files into ftp server
+on:
+  push:
+    branches:
+     - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+#deployment action
+      - name: Upload repository via FTP
+        uses: airvzxf/ftp-deployment-action@latest
+        with:
+          server:   ${{ secrets.CICD_FTP_SERVER }}
+          user: ${{ secrets.CICD_FTP_USER_PROD }}
+          password: ${{ secrets.CICD_FTP_PASS_PROD }}
+          remote_dir: "./public_nodejs"
+          delete: "false"
+#invoke patch request
+      - name: Invoke PATCH request to build and deploy website
+        env:
+          CICD_API_KEY: ${{ secrets.CICD_API_KEY }}
+        run: |
+          curl -X PATCH -H "Authorization: Bearer $CICD_API_KEY" ${{ vars.CICD_PROD_URL }}

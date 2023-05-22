@@ -5,7 +5,7 @@ import {
     OneToOne,
     PrimaryGeneratedColumn,
 } from 'typeorm';
-import { ProjectDraft } from './project_draft.entity';
+import { ProjectDraft } from './project-draft.entity';
 
 @Entity({ name: 'projects' })
 export class Project {

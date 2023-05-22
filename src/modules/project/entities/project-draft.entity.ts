@@ -21,6 +21,5 @@ export class ProjectDraft {
     foundingObjectives: string;
 
     // TO DO
-    // Connect to: Category, ProjectDraftOpenPosition,
-    // ProjectDraftSubmission
+    // Connect to: Category, ProjectDraftOpenPosition
 }

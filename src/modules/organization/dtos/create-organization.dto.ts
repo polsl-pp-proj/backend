@@ -1,8 +1,8 @@
-import { IsEmpty, IsString, MaxLength } from 'class-validator';
+import { IsString, MaxLength, MinLength } from 'class-validator';
 
 export class CreateOrganizationDto {
     @IsString({ message: 'not_string' })
-    @IsEmpty({ message: 'empty' })
+    @MinLength(3, { message: 'name_too_short' })
     @MaxLength(50, { message: 'name_too_long' })
     name: string;
 }

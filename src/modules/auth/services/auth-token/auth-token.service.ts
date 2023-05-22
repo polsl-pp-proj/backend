@@ -20,7 +20,7 @@ import { IssuedRefreshTokenRepository } from '../../repositories/issued-refresh-
 import { UserOrganizationDto } from '../../dtos/user-organization.dto';
 import { OrganizationUser } from 'src/modules/organization/entities/organization-user.entity';
 
-const sixMonthsInMs = 13046400;
+const sixMonthsInMs = 13046400000;
 
 @Injectable()
 export class AuthTokenService implements IAuthTokenService {
@@ -143,11 +143,12 @@ export class AuthTokenService implements IAuthTokenService {
             lastName: user.lastName,
             isActive: user.isActive,
             isVerifiedStudent: user.lastVerifiedAsStudent
-                ? user.lastVerifiedAsStudent.valueOf() + sixMonthsInMs >
+                ? new Date(user.lastVerifiedAsStudent).valueOf() +
+                      sixMonthsInMs >
                   new Date().valueOf()
                 : false,
             lastVerifiedAsStudent: user.lastVerifiedAsStudent
-                ? user.lastVerifiedAsStudent.valueOf()
+                ? new Date(user.lastVerifiedAsStudent).valueOf()
                 : null,
             role: user.role,
             organizations:

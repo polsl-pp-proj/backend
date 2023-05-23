@@ -46,6 +46,7 @@ export class SignupDto {
     @IsString({
         message: 'not_string',
     })
+    @MinLength(5, { message: 'too_short' })
     password: string;
 
     @IsDefined({

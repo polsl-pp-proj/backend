@@ -10,9 +10,11 @@ import { CreateOrganizationDto } from '../dtos/create-organization.dto';
 import { MemberDto } from '../dtos/member.dto';
 import { RemoveMembersDto } from '../dtos/remove-members.dto';
 import { FullOrganizationDto } from '../dtos/full-organization.dto';
+import { IOrganizationService } from 'src/interfaces/organization.service.interface';
+import { AddMembersDto } from '../dtos/add-members.dto';
 
 @Injectable()
-export class OrganizationService {
+export class OrganizationService implements IOrganizationService {
     constructor(
         private readonly organizationRepository: OrganizationRepository,
     ) {}
@@ -34,6 +36,16 @@ export class OrganizationService {
         }
 
         return convertOrganizationToOrganizationDto(organization);
+    }
+
+    async getOwnOrganizations(userId: number): Promise<OrganizationDto[]> {
+        return (
+            await this.organizationRepository.getOrganizationsContainingUser(
+                userId,
+            )
+        ).map((organization) =>
+            convertOrganizationToOrganizationDto(organization),
+        );
     }
 
     async getFullOrganizationById(
@@ -66,12 +78,12 @@ export class OrganizationService {
     async addMembers(
         userId: number,
         organizationId: number,
-        addMemberDto: MemberDto[],
+        addMemberDto: AddMembersDto,
     ): Promise<void> {
         await this.organizationRepository.addMembers(
             userId,
             organizationId,
-            addMemberDto,
+            addMemberDto.memebers,
         );
     }
 

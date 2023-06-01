@@ -153,6 +153,20 @@ export class OrganizationRepository extends Repository<Organization> {
         });
     }
 
+    async getOrganizationsContainingUser(userId: number) {
+        const organizationUserRepository = new OrganizationUserRepository(
+            this.dataSource,
+            this.entityManager,
+        );
+        const organizations = await organizationUserRepository.find({
+            where: { userId },
+            relations: { organization: true },
+        });
+        return organizations.map(
+            (organizationUser) => organizationUser.organization,
+        );
+    }
+
     async getOrganizationWithUsersContainingUser(
         userId: number,
         organizationId: number,

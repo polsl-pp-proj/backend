@@ -19,6 +19,7 @@ import { ForeignKeyConstraintViolationException } from 'src/exceptions/foreign-k
 import { StripeEvent } from 'src/decorators/param/stripe-event.decorator';
 import { StripeWebhookGuard } from 'src/modules/auth/guards/stripe-webhook.guard';
 import Stripe from 'stripe';
+import { PreparedProjectDonationDto } from '../../dtos/prepared-project-donation.dto';
 
 @Controller({ path: 'donation', version: '1' })
 export class DonationController {
@@ -51,11 +52,13 @@ export class DonationController {
         prepareProjectDonationDto: PrepareProjectDonationDto,
     ) {
         try {
-            return await this.donationService.prepareProjectDonation(
-                user.userId,
-                projectId,
-                prepareProjectDonationDto,
-            );
+            return new PreparedProjectDonationDto({
+                clientSecret: await this.donationService.prepareProjectDonation(
+                    user.userId,
+                    projectId,
+                    prepareProjectDonationDto,
+                ),
+            });
         } catch (ex) {
             if (
                 ex instanceof RecordNotFoundException ||

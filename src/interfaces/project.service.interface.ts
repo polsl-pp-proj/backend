@@ -1,5 +1,11 @@
-import { ProjectDraftDto } from 'src/modules/project/dtos/project-draft.dto';
-import { ProjectDto } from 'src/modules/project/dtos/project.dto';
+import {
+    ProjectDraftDto,
+    SimpleProjectDraftDto,
+} from 'src/modules/project/dtos/project-draft.dto';
+import {
+    ProjectDto,
+    SimpleProjectDto,
+} from 'src/modules/project/dtos/project.dto';
 import { UploadProjectDto } from 'src/modules/project/dtos/upload-project.dto';
 
 export abstract class IProjectService {
@@ -8,7 +14,17 @@ export abstract class IProjectService {
      *
      * @returns ProjectDto[] all projects
      */
-    abstract getAllProjects(): Promise<ProjectDto[]>;
+    abstract getAllProjects(): Promise<SimpleProjectDto[]>;
+
+    /**
+     * Returns all projects belonging to given organization
+     *
+     * @param organizationId Owner organization ID
+     * @returns SimpleProjectDto[] Organization's projects
+     */
+    abstract getAllOrganizationsProjects(
+        organizationId: number,
+    ): Promise<SimpleProjectDto[]>;
 
     /**
      * Returns project with given ID
@@ -23,7 +39,17 @@ export abstract class IProjectService {
      *
      * @returns ProjectDraftDto[] all projects' drafts
      */
-    abstract getAllDrafts(): Promise<ProjectDraftDto[]>;
+    abstract getAllDrafts(): Promise<SimpleProjectDraftDto[]>;
+
+    /**
+     * Returns all drafts belonging to given organization
+     *
+     * @param organizationId Owner organization ID
+     * @returns SimpleProjectDraftDto[] Organization's drafts
+     */
+    abstract getAllOrganizationsDrafts(
+        organizationId: number,
+    ): Promise<SimpleProjectDraftDto[]>;
 
     /**
      * Returns project draft with given ID

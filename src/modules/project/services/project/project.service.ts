@@ -4,8 +4,8 @@ import { SimpleProjectDto } from '../../dtos/project.dto';
 import { UploadProjectDto } from '../../dtos/upload-project.dto';
 import { ProjectDraftRepository } from '../../repositories/project-draft.repositry';
 import {
-    converProjectDraftToProjectDraftDto,
-    converProjectDraftToSimpleProjectDraftDto,
+    convertProjectDraftToProjectDraftDto,
+    convertProjectDraftToSimpleProjectDraftDto,
 } from '../../helper/project-draft-to-project-draft-dto';
 import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
 
@@ -35,7 +35,7 @@ export class ProjectService {
         });
 
         return drafts.map((draft) => {
-            return converProjectDraftToSimpleProjectDraftDto(
+            return convertProjectDraftToSimpleProjectDraftDto(
                 draft,
                 draft.ownerOrganization.name,
             );
@@ -49,7 +49,7 @@ export class ProjectService {
         });
 
         return drafts.map((draft) => {
-            return converProjectDraftToSimpleProjectDraftDto(
+            return convertProjectDraftToSimpleProjectDraftDto(
                 draft,
                 draft.ownerOrganization.name,
             );
@@ -58,7 +58,7 @@ export class ProjectService {
 
     async getDraftById(draftId: number, userId: number) {
         const draft = await this.projectDraftRepository.getDraftById(draftId);
-        return converProjectDraftToProjectDraftDto(
+        return convertProjectDraftToProjectDraftDto(
             draft,
             draft.ownerOrganization.name,
         );

@@ -4,7 +4,7 @@ import {
 } from '../dtos/project-draft.dto';
 import { ProjectDraft } from '../entities/project-draft.entity';
 
-export const converProjectDraftToProjectDraftDto = (
+export const convertProjectDraftToProjectDraftDto = (
     projectDraft: ProjectDraft,
     organizationName: string,
 ) => {
@@ -19,7 +19,7 @@ export const converProjectDraftToProjectDraftDto = (
     });
 };
 
-export const converProjectDraftToSimpleProjectDraftDto = (
+export const convertProjectDraftToSimpleProjectDraftDto = (
     projectDraft: ProjectDraft,
     organizationName: string,
 ) => {

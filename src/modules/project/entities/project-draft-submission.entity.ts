@@ -14,7 +14,7 @@ export class ProjectDraftSubmission {
     id: number;
 
     @Column({ name: 'project_draft_id' })
-    projecdtDraftId: number;
+    projectDraftId: number;
 
     @ManyToOne(() => ProjectDraft)
     @JoinColumn({ name: 'project_draft_id' })

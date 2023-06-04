@@ -29,7 +29,10 @@ export class ProjectDraft {
     ownerOrganization: Organization;
 
     @Column({ name: 'funding_objectives' })
-    foundingObjectives: string;
+    fundingObjectives: string;
+
+    @Column({ name: 'last_modified' })
+    lastModified: Date;
 
     // TO DO
     // Connect to: Category, ProjectDraftOpenPosition

@@ -7,9 +7,9 @@ import { convertCategoryToCategoryDto } from '../helpers/category-to-category-dt
 @Injectable()
 export class CategoryService {
     constructor(
-        private readonly categoryRepository: CategoryRepository,) {}
+        private readonly categoryRepository: CategoryRepository,) { }
 
-    async getAllCategories(): Promise<CategoryDto[]>{
+    async getAllCategories(): Promise<CategoryDto[]> {
         const categories = await this.categoryRepository.find();
         return categories.map((category) => {
             return convertCategoryToCategoryDto(category);
@@ -20,11 +20,11 @@ export class CategoryService {
         const category = await this.categoryRepository.findOne({
             where: { id },
         });
-        
-        if(!category){
+
+        if (!category) {
             throw new RecordNotFoundException('category_with_id_not_found');
         }
-        
+
         return convertCategoryToCategoryDto(category);
     }
 
@@ -41,11 +41,11 @@ export class CategoryService {
         const category = await this.categoryRepository.findOne({
             where: { id },
         });
-    
+
         if (!category) {
             throw new RecordNotFoundException('category_with_id_not_found');
         }
-    
+
         await this.categoryRepository.remove(category);
     }
 }

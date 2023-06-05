@@ -28,6 +28,7 @@ import { OneTimeTokenRepository } from './repositories/one-time-token.repository
 import { AuthMailerModule } from './modules/auth-mailer/auth-mailer.module';
 import { SignupMailerModule } from './modules/signup-mailer/signup-mailer.module';
 import { StripeWebhookStrategy } from './strategies/stripe-webhook.strategy';
+import { DonationModule } from '../donation/donation.module';
 
 @Module({
     imports: [
@@ -40,6 +41,7 @@ import { StripeWebhookStrategy } from './strategies/stripe-webhook.strategy';
         JwtModule.register(jwtModuleConfig),
         AuthMailerModule,
         SignupMailerModule,
+        DonationModule,
     ],
     controllers: [AuthController, SignupController],
     providers: [

@@ -1,10 +1,12 @@
 import { User } from '../../user/entities/user.entity';
 import {
     Column,
+    CreateDateColumn,
     Entity,
     JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
+    UpdateDateColumn,
 } from 'typeorm';
 
 @Entity({ name: 'project_donations' })
@@ -14,6 +16,10 @@ export class ProjectDonation {
 
     @Column({ name: 'project_id' })
     projectId: number;
+
+    // @ManyToOne(() => Project)
+    // @JoinColumn({ name: 'project_id' })
+    // project: Project;
 
     @Column({ name: 'user_id' })
     userId: number;
@@ -33,4 +39,10 @@ export class ProjectDonation {
 
     @Column({ name: 'payment_finished' })
     paymentFinished: boolean;
+
+    @CreateDateColumn({ name: 'created_at' })
+    createdAt: Date;
+
+    @UpdateDateColumn({ name: 'updated_at' })
+    updatedAt: Date;
 }

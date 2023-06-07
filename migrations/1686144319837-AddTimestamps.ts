@@ -18,11 +18,6 @@ export class AddTimestamps1686144143455 implements MigrationInterface {
                 ADD COLUMN updated_at timestamp with time zone NOT NULL DEFAULT now();`,
         );
         await queryRunner.query(
-            `ALTER TABLE IF EXISTS public.project_open_positions
-                ADD COLUMN created_at timestamp with time zone NOT NULL DEFAULT now(),
-                ADD COLUMN updated_at timestamp with time zone NOT NULL DEFAULT now();`,
-        );
-        await queryRunner.query(
             `ALTER TABLE IF EXISTS public.categories
                 ADD COLUMN created_at timestamp with time zone NOT NULL DEFAULT now();`,
         );

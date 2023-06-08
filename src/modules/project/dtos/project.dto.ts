@@ -1,3 +1,5 @@
+import { OpenPositionDto } from './open-position.dto';
+
 export class ProjectDto {
     id: number;
     name: string;
@@ -5,8 +7,9 @@ export class ProjectDto {
     description: string;
     fundingObjectives: string;
     organizationName: string;
+    openPositions: OpenPositionDto[];
     // TO DO
-    // Add assets, orgnization name
+    // Add assets
 
     constructor(partialProjectDto: Partial<ProjectDto>) {
         Object.assign(this, partialProjectDto);

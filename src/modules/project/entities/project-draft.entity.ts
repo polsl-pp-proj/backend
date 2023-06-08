@@ -4,8 +4,10 @@ import {
     Entity,
     JoinColumn,
     ManyToOne,
+    OneToMany,
     PrimaryGeneratedColumn,
 } from 'typeorm';
+import { ProjectDraftOpenPosition } from './project-draft-open-position.entity';
 
 @Entity({ name: 'project_drafts' })
 export class ProjectDraft {
@@ -34,6 +36,12 @@ export class ProjectDraft {
     @Column({ name: 'last_modified' })
     lastModified: Date;
 
+    @OneToMany(
+        () => ProjectDraftOpenPosition,
+        (projectDraftOpenPosition) => projectDraftOpenPosition.projectDraft,
+        { cascade: true },
+    )
+    openPositions: ProjectDraftOpenPosition[];
     // TO DO
-    // Connect to: Category, ProjectDraftOpenPosition
+    // Connect to: Category
 }

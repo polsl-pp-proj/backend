@@ -2,10 +2,12 @@ import {
     Column,
     Entity,
     JoinColumn,
+    OneToMany,
     OneToOne,
     PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ProjectDraft } from './project-draft.entity';
+import { ProjectOpenPosition } from './project-open-position.entity';
 
 @Entity({ name: 'projects' })
 export class Project {
@@ -31,8 +33,15 @@ export class Project {
     @Column({ name: 'funding_objectives' })
     fundingObjectives: string;
 
+    @OneToMany(
+        () => ProjectOpenPosition,
+        (openPosition) => openPosition.project,
+        { cascade: true },
+    )
+    openPositions: ProjectOpenPosition[];
+
     // TO DO
     // Connect to: ProjectGalleryEntry, Category,
-    // ProjectDonation, ProjectMessage, ProjectOpenPosition and
+    // ProjectDonation, ProjectMessage and
     // FavouriteProject
 }

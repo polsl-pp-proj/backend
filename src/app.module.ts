@@ -7,6 +7,7 @@ import * as dotenv from 'dotenv';
 import { OrganizationModule } from './modules/organization/organization.module';
 import { AssetModule } from './modules/asset/asset.module';
 import { DonationModule } from './modules/donation/donation.module';
+import { NotificationModule } from './modules/notification/notification.module';
 dotenv.config();
 
 @Module({
@@ -26,6 +27,7 @@ dotenv.config();
         OrganizationModule,
         AssetModule,
         DonationModule,
+        NotificationModule,
     ],
     controllers: [AppController],
 })

@@ -81,7 +81,7 @@ export class ProjectDraftSubmissionRepository extends Repository<ProjectDraftSub
                     'change_submission_not_found',
                 );
             } else if (
-                submission.projectDraft.lastModified.valueOf() !==
+                submission.projectDraft.updatedAt.valueOf() !==
                 draftLastModified.valueOf()
             ) {
                 throw new ModifiedAfterReadException(

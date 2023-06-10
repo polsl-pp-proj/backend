@@ -108,8 +108,7 @@ export class ProjectRepository extends Repository<Project> {
             );
 
             if (
-                projectDraft.lastModified.valueOf() !==
-                draftLastModified.valueOf()
+                projectDraft.updatedAt.valueOf() !== draftLastModified.valueOf()
             ) {
                 throw new ModifiedAfterReadException(
                     'draft_modified_after_read',

@@ -28,8 +28,6 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
                 entityManager,
             );
 
-            const now = new Date();
-
             const draft = projectDraftRepository.create({
                 name: uploadProjectDto.name,
                 shortDescription: uploadProjectDto.shortDescription,
@@ -37,7 +35,6 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
                 ownerOrganization: { id: uploadProjectDto.ownerOrganizationId },
                 ownerOrganizationId: uploadProjectDto.ownerOrganizationId,
                 fundingObjectives: uploadProjectDto.fundingObjectives,
-                lastModified: now.getTime(),
             });
 
             await projectDraftRepository.save(draft, { reload: true });
@@ -81,8 +78,6 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
                 throw new RecordNotFoundException('draft_with_id_not_found');
             }
 
-            const now = new Date();
-
             draft = await projectDraftRepository.save({
                 ...draft,
                 description: updateProjectDto.description,
@@ -91,7 +86,6 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
                 fundingObjectives: updateProjectDto.fundingObjectives,
                 ownerOrganization: { id: updateProjectDto.ownerOrganizationId },
                 ownerOrganizationId: updateProjectDto.ownerOrganizationId,
-                lastModified: now.getTime(),
             });
 
             const submission = submissionRepository.findOne({

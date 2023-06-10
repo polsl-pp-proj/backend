@@ -1,12 +1,15 @@
 import {
     IsArray,
     IsDefined,
+    IsNumber,
     IsString,
     MaxLength,
     MinLength,
 } from 'class-validator';
 
 export class UploadOpenPositionDto {
+    id?: number;
+
     @IsDefined({ message: 'not_defined' })
     @IsString({ message: 'not_a_string' })
     @MinLength(2, { message: 'too_short' })

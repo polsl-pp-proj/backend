@@ -40,6 +40,12 @@ export class Project {
     )
     openPositions: ProjectOpenPosition[];
 
+    @Column({ name: 'created_at' })
+    createdAt: Date;
+
+    @Column({ name: 'updated_at' })
+    updatedAt: Date;
+
     // TO DO
     // Connect to: ProjectGalleryEntry, Category,
     // ProjectDonation, ProjectMessage and

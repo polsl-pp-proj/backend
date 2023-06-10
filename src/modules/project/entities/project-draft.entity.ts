@@ -8,20 +8,12 @@ import {
     PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ProjectDraftOpenPosition } from './project-draft-open-position.entity';
+import { ProjectBase } from './project.entitybase';
 
 @Entity({ name: 'project_drafts' })
-export class ProjectDraft {
+export class ProjectDraft extends ProjectBase {
     @PrimaryGeneratedColumn({ name: 'id' })
     id: number;
-
-    @Column({ name: 'name' })
-    name: string;
-
-    @Column({ name: 'description' })
-    description: string;
-
-    @Column({ name: 'short_description' })
-    shortDescription: string;
 
     @Column({ name: 'owner_organization_id' })
     ownerOrganizationId: number;
@@ -40,11 +32,6 @@ export class ProjectDraft {
     )
     openPositions: ProjectDraftOpenPosition[];
 
-    @Column({ name: 'created_at' })
-    createdAt: Date;
-
-    @Column({ name: 'updated_at' })
-    updatedAt: Date;
     // TO DO
     // Connect to: Category
 }

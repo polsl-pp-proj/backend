@@ -8,20 +8,12 @@ import {
 } from 'typeorm';
 import { ProjectDraft } from './project-draft.entity';
 import { ProjectOpenPosition } from './project-open-position.entity';
+import { ProjectBase } from './project.entitybase';
 
 @Entity({ name: 'projects' })
-export class Project {
+export class Project extends ProjectBase {
     @PrimaryGeneratedColumn({ name: 'id' })
     id: number;
-
-    @Column({ name: 'name' })
-    name: string;
-
-    @Column({ name: 'description' })
-    description: string;
-
-    @Column({ name: 'short_description' })
-    shortDescription: string;
 
     @Column({ name: 'draft_id' })
     projectDraftId: number;
@@ -39,12 +31,6 @@ export class Project {
         { cascade: true },
     )
     openPositions: ProjectOpenPosition[];
-
-    @Column({ name: 'created_at' })
-    createdAt: Date;
-
-    @Column({ name: 'updated_at' })
-    updatedAt: Date;
 
     // TO DO
     // Connect to: ProjectGalleryEntry, Category,

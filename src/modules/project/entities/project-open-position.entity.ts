@@ -29,4 +29,10 @@ export class ProjectOpenPosition {
 
     @Column({ name: 'requirements', default: [], type: 'jsonb' })
     requirements: string[];
+
+    @Column({ name: 'created_at' })
+    createdAt: Date;
+
+    @Column({ name: 'updated_at' })
+    updatedAt: Date;
 }

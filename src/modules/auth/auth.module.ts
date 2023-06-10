@@ -27,6 +27,8 @@ import { IOneTimeTokenService } from 'src/interfaces/one-time-token.service.inte
 import { OneTimeTokenRepository } from './repositories/one-time-token.repository';
 import { AuthMailerModule } from './modules/auth-mailer/auth-mailer.module';
 import { SignupMailerModule } from './modules/signup-mailer/signup-mailer.module';
+import { StripeWebhookStrategy } from './strategies/stripe-webhook.strategy';
+import { DonationModule } from '../donation/donation.module';
 
 @Module({
     imports: [
@@ -39,6 +41,7 @@ import { SignupMailerModule } from './modules/signup-mailer/signup-mailer.module
         JwtModule.register(jwtModuleConfig),
         AuthMailerModule,
         SignupMailerModule,
+        DonationModule,
     ],
     controllers: [AuthController, SignupController],
     providers: [
@@ -54,6 +57,7 @@ import { SignupMailerModule } from './modules/signup-mailer/signup-mailer.module
         { provide: ISignupService, useClass: SignupService },
         OneTimeTokenRepository,
         { provide: IOneTimeTokenService, useClass: OneTimeTokenService },
+        StripeWebhookStrategy,
     ],
 })
 export class AuthModule {}

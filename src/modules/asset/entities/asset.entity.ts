@@ -1,4 +1,9 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
 import { AssetType } from '../enums/asset-type.enum';
 
 @Entity({ name: 'assets' })
@@ -19,4 +24,7 @@ export class Asset {
         name: 'type',
     })
     type: AssetType;
+
+    @CreateDateColumn({ name: 'created_at' })
+    createdAt: Date;
 }

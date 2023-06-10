@@ -113,7 +113,7 @@ export class OrganizationRepository extends Repository<Organization> {
         organizationId: number,
         memberIds: number[],
     ) {
-        this.entityManager.transaction(async (entityManager) => {
+        await this.entityManager.transaction(async (entityManager) => {
             const organizationUserRepository = new OrganizationUserRepository(
                 entityManager.connection,
                 entityManager,
@@ -151,6 +151,20 @@ export class OrganizationRepository extends Repository<Organization> {
 
             await Promise.allSettled(deleteMembersPromise);
         });
+    }
+
+    async getOrganizationsContainingUser(userId: number) {
+        const organizationUserRepository = new OrganizationUserRepository(
+            this.dataSource,
+            this.entityManager,
+        );
+        const organizations = await organizationUserRepository.find({
+            where: { userId },
+            relations: { organization: true },
+        });
+        return organizations.map(
+            (organizationUser) => organizationUser.organization,
+        );
     }
 
     async getOrganizationWithUsersContainingUser(

@@ -1,4 +1,10 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    OneToMany,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
 import { OrganizationUser } from './organization-user.entity';
 
 @Entity({ name: 'organizations' })
@@ -13,4 +19,7 @@ export class Organization {
         cascade: true,
     })
     organizationUsers: OrganizationUser[];
+
+    @CreateDateColumn({ name: 'created_at' })
+    createdAt: Date;
 }

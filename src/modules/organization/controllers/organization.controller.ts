@@ -22,6 +22,7 @@ import { AddMembersDto } from '../dtos/add-members.dto';
 import { RemoveMembersDto } from '../dtos/remove-members.dto';
 import { AuthTokenGuard } from 'src/modules/auth/guards/auth-token.guard';
 import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
+import { FullOrganizationDto } from '../dtos/full-organization.dto';
 
 @Controller({ path: 'organization', version: '1' })
 export class OrganizationController {
@@ -35,8 +36,8 @@ export class OrganizationController {
     @UseGuards(AuthTokenGuard)
     async getOwnOrganizations(
         @AuthTokenPayload() user: AuthTokenPayloadDto,
-    ): Promise<OrganizationDto> {
-        throw new NotImplementedException();
+    ): Promise<OrganizationDto[]> {
+        return await this.organizationService.getOwnOrganizations(user.userId);
     }
 
     @Get(':organizationId/full')
@@ -44,7 +45,7 @@ export class OrganizationController {
     async getOwnOrganizationById(
         @AuthTokenPayload() user: AuthTokenPayloadDto,
         @Param('organizationId', ParseIntPipe) organizationId: number,
-    ): Promise<OrganizationDto> {
+    ): Promise<FullOrganizationDto> {
         try {
             return await this.organizationService.getFullOrganizationById(
                 user.userId,

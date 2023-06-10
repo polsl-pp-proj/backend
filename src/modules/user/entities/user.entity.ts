@@ -1,4 +1,11 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
+} from 'typeorm';
 import { UserRole } from '../enums/user-role.enum';
 import { OrganizationUser } from '../../organization/entities/organization-user.entity';
 
@@ -41,4 +48,10 @@ export class User {
         (organizationUser) => organizationUser.user,
     )
     userOrganizations: OrganizationUser[];
+
+    @CreateDateColumn({ name: 'created_at' })
+    createdAt: Date;
+
+    @UpdateDateColumn({ name: 'updated_at' })
+    updatedAt: Date;
 }

@@ -87,7 +87,7 @@ export class AuthController {
         }
     }
 
-    @Patch('password/reset/:emailAddress/:token')
+    @Patch('password/reset/:emailAddress/:oneTimeToken')
     async confirmPasswordReset(
         @Param(new ValidationPipe(validationConfig))
         { emailAddress, oneTimeToken }: EmailTokenParamsDto,

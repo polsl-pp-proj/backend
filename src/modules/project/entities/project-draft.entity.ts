@@ -33,15 +33,18 @@ export class ProjectDraft {
     @Column({ name: 'funding_objectives' })
     fundingObjectives: string;
 
-    @Column({ name: 'last_modified' })
-    lastModified: Date;
-
     @OneToMany(
         () => ProjectDraftOpenPosition,
         (projectDraftOpenPosition) => projectDraftOpenPosition.projectDraft,
         { cascade: true },
     )
     openPositions: ProjectDraftOpenPosition[];
+
+    @Column({ name: 'created_at' })
+    createdAt: Date;
+
+    @Column({ name: 'updated_at' })
+    updatedAt: Date;
     // TO DO
     // Connect to: Category
 }

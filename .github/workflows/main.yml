@@ -8,15 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-#deployment action
-      - name: Upload from public_html via FTP
-        uses: airvzxf/ftp-deployment-action@latest
-        with:
-          server:   ${{ secrets.CICD_FTP_SERVER }}
-          user: ${{ secrets.CICD_FTP_USER_PROD }}
-          password: ${{ secrets.CICD_FTP_PASS_PROD }}
-          remote_dir: "./public_nodejs"
-          delete: "false"
 #invoke patch request
       - name: Invoke PATCH request
         env:

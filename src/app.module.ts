@@ -8,6 +8,7 @@ import { OrganizationModule } from './modules/organization/organization.module';
 import { AssetModule } from './modules/asset/asset.module';
 import { DonationModule } from './modules/donation/donation.module';
 import { PolonModule } from './modules/polon/polon.module';
+import { FavoriteModule } from './modules/favorite/favorite.module';
 dotenv.config();
 
 @Module({
@@ -28,6 +29,7 @@ dotenv.config();
         AssetModule,
         DonationModule,
         PolonModule,
+        FavoriteModule,
     ],
     controllers: [AppController],
 })

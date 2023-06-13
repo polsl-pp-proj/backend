@@ -12,6 +12,7 @@ import { RecordNotFoundException } from 'src/exceptions/record-not-found.excepti
 import { OrganizationRepository } from 'src/modules/organization/repositories/organization.repository';
 import { ProjectDraft } from '../entities/project-draft.entity';
 import { ModifiedAfterReadException } from 'src/exceptions/modified-after-read.exception';
+import { ProjectOpenPositionRepository } from './project-open-position.repository';
 
 @Injectable()
 export class ProjectRepository extends Repository<Project> {
@@ -106,6 +107,11 @@ export class ProjectRepository extends Repository<Project> {
                 entityManager.connection,
                 entityManager,
             );
+            const projectOpenPositionRepository =
+                new ProjectOpenPositionRepository(
+                    entityManager.connection,
+                    entityManager,
+                );
 
             if (
                 projectDraft.updatedAt.valueOf() !== draftLastModified.valueOf()
@@ -137,6 +143,10 @@ export class ProjectRepository extends Repository<Project> {
                     projectDraftId: projectDraft.id,
                 });
             }
+            await projectOpenPositionRepository.importOpenPositionsFromDraft(
+                project.id,
+                projectDraft.id,
+            );
             await projectRepository.save(project, { reload: true });
         });
     }

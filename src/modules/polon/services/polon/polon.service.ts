@@ -32,7 +32,9 @@ export class PolonService {
                 map((response) => response.data),
                 map((institution) => {
                     if (institution.status !== 'OPERATING') {
-                        throw new Error('provided_university_does_not_exist');
+                        throw new Error(
+                            'provided_university_does_not_exist_anymore',
+                        );
                     }
 
                     const studentEmailUrl = new URL(`https://${emailAddress}`); // hack to use URL object with email address
@@ -49,9 +51,7 @@ export class PolonService {
                             universityWebsiteUrl.hostname,
                         )
                     ) {
-                        throw new Error(
-                            'provided_email_does_not_contain_university_domain_name',
-                        );
+                        return false;
                     }
                     return true;
                 }),

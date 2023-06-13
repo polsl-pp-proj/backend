@@ -1,10 +1,13 @@
 import { User } from '../../user/entities/user.entity';
 import {
     Column,
+    CreateDateColumn,
+    DeleteDateColumn,
     Entity,
     JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
+    UpdateDateColumn,
 } from 'typeorm';
 import { OrganizationNotificationType } from '../enums/organization-notification-type.enum';
 
@@ -43,4 +46,13 @@ export class OrganizationNotification {
 
     @Column({ name: 'seen', default: false })
     seen: boolean;
+
+    @CreateDateColumn({ name: 'created_at' })
+    createdAt: Date;
+
+    @UpdateDateColumn({ name: 'updated_at' })
+    updatedAt: Date;
+
+    @DeleteDateColumn({ name: 'deleted_at' })
+    deletedAt: Date;
 }

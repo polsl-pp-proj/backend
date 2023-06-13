@@ -1,10 +1,13 @@
 import { User } from '../../user/entities/user.entity';
 import {
     Column,
+    CreateDateColumn,
+    DeleteDateColumn,
     Entity,
     JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
+    UpdateDateColumn,
 } from 'typeorm';
 
 @Entity({ name: 'user_notifications' })
@@ -34,4 +37,13 @@ export class UserNotification {
 
     @Column({ name: 'seen', default: false })
     seen: boolean;
+
+    @CreateDateColumn({ name: 'created_at' })
+    createdAt: Date;
+
+    @UpdateDateColumn({ name: 'updated_at' })
+    updatedAt: Date;
+
+    @DeleteDateColumn({ name: 'deleted_at' })
+    deletedAt: Date;
 }

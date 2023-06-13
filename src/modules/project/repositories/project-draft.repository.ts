@@ -6,8 +6,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
 import { ProjectDraftSubmissionRepository } from './project-draft-submission.repository';
 import { ProjectDraftSubmissionStatus } from '../enums/project-draft-submission-status.enum';
-import { ProjectDraftOpenPosition } from '../entities/project-draft-open-position.entity';
-import { OpenPositionDto } from '../dtos/open-position.dto';
+import { ProjectDraftOpenPositionRepository } from './project-draft-open-position.repository';
 
 @Injectable()
 export class ProjectDraftRepository extends Repository<ProjectDraft> {
@@ -29,6 +28,11 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
                 entityManager.connection,
                 entityManager,
             );
+            const projectDraftOpenPositionRepository =
+                new ProjectDraftOpenPositionRepository(
+                    entityManager.connection,
+                    entityManager,
+                );
 
             const draft = projectDraftRepository.create({
                 name: uploadProjectDto.name,
@@ -38,6 +42,11 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
                 ownerOrganizationId: uploadProjectDto.ownerOrganizationId,
                 fundingObjectives: uploadProjectDto.fundingObjectives,
             });
+
+            await projectDraftOpenPositionRepository.updateOpenPositions(
+                uploadProjectDto.openPositions,
+                draft.id,
+            );
 
             await projectDraftRepository.save(draft, { reload: true });
             await submissionRepository.createSubmission(draft.id);
@@ -71,6 +80,11 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
                 entityManager.connection,
                 entityManager,
             );
+            const projectDraftOpenPositionRepository =
+                new ProjectDraftOpenPositionRepository(
+                    entityManager.connection,
+                    entityManager,
+                );
 
             let draft = await projectDraftRepository.findOne({
                 where: { id: projectDraftId },
@@ -89,6 +103,11 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
                 ownerOrganization: { id: updateProjectDto.ownerOrganizationId },
                 ownerOrganizationId: updateProjectDto.ownerOrganizationId,
             });
+
+            await projectDraftOpenPositionRepository.updateOpenPositions(
+                updateProjectDto.openPositions,
+                draft.id,
+            );
 
             const submission = await submissionRepository.findOne({
                 where: {

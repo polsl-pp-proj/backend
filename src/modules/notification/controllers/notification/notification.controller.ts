@@ -1,22 +1,26 @@
 import {
     Controller,
     Delete,
+    Get,
     MessageEvent,
     NotFoundException,
     Param,
     ParseIntPipe,
     Patch,
+    Query,
     Sse,
     UseGuards,
+    ValidationPipe,
 } from '@nestjs/common';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { User } from 'src/modules/auth/decorators/param/user.decorator';
 import { AuthTokenPayloadDto } from 'src/modules/auth/dtos/auth-token-payload.dto';
 import { AuthTokenGuard } from 'src/modules/auth/guards/auth-token.guard';
 import { NotificationService } from '../../services/notification/notification.service';
 import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
-import { Organization } from 'src/modules/organization/entities/organization.entity';
 import { OrganizationMemberRole } from 'src/modules/organization/enums/organization-member-role.enum';
+import { validationConfig } from 'src/configs/validation.config';
+import { PaginationDto } from 'src/dtos/pagination.dto';
 
 @Controller({ path: 'notification', version: '1' })
 export class NotificationController {
@@ -25,13 +29,41 @@ export class NotificationController {
     @Sse('events')
     @UseGuards(AuthTokenGuard)
     notificationEvents(
-        @User() user: AuthTokenPayloadDto,
+        @User() user: AuthTokenPayloadDto & { exp: number },
     ): Observable<MessageEvent> {
-        const authTokenExpiresAt = new Date(
-            (user as AuthTokenPayloadDto & { exp: number }).exp * 1000,
-        ); // close connection after auth token expires
+        return new Observable<MessageEvent>((subscriber) => {
+            const subscription = this.notificationService
+                .getNotificationObservable(user)
+                .subscribe({
+                    next: (notification) => {
+                        subscriber.next({
+                            type: 'notification',
+                            data: notification,
+                        });
+                    },
+                    complete: () => {
+                        subscriber.next({
+                            type: 'close_connection',
+                            data: 'reconnect',
+                        });
+                        subscriber.complete();
+                        subscription.unsubscribe();
+                    },
+                });
+        });
+    }
 
-        return of({ data: {} });
+    @Get()
+    @UseGuards(AuthTokenGuard)
+    async getNotifications(
+        @User() user: AuthTokenPayloadDto,
+        @Query(new ValidationPipe(validationConfig))
+        paginationParams: PaginationDto,
+    ) {
+        return await this.notificationService.getNotificationsForUser(
+            user.userId,
+            paginationParams,
+        );
     }
 
     @Patch('organization/:notificationId/mark-seen')

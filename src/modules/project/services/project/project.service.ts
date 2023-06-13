@@ -8,6 +8,7 @@ import {
     convertProjectDraftToSimpleProjectDraftDto,
 } from '../../helper/project-draft-to-project-draft-dto';
 import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
+import { error } from 'console';
 
 @Injectable()
 export class ProjectService {
@@ -87,15 +88,9 @@ export class ProjectService {
         projectId: number,
         uploadProjectDto: UploadProjectDto,
     ) {
-        const { name, shortDescription, description, fundingObjectives } =
-            uploadProjectDto;
-        const queryResult = await this.projectRepository.update(
-            { id: projectId },
-            { name, shortDescription, description, fundingObjectives },
+        await this.projectRepository.editProjectContent(
+            projectId,
+            uploadProjectDto,
         );
-
-        if (!queryResult.affected) {
-            throw new RecordNotFoundException('project_with_id_not_found');
-        }
     }
 }

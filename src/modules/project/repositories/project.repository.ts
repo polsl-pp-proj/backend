@@ -1,4 +1,9 @@
-import { DataSource, EntityManager, Repository } from 'typeorm';
+import {
+    DataSource,
+    EntityManager,
+    EntityRepository,
+    Repository,
+} from 'typeorm';
 import { Project } from '../entities/project.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { SimpleProjectDto } from '../dtos/project.dto';
@@ -13,6 +18,7 @@ import { OrganizationRepository } from 'src/modules/organization/repositories/or
 import { ProjectDraft } from '../entities/project-draft.entity';
 import { ModifiedAfterReadException } from 'src/exceptions/modified-after-read.exception';
 import { ProjectOpenPositionRepository } from './project-open-position.repository';
+import { UploadProjectDto } from '../dtos/upload-project.dto';
 
 @Injectable()
 export class ProjectRepository extends Repository<Project> {
@@ -148,6 +154,45 @@ export class ProjectRepository extends Repository<Project> {
                 projectDraft.id,
             );
             await projectRepository.save(project, { reload: true });
+        });
+    }
+
+    async editProjectContent(
+        projectId: number,
+        uploadProjectDto: UploadProjectDto,
+    ) {
+        await this.entityManager.transaction(async (entityManager) => {
+            const projectRepository = new ProjectRepository(
+                entityManager.connection,
+                entityManager,
+            );
+            const projectOpenPositionRepository =
+                new ProjectOpenPositionRepository(
+                    entityManager.connection,
+                    entityManager,
+                );
+
+            const {
+                name,
+                shortDescription,
+                description,
+                fundingObjectives,
+                openPositions,
+            } = uploadProjectDto;
+
+            const queryResult = await projectRepository.update(
+                { id: projectId },
+                { name, shortDescription, description, fundingObjectives },
+            );
+
+            if (queryResult.affected === 0) {
+                throw new RecordNotFoundException('project_with_id_not_found');
+            }
+
+            await projectOpenPositionRepository.editProjectOpenPositions(
+                projectId,
+                openPositions,
+            );
         });
     }
 }

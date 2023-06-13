@@ -25,8 +25,8 @@ export class ProjectDraftOpenPosition {
     @Column({ name: 'description' })
     description: string;
 
-    @Column('jsonb', { name: 'requirements', default: {} })
-    requirements: string;
+    @Column({ name: 'requirements', default: [], type: 'jsonb' })
+    requirements: string[];
 
     @Column({ name: 'created_at' })
     createdAt: Date;

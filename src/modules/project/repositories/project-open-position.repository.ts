@@ -2,6 +2,7 @@ import { DataSource, EntityManager, Repository } from 'typeorm';
 import { ProjectOpenPosition } from '../entities/project-open-position.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { ProjectDraftOpenPositionRepository } from './project-draft-open-position.repository';
+import { UploadOpenPositionDto } from '../dtos/upload-open-position.dto';
 
 export class ProjectOpenPositionRepository extends Repository<ProjectOpenPosition> {
     constructor(
@@ -32,13 +33,28 @@ export class ProjectOpenPositionRepository extends Repository<ProjectOpenPositio
                     where: { projectDraftId: draftId },
                 });
 
+            await this.editProjectOpenPositions(projectId, draftOpenPositions);
+        });
+    }
+
+    async editProjectOpenPositions(
+        projectId: number,
+        uploadOpenPositionDto: UploadOpenPositionDto[],
+    ) {
+        await this.entityManager.transaction(async (entityManager) => {
+            const projectOpenPositionRepository =
+                new ProjectOpenPositionRepository(
+                    entityManager.connection,
+                    entityManager,
+                );
+
             await projectOpenPositionRepository.delete({ projectId });
 
-            if (draftOpenPositions.length === 0) {
+            if (uploadOpenPositionDto.length === 0) {
                 return;
             }
 
-            const projectOpenPositionsPromise = draftOpenPositions.map(
+            const projectOpenPositionsPromise = uploadOpenPositionDto.map(
                 async (openPosition) => {
                     return projectOpenPositionRepository.create({
                         name: openPosition.name,

@@ -8,7 +8,7 @@ import { OrganizationModule } from '../organization/organization.module';
 import { ProjectService } from './services/project/project.service';
 import { IProjectService } from 'src/interfaces/project.service.interface';
 import { IProjectDraftSubmissionService } from 'src/interfaces/project-draft-submission.service.interface';
-import { ProjectDraftRepository } from './repositories/project-draft.repositry';
+import { ProjectDraftRepository } from './repositories/project-draft.repository';
 import { ProjectDraftSubmissionRepository } from './repositories/project-draft-submission.repository';
 import { ProjectRepository } from './repositories/project.repository';
 import { ProjectController } from './controllers/project/project/project.controller';

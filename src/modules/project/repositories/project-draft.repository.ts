@@ -1,4 +1,4 @@
-import { DataSource, EntityManager, Repository } from 'typeorm';
+import { DataSource, EntityManager, In, Not, Repository } from 'typeorm';
 import { ProjectDraft } from '../entities/project-draft.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { UploadProjectDto } from '../dtos/upload-project.dto';
@@ -6,6 +6,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
 import { ProjectDraftSubmissionRepository } from './project-draft-submission.repository';
 import { ProjectDraftSubmissionStatus } from '../enums/project-draft-submission-status.enum';
+import { ProjectDraftOpenPosition } from '../entities/project-draft-open-position.entity';
+import { OpenPositionDto } from '../dtos/open-position.dto';
 
 @Injectable()
 export class ProjectDraftRepository extends Repository<ProjectDraft> {
@@ -88,7 +90,7 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
                 ownerOrganizationId: updateProjectDto.ownerOrganizationId,
             });
 
-            const submission = submissionRepository.findOne({
+            const submission = await submissionRepository.findOne({
                 where: {
                     projectDraftId: draft.id,
                     status: ProjectDraftSubmissionStatus.ToBeResolved,
@@ -96,7 +98,7 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
             });
 
             if (!submission) {
-                submissionRepository.createSubmission(draft.id);
+                await submissionRepository.createSubmission(draft.id);
             }
         });
     }

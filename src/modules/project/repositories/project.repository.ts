@@ -2,7 +2,7 @@ import { DataSource, EntityManager, Repository } from 'typeorm';
 import { Project } from '../entities/project.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { SimpleProjectDto } from '../dtos/project.dto';
-import { ProjectDraftRepository } from './project-draft.repositry';
+import { ProjectDraftRepository } from './project-draft.repository';
 import {
     convertProjectToProjectDto,
     convertProjectToSimpleProjectDto,
@@ -116,7 +116,10 @@ export class ProjectRepository extends Repository<Project> {
             }
 
             let project = await projectRepository.findOne({
-                where: { projectDraft, projectDraftId: projectDraft.id },
+                where: {
+                    projectDraft: { id: projectDraft.id },
+                    projectDraftId: projectDraft.id,
+                },
             });
 
             if (project) {

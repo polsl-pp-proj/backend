@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ProjectRepository } from '../../repositories/project.repository';
 import { SimpleProjectDto } from '../../dtos/project.dto';
 import { UploadProjectDto } from '../../dtos/upload-project.dto';
-import { ProjectDraftRepository } from '../../repositories/project-draft.repositry';
+import { ProjectDraftRepository } from '../../repositories/project-draft.repository';
 import {
     convertProjectDraftToProjectDraftDto,
     convertProjectDraftToSimpleProjectDraftDto,

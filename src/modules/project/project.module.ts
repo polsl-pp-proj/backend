@@ -14,6 +14,10 @@ import { ProjectRepository } from './repositories/project.repository';
 import { ProjectController } from './controllers/project/project/project.controller';
 import { ProjectDraftController } from './controllers/project-draft/project-draft/project-draft.controller';
 import { ProjectDraftSubmissionController } from './controllers/project-draft-submission/project-draft-submission/project-draft-submission.controller';
+import { ProjectDraftOpenPosition } from './entities/project-draft-open-position.entity';
+import { ProjectOpenPosition } from './entities/project-open-position.entity';
+import { ProjectDraftOpenPositionRepository } from './repositories/project-draft-open-position.repository';
+import { ProjectOpenPositionRepository } from './repositories/project-open-position.repository';
 
 @Module({
     imports: [
@@ -23,6 +27,8 @@ import { ProjectDraftSubmissionController } from './controllers/project-draft-su
             Project,
             ProjectDraft,
             ProjectDraftSubmission,
+            ProjectDraftOpenPosition,
+            ProjectOpenPosition,
         ]),
     ],
     controllers: [
@@ -39,6 +45,8 @@ import { ProjectDraftSubmissionController } from './controllers/project-draft-su
         ProjectDraftRepository,
         ProjectDraftSubmissionRepository,
         ProjectRepository,
+        ProjectDraftOpenPositionRepository,
+        ProjectOpenPositionRepository,
     ],
 })
 export class ProjectModule {}

@@ -1,4 +1,3 @@
-import { Organization } from 'src/modules/organization/entities/organization.entity';
 import {
     Column,
     Entity,
@@ -9,6 +8,7 @@ import {
 } from 'typeorm';
 import { ProjectDraftOpenPosition } from './project-draft-open-position.entity';
 import { ProjectBase } from './project.entitybase';
+import { Organization } from '../../organization/entities/organization.entity';
 
 @Entity({ name: 'project_drafts' })
 export class ProjectDraft extends ProjectBase {

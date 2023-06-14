@@ -1,4 +1,4 @@
-import { Column } from 'typeorm';
+import { Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 export abstract class ProjectBase {
     @Column({ name: 'name' })
@@ -10,9 +10,9 @@ export abstract class ProjectBase {
     @Column({ name: 'short_description' })
     shortDescription: string;
 
-    @Column({ name: 'created_at' })
+    @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;
 
-    @Column({ name: 'updated_at' })
+    @UpdateDateColumn({ name: 'updated_at' })
     updatedAt: Date;
 }

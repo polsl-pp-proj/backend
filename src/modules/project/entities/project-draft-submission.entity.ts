@@ -1,9 +1,11 @@
 import {
     Column,
+    CreateDateColumn,
     Entity,
     JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
+    UpdateDateColumn,
 } from 'typeorm';
 import { ProjectDraftSubmissionStatus } from '../enums/project-draft-submission-status.enum';
 import { ProjectDraft } from './project-draft.entity';
@@ -28,9 +30,9 @@ export class ProjectDraftSubmission {
     })
     status: ProjectDraftSubmissionStatus;
 
-    @Column({ name: 'created_at' })
+    @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;
 
-    @Column({ name: 'updated_at' })
+    @UpdateDateColumn({ name: 'updated_at' })
     updatedAt: Date;
 }

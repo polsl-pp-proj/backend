@@ -7,7 +7,7 @@ export class ProjectDto {
     description: string;
     fundingObjectives: string;
     organizationName: string;
-    openPositions: OpenPositionDto[];
+    openPositions?: OpenPositionDto[];
     // TO DO
     // Add assets
 

@@ -1,3 +1,4 @@
+import { OpenPositionDto } from '../dtos/open-position.dto';
 import {
     ProjectDraftDto,
     SimpleProjectDraftDto,
@@ -15,7 +16,8 @@ export const convertProjectDraftToProjectDraftDto = (
         shortDescription: projectDraft.shortDescription,
         description: projectDraft.description,
         fundingObjectives: projectDraft.fundingObjectives,
-        lastModified: projectDraft.lastModified,
+        lastModified: projectDraft.updatedAt,
+        openPositions: projectDraft.openPositions,
     });
 };
 

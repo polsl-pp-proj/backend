@@ -1,3 +1,4 @@
+import { OpenPositionDto } from '../dtos/open-position.dto';
 import { ProjectDto, SimpleProjectDto } from '../dtos/project.dto';
 import { Project } from '../entities/project.entity';
 
@@ -12,6 +13,7 @@ export const convertProjectToProjectDto = (
         description: project.description,
         fundingObjectives: project.fundingObjectives,
         organizationName,
+        openPositions: project.openPositions,
     });
 };
 

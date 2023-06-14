@@ -179,10 +179,9 @@ export class NotificationService {
                             'organizationNotifications.message',
                             'message',
                         )
-                        .addSelect(
-                            'organizationNotifications.projectId',
-                            'projectId',
-                        )
+                        .addSelect('project.id', 'projectId')
+                        .addSelect('project.name', 'projectName')
+                        .addSelect('organization.id', 'organizationId')
                         .addSelect('organization.name', 'organizationName')
                         .addSelect('organizationNotifications.type', 'type')
                         .addSelect('organizationNotifications.seen', 'seen')
@@ -207,7 +206,9 @@ export class NotificationService {
                     .addSelect('userNotifications.id', 'id')
                     .addSelect('userNotifications.subject', 'subject')
                     .addSelect('userNotifications.message', 'message')
-                    .addSelect('userNotifications.projectId', 'projectId')
+                    .addSelect('project.id', 'projectId')
+                    .addSelect('project.name', 'projectName')
+                    .addSelect('organization.id', 'organizationId')
                     .addSelect('organization.name', 'organizationName')
                     .addSelect('"message_answer"', 'type')
                     .addSelect('userNotifications.seen', 'seen')
@@ -242,6 +243,8 @@ export class NotificationService {
                     .addSelect('subject')
                     .addSelect('message')
                     .addSelect('projectId')
+                    .addSelect('projectName')
+                    .addSelect('organizationId')
                     .addSelect('organizationName')
                     .addSelect('type')
                     .addSelect('seen')
@@ -308,6 +311,8 @@ export class NotificationService {
                         },
                         select: {
                             project: {
+                                id: true,
+                                name: true,
                                 projectDraft: {
                                     ownerOrganization: { id: true, name: true },
                                 },
@@ -323,7 +328,11 @@ export class NotificationService {
                         id: notification.id,
                         subject: notification.subject,
                         message: notification.message,
-                        projectId: notification.projectId,
+                        projectId: notification.project.id,
+                        projectName: notification.project.name,
+                        organizationId:
+                            notification.project.projectDraft.ownerOrganization
+                                .id,
                         organizationName:
                             notification.project.projectDraft.ownerOrganization
                                 .name,
@@ -366,6 +375,8 @@ export class NotificationService {
                         },
                         select: {
                             project: {
+                                id: true,
+                                name: true,
                                 projectDraft: {
                                     ownerOrganization: { id: true, name: true },
                                 },
@@ -381,7 +392,11 @@ export class NotificationService {
                         id: notification.id,
                         subject: notification.subject,
                         message: notification.message,
-                        projectId: notification.projectId,
+                        projectId: notification.project.id,
+                        projectName: notification.project.name,
+                        organizationId:
+                            notification.project.projectDraft.ownerOrganization
+                                .id,
                         organizationName:
                             notification.project.projectDraft.ownerOrganization
                                 .name,

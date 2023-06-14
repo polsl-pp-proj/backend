@@ -5,6 +5,8 @@ export interface INotification {
     subject: string;
     message: string;
     projectId: number;
+    projectName: string;
+    organizationId: number;
     organizationName: string;
     type: NotificationType;
     seen: boolean;

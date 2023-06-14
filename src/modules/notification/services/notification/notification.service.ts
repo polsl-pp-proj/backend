@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, MessageEvent } from '@nestjs/common';
 import { OrganizationNotificationRepository } from '../../repositories/organization-notification.repository';
 import { UserNotificationRepository } from '../../repositories/user-notification.repository';
-import { In, SelectQueryBuilder } from 'typeorm';
+import { SelectQueryBuilder } from 'typeorm';
 import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
 import { PaginationDto } from 'src/dtos/pagination.dto';
 import {
@@ -17,6 +17,7 @@ import { NotificationDto } from '../../dtos/notification.dto';
 import { NotificationReceiver } from '../../types/notification-receiver.type';
 import { CreateNotificationDto } from '../../dtos/create-notification.dto';
 import { OrganizationNotificationType } from '../../enums/organization-notification-type.enum';
+import { NotificationEventType } from '../../types/notification-event-type.type';
 
 @Injectable()
 export class NotificationService {
@@ -30,36 +31,106 @@ export class NotificationService {
         userId,
         organizations,
         exp,
-    }: AuthTokenPayloadDto & { exp: number }) {
+    }: AuthTokenPayloadDto & { exp: number }): Observable<MessageEvent> {
         const authTokenExpiresAt = new Date(exp * 1000); // close connection after auth token expires
-        const organizationIds = organizations.map((org) => org.organizationId);
+        const userOrganizationIds = organizations.map(
+            (org) => org.organizationId,
+        );
 
-        return new Observable<NotificationDto>((subscriber) => {
+        return new Observable<MessageEvent>((subscriber) => {
             const subs: Subscription[] = [];
 
             const checkExpiry = () => {
                 if (authTokenExpiresAt.valueOf() < new Date().valueOf()) {
                     subs.forEach((sub) => sub.unsubscribe());
+                    subscriber.next({
+                        type: 'close_connection',
+                        data: 'reconnect',
+                    });
                     subscriber.complete();
                 }
             };
 
             subs.push(
-                this.getNotification('usr', userId).subscribe(
+                this.getNotificationCreated('usr', userId).subscribe(
                     (notification) => {
-                        subscriber.next(notification);
+                        subscriber.next({
+                            type: 'notification:created',
+                            data: notification,
+                        });
+                        checkExpiry();
+                    },
+                ),
+                this.getNotificationSeen('usr', userId).subscribe(
+                    (notificationId) => {
+                        subscriber.next({
+                            type: 'notification:seen',
+                            data: { id: notificationId },
+                        });
+                        checkExpiry();
+                    },
+                ),
+                this.getNotificationNotSeen('usr', userId).subscribe(
+                    (notificationId) => {
+                        subscriber.next({
+                            type: 'notification:not-seen',
+                            data: { id: notificationId },
+                        });
+                        checkExpiry();
+                    },
+                ),
+                this.getNotificationRemoved('usr', userId).subscribe(
+                    (notificationId) => {
+                        subscriber.next({
+                            type: 'notification:removed',
+                            data: { id: notificationId },
+                        });
                         checkExpiry();
                     },
                 ),
             );
-            organizationIds.forEach((organizationId) => {
+
+            userOrganizationIds.forEach((organizationId) => {
                 subs.push(
-                    this.getNotification('org', organizationId).subscribe(
-                        (notification) => {
-                            subscriber.next(notification);
+                    this.getNotificationCreated(
+                        'org',
+                        organizationId,
+                    ).subscribe((notification) => {
+                        subscriber.next({
+                            type: 'notification:created',
+                            data: notification,
+                        });
+                        checkExpiry();
+                    }),
+                    this.getNotificationSeen('org', organizationId).subscribe(
+                        (notificationId) => {
+                            subscriber.next({
+                                type: 'notification:seen',
+                                data: { id: notificationId },
+                            });
                             checkExpiry();
                         },
                     ),
+                    this.getNotificationNotSeen(
+                        'org',
+                        organizationId,
+                    ).subscribe((notificationId) => {
+                        subscriber.next({
+                            type: 'notification:not-seen',
+                            data: { id: notificationId },
+                        });
+                        checkExpiry();
+                    }),
+                    this.getNotificationRemoved(
+                        'org',
+                        organizationId,
+                    ).subscribe((notificationId) => {
+                        subscriber.next({
+                            type: 'notification:removed',
+                            data: { id: notificationId },
+                        });
+                        checkExpiry();
+                    }),
                 );
             });
         });
@@ -244,7 +315,7 @@ export class NotificationService {
                     }),
                 );
 
-                await this.sendNotification(
+                await this.sendNotificationCreated(
                     'org',
                     notification.project.projectDraft.ownerOrganization.id,
                     new NotificationDto({
@@ -302,7 +373,7 @@ export class NotificationService {
                     }),
                 );
 
-                await this.sendNotification(
+                await this.sendNotificationCreated(
                     'usr',
                     notification.userId,
                     new NotificationDto({
@@ -324,7 +395,7 @@ export class NotificationService {
     }
 
     async markOrganizationNotificationAsSeen(
-        organizationIds: number[],
+        organizationId: number,
         notificationId: number,
     ) {
         const updateResult =
@@ -333,7 +404,7 @@ export class NotificationService {
                     id: notificationId,
                     project: {
                         projectDraft: {
-                            ownerOrganizationId: In(organizationIds),
+                            ownerOrganizationId: organizationId,
                         },
                     },
                 },
@@ -343,6 +414,8 @@ export class NotificationService {
         if (updateResult.affected === 0) {
             throw new RecordNotFoundException('notification_not_found');
         }
+
+        await this.sendNotificationSeen('org', organizationId, notificationId);
     }
 
     async markUserNotificationAsSeen(userId: number, notificationId: number) {
@@ -357,10 +430,12 @@ export class NotificationService {
         if (updateResult.affected === 0) {
             throw new RecordNotFoundException('notification_not_found');
         }
+
+        await this.sendNotificationSeen('usr', userId, notificationId);
     }
 
     async markOrganizationNotificationAsNotSeen(
-        organizationIds: number[],
+        organizationId: number,
         notificationId: number,
     ) {
         const updateResult =
@@ -369,7 +444,7 @@ export class NotificationService {
                     id: notificationId,
                     project: {
                         projectDraft: {
-                            ownerOrganizationId: In(organizationIds),
+                            ownerOrganizationId: organizationId,
                         },
                     },
                 },
@@ -379,6 +454,12 @@ export class NotificationService {
         if (updateResult.affected === 0) {
             throw new RecordNotFoundException('notification_not_found');
         }
+
+        await this.sendNotificationNotSeen(
+            'org',
+            organizationId,
+            notificationId,
+        );
     }
 
     async markUserNotificationAsNotSeen(
@@ -396,10 +477,12 @@ export class NotificationService {
         if (updateResult.affected === 0) {
             throw new RecordNotFoundException('notification_not_found');
         }
+
+        await this.sendNotificationNotSeen('usr', userId, notificationId);
     }
 
     async removeOrganizationNotification(
-        usersOwnOrganizationIds: number[],
+        organizationId: number,
         notificationId: number,
     ) {
         const deleteResult =
@@ -407,7 +490,7 @@ export class NotificationService {
                 id: notificationId,
                 project: {
                     projectDraft: {
-                        ownerOrganizationId: In(usersOwnOrganizationIds),
+                        ownerOrganizationId: organizationId,
                     },
                 },
             });
@@ -415,6 +498,12 @@ export class NotificationService {
         if (deleteResult.affected === 0) {
             throw new RecordNotFoundException('notification_not_found');
         }
+
+        await this.sendNotificationRemoved(
+            'org',
+            organizationId,
+            notificationId,
+        );
     }
 
     async removeUserNotification(userId: number, notificationId: number) {
@@ -426,25 +515,125 @@ export class NotificationService {
         if (deleteResult.affected === 0) {
             throw new RecordNotFoundException('notification_not_found');
         }
+
+        await this.sendNotificationRemoved('usr', userId, notificationId);
     }
 
-    private async sendNotification(
+    private async sendNotificationCreated(
         receiver: NotificationReceiver,
         receiverId: number,
         notificationdDto: NotificationDto,
     ) {
-        await this.redisService.publish(
-            `notify:${receiver}:${receiverId}`,
+        await this.sendNotificationEvent(
+            'created',
+            receiver,
+            receiverId,
             notificationdDto,
         );
     }
 
-    private getNotification(
+    private async sendNotificationRemoved(
+        receiver: NotificationReceiver,
+        receiverId: number,
+        notificationId: number,
+    ) {
+        await this.sendNotificationEvent(
+            'removed',
+            receiver,
+            receiverId,
+            notificationId,
+        );
+    }
+
+    private async sendNotificationSeen(
+        receiver: NotificationReceiver,
+        receiverId: number,
+        notificationId: number,
+    ) {
+        await this.sendNotificationEvent(
+            'seen',
+            receiver,
+            receiverId,
+            notificationId,
+        );
+    }
+
+    private async sendNotificationNotSeen(
+        receiver: NotificationReceiver,
+        receiverId: number,
+        notificationId: number,
+    ) {
+        await this.sendNotificationEvent(
+            'not-seen',
+            receiver,
+            receiverId,
+            notificationId,
+        );
+    }
+
+    private getNotificationCreated(
+        receiver: NotificationReceiver,
+        receiverId: number,
+    ) {
+        return this.getNotificationEvent(
+            'created',
+            receiver,
+            receiverId,
+        ) as Observable<NotificationDto>;
+    }
+
+    private getNotificationRemoved(
+        receiver: NotificationReceiver,
+        receiverId: number,
+    ) {
+        return this.getNotificationEvent(
+            'removed',
+            receiver,
+            receiverId,
+        ) as Observable<number>;
+    }
+
+    private getNotificationSeen(
+        receiver: NotificationReceiver,
+        receiverId: number,
+    ) {
+        return this.getNotificationEvent(
+            'seen',
+            receiver,
+            receiverId,
+        ) as Observable<number>;
+    }
+
+    private getNotificationNotSeen(
+        receiver: NotificationReceiver,
+        receiverId: number,
+    ) {
+        return this.getNotificationEvent(
+            'not-seen',
+            receiver,
+            receiverId,
+        ) as Observable<number>;
+    }
+
+    private async sendNotificationEvent(
+        event: NotificationEventType,
+        receiver: NotificationReceiver,
+        receiverId: number,
+        notification: NotificationDto | number,
+    ) {
+        await this.redisService.publish(
+            `notify:${event}:${receiver}:${receiverId}`,
+            notification,
+        );
+    }
+
+    private getNotificationEvent(
+        event: NotificationEventType,
         receiver: NotificationReceiver,
         receiverId: number,
     ) {
         return this.redisService.fromEvent(
-            `notify:${receiver}:${receiverId}`,
-        ) as Observable<NotificationDto>;
+            `notify:${event}:${receiver}:${receiverId}`,
+        ) as Observable<NotificationDto | number>;
     }
 }

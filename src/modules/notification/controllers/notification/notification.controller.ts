@@ -1,6 +1,7 @@
 import {
     Controller,
     Delete,
+    ForbiddenException,
     Get,
     MessageEvent,
     NotFoundException,
@@ -31,26 +32,7 @@ export class NotificationController {
     notificationEvents(
         @User() user: AuthTokenPayloadDto & { exp: number },
     ): Observable<MessageEvent> {
-        return new Observable<MessageEvent>((subscriber) => {
-            const subscription = this.notificationService
-                .getNotificationObservable(user)
-                .subscribe({
-                    next: (notification) => {
-                        subscriber.next({
-                            type: 'notification',
-                            data: notification,
-                        });
-                    },
-                    complete: () => {
-                        subscriber.next({
-                            type: 'close_connection',
-                            data: 'reconnect',
-                        });
-                        subscriber.complete();
-                        subscription.unsubscribe();
-                    },
-                });
-        });
+        return this.notificationService.getNotificationObservable(user);
     }
 
     @Get()
@@ -66,23 +48,32 @@ export class NotificationController {
         );
     }
 
-    @Patch('organization/:notificationId/mark-seen')
+    @Patch('organization/:organizationId/:notificationId/mark-seen')
     @UseGuards(AuthTokenGuard)
     async markOrganizationNotificationAsSeen(
         @User() user: AuthTokenPayloadDto,
+        @Param('organizationId', ParseIntPipe) organizationId: number,
         @Param('notificationId', ParseIntPipe) notificationId: number,
     ) {
-        try {
-            await this.notificationService.markOrganizationNotificationAsSeen(
-                user.organizations.map((org) => org.organizationId),
-                notificationId,
-            );
-        } catch (ex) {
-            if (ex instanceof RecordNotFoundException) {
-                throw new NotFoundException(ex.message);
+        if (
+            user.organizations.some(
+                (org) => org.organizationId === organizationId,
+            )
+        ) {
+            try {
+                await this.notificationService.markOrganizationNotificationAsSeen(
+                    organizationId,
+                    notificationId,
+                );
+            } catch (ex) {
+                if (ex instanceof RecordNotFoundException) {
+                    throw new NotFoundException(ex.message);
+                }
+                throw ex;
             }
-            throw ex;
+            return;
         }
+        throw new ForbiddenException('user_not_in_organization');
     }
 
     @Patch('user/:notificationId/mark-seen')
@@ -104,23 +95,32 @@ export class NotificationController {
         }
     }
 
-    @Patch('organization/:notificationId/mark-not-seen')
+    @Patch('organization/:organizationId/:notificationId/mark-not-seen')
     @UseGuards(AuthTokenGuard)
     async markOrganizationNotificationAsNotSeen(
         @User() user: AuthTokenPayloadDto,
+        @Param('organizationId', ParseIntPipe) organizationId: number,
         @Param('notificationId', ParseIntPipe) notificationId: number,
     ) {
-        try {
-            await this.notificationService.markOrganizationNotificationAsNotSeen(
-                user.organizations.map((org) => org.organizationId),
-                notificationId,
-            );
-        } catch (ex) {
-            if (ex instanceof RecordNotFoundException) {
-                throw new NotFoundException(ex.message);
+        if (
+            user.organizations.some(
+                (org) => org.organizationId === organizationId,
+            )
+        ) {
+            try {
+                await this.notificationService.markOrganizationNotificationAsNotSeen(
+                    organizationId,
+                    notificationId,
+                );
+            } catch (ex) {
+                if (ex instanceof RecordNotFoundException) {
+                    throw new NotFoundException(ex.message);
+                }
+                throw ex;
             }
-            throw ex;
+            return;
         }
+        throw new ForbiddenException('user_not_in_organization');
     }
 
     @Patch('user/:notificationId/mark-not-seen')
@@ -142,25 +142,34 @@ export class NotificationController {
         }
     }
 
-    @Delete('organization/:notificationId')
+    @Delete('organization/:organizationId/:notificationId')
     @UseGuards(AuthTokenGuard)
     async removeOrganizationNotification(
         @User() user: AuthTokenPayloadDto,
+        @Param('organizationId', ParseIntPipe) organizationId: number,
         @Param('notificationId', ParseIntPipe) notificationId: number,
     ) {
-        try {
-            await this.notificationService.removeOrganizationNotification(
-                user.organizations
-                    .filter((org) => org.role === OrganizationMemberRole.Owner)
-                    .map((org) => org.organizationId),
-                notificationId,
-            );
-        } catch (ex) {
-            if (ex instanceof RecordNotFoundException) {
-                throw new NotFoundException(ex.message);
+        if (
+            user.organizations.some(
+                (org) =>
+                    org.organizationId === organizationId &&
+                    org.role === OrganizationMemberRole.Owner,
+            )
+        ) {
+            try {
+                await this.notificationService.removeOrganizationNotification(
+                    organizationId,
+                    notificationId,
+                );
+            } catch (ex) {
+                if (ex instanceof RecordNotFoundException) {
+                    throw new NotFoundException(ex.message);
+                }
+                throw ex;
             }
-            throw ex;
+            return;
         }
+        throw new ForbiddenException('user_not_organization_owner');
     }
 
     @Delete('user/:notificationId')

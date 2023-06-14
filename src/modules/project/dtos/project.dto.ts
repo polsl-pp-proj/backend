@@ -5,7 +5,7 @@ export class ProjectDto {
     name: string;
     shortDescription: string;
     description: string;
-    fundingObjectives: string;
+    fundingObjectives?: string;
     organizationName: string;
     openPositions?: OpenPositionDto[];
     // TO DO

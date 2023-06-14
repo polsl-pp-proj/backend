@@ -37,8 +37,8 @@ export class ProjectDraftOpenPositionRepository extends Repository<ProjectDraftO
             id: Not(In(oldOpenPositionsIds)),
         });
 
-        const newOpenPositionsPromises = newOpenPositions.map(
-            async (newOpenPosition) => {
+        const newOpenPositionsEntities = newOpenPositions.map(
+            (newOpenPosition) => {
                 return this.create({
                     name: newOpenPosition.name,
                     description: newOpenPosition.description,
@@ -49,10 +49,6 @@ export class ProjectDraftOpenPositionRepository extends Repository<ProjectDraftO
             },
         );
 
-        const createdOpenPositions = await Promise.all(
-            newOpenPositionsPromises,
-        );
-
-        await this.save(createdOpenPositions);
+        await this.save(newOpenPositionsEntities);
     }
 }

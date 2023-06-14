@@ -159,7 +159,13 @@ export class ProjectRepository extends Repository<Project> {
 
     async editProjectContent(
         projectId: number,
-        uploadProjectDto: UploadProjectDto,
+        {
+            name,
+            shortDescription,
+            description,
+            fundingObjectives,
+            openPositions,
+        }: UploadProjectDto,
     ) {
         await this.entityManager.transaction(async (entityManager) => {
             const projectRepository = new ProjectRepository(
@@ -171,14 +177,6 @@ export class ProjectRepository extends Repository<Project> {
                     entityManager.connection,
                     entityManager,
                 );
-
-            const {
-                name,
-                shortDescription,
-                description,
-                fundingObjectives,
-                openPositions,
-            } = uploadProjectDto;
 
             const queryResult = await projectRepository.update(
                 { id: projectId },

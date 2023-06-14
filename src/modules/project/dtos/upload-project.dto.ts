@@ -3,6 +3,7 @@ import {
     IsDefined,
     IsJSON,
     IsNumber,
+    IsPositive,
     IsString,
     MaxLength,
     MinLength,
@@ -20,6 +21,7 @@ export class UploadProjectDto {
 
     @IsDefined({ message: 'not_defined' })
     @IsNumber({ maxDecimalPlaces: 0 }, { message: 'not_a_number' })
+    @IsPositive({ message: 'not_positive_number' })
     ownerOrganizationId: number;
 
     @IsDefined({ message: 'not_defined' })

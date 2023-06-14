@@ -16,7 +16,7 @@ export class ProjectDraftOpenPosition {
     projectDraftId: number;
 
     @ManyToOne(() => ProjectDraft)
-    @JoinColumn({ name: 'draft_id' })
+    @JoinColumn({ name: 'project_draft_id' })
     projectDraft: ProjectDraft;
 
     @Column({ name: 'name' })

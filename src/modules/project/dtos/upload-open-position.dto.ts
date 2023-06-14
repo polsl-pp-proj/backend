@@ -2,12 +2,15 @@ import {
     IsArray,
     IsDefined,
     IsNumber,
+    IsPositive,
     IsString,
     MaxLength,
     MinLength,
 } from 'class-validator';
 
 export class UploadOpenPositionDto {
+    @IsNumber({ maxDecimalPlaces: 0 }, { message: 'not_a_number' })
+    @IsPositive({ message: 'not_positive_number' })
     id?: number;
 
     @IsDefined({ message: 'not_defined' })

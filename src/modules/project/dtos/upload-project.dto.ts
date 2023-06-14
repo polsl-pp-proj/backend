@@ -33,10 +33,9 @@ export class UploadProjectDto {
     @MinLength(2, { message: 'too_short' })
     description: string;
 
-    @IsDefined({ message: 'not_defined' })
     @IsString({ message: 'not_a_string' })
     @MinLength(2, { message: 'too_short' })
-    fundingObjectives: string;
+    fundingObjectives?: string;
 
     @IsDefined({ message: 'not_defined' })
     @IsArray({ message: 'not_an_array' })

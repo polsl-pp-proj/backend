@@ -15,9 +15,7 @@ export class ProjectOpenPosition {
     @Column({ name: 'project_id' })
     projectId: number;
 
-    @ManyToOne(() => Project, (project) => project.openPositions, {
-        cascade: true,
-    })
+    @ManyToOne(() => Project, (project) => project.openPositions)
     @JoinColumn({ name: 'project_id' })
     project: Project;
 

@@ -43,6 +43,8 @@ export class ProjectDraftOpenPositionRepository extends Repository<ProjectDraftO
                     name: newOpenPosition.name,
                     description: newOpenPosition.description,
                     requirements: newOpenPosition.requirements,
+                    projectDraftId: draftId,
+                    projectDraft: { id: draftId },
                 });
             },
         );

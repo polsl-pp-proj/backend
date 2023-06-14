@@ -56,7 +56,7 @@ export class NotificationService {
                     (notification) => {
                         subscriber.next({
                             type: 'notification:created',
-                            data: notification,
+                            data: { ...notification, receiver: 'usr' },
                         });
                         checkExpiry();
                     },
@@ -65,7 +65,7 @@ export class NotificationService {
                     (notificationId) => {
                         subscriber.next({
                             type: 'notification:seen',
-                            data: { id: notificationId },
+                            data: { id: notificationId, receiver: 'usr' },
                         });
                         checkExpiry();
                     },
@@ -74,7 +74,7 @@ export class NotificationService {
                     (notificationId) => {
                         subscriber.next({
                             type: 'notification:not-seen',
-                            data: { id: notificationId },
+                            data: { id: notificationId, receiver: 'usr' },
                         });
                         checkExpiry();
                     },
@@ -83,7 +83,7 @@ export class NotificationService {
                     (notificationId) => {
                         subscriber.next({
                             type: 'notification:removed',
-                            data: { id: notificationId },
+                            data: { id: notificationId, receiver: 'usr' },
                         });
                         checkExpiry();
                     },
@@ -98,7 +98,7 @@ export class NotificationService {
                     ).subscribe((notification) => {
                         subscriber.next({
                             type: 'notification:created',
-                            data: notification,
+                            data: { ...notification, receiver: 'org' },
                         });
                         checkExpiry();
                     }),
@@ -106,7 +106,7 @@ export class NotificationService {
                         (notificationId) => {
                             subscriber.next({
                                 type: 'notification:seen',
-                                data: { id: notificationId },
+                                data: { id: notificationId, receiver: 'org' },
                             });
                             checkExpiry();
                         },
@@ -117,7 +117,7 @@ export class NotificationService {
                     ).subscribe((notificationId) => {
                         subscriber.next({
                             type: 'notification:not-seen',
-                            data: { id: notificationId },
+                            data: { id: notificationId, receiver: 'org' },
                         });
                         checkExpiry();
                     }),
@@ -127,7 +127,7 @@ export class NotificationService {
                     ).subscribe((notificationId) => {
                         subscriber.next({
                             type: 'notification:removed',
-                            data: { id: notificationId },
+                            data: { id: notificationId, receiver: 'org' },
                         });
                         checkExpiry();
                     }),
@@ -248,6 +248,7 @@ export class NotificationService {
                     .addSelect('createdAt')
                     .addSelect('updatedAt')
                     .from(`(${unionedQuery})`, 'combined_queries_alias')
+                    .addOrderBy('createdAt', 'DESC', 'NULLS LAST')
                     .setParameters(
                         sqlParameters,
                     ) as SelectQueryBuilder<INotification>;

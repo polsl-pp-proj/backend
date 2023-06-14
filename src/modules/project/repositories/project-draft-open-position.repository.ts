@@ -19,18 +19,14 @@ export class ProjectDraftOpenPositionRepository extends Repository<ProjectDraftO
         draftId: number,
     ) {
         // Filter openPositions without id nr (new openPositons that are not in database yet)
-        const newOpenPositions = openPositions.filter((openPositionDto) => {
-            if (!openPositionDto.id) {
-                return true;
-            }
-        });
+        const newOpenPositions = openPositions.filter(
+            (openPositionDto) => !openPositionDto.id,
+        );
 
         // Filter openPositions' Ids present in database
         const oldOpenPositionsIds = openPositions
-            .filter((openPositionDto) => openPositionDto.id)
-            .map((openPositionDto) => {
-                return openPositionDto.id;
-            });
+            .filter((openPositionDto) => !!openPositionDto.id)
+            .map((openPositionDto) => openPositionDto.id);
 
         await this.delete({
             projectDraftId: draftId,

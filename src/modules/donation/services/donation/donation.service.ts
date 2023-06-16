@@ -4,7 +4,7 @@ import { ProjectDonationRepository } from '../../repositories/project-donation.r
 import Stripe from 'stripe';
 import { Not } from 'typeorm';
 import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
-import { ProjectRepository } from '../../../project/repositories/project.repository.ts';
+import { ProjectRepository } from '../../../project/repositories/project.repository';
 
 @Injectable()
 export class DonationService {

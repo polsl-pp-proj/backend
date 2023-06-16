@@ -18,33 +18,42 @@ export class ProjectDraftOpenPositionRepository extends Repository<ProjectDraftO
         openPositions: UploadOpenPositionDto[],
         draftId: number,
     ) {
-        // Filter openPositions without id nr (new openPositons that are not in database yet)
-        const newOpenPositions = openPositions.filter(
-            (openPositionDto) => !openPositionDto.id,
-        );
+        await this.entityManager.transaction(async (entityManager) => {
+            const projectDraftOpenPositionRepository =
+                new ProjectDraftOpenPositionRepository(
+                    entityManager.connection,
+                    entityManager,
+                );
+            // Filter openPositions without id nr (new openPositons that are not in database yet)
+            const newOpenPositions = openPositions.filter(
+                (openPositionDto) => !openPositionDto.id,
+            );
 
-        // Filter openPositions' Ids present in database
-        const oldOpenPositionsIds = openPositions
-            .filter((openPositionDto) => !!openPositionDto.id)
-            .map((openPositionDto) => openPositionDto.id);
+            // Filter openPositions' Ids present in database
+            const oldOpenPositionsIds = openPositions
+                .filter((openPositionDto) => !!openPositionDto.id)
+                .map((openPositionDto) => openPositionDto.id);
 
-        await this.delete({
-            projectDraftId: draftId,
-            id: Not(In(oldOpenPositionsIds)),
+            await projectDraftOpenPositionRepository.delete({
+                projectDraftId: draftId,
+                id: Not(In(oldOpenPositionsIds)),
+            });
+
+            const newOpenPositionsEntities = newOpenPositions.map(
+                (newOpenPosition) => {
+                    return this.create({
+                        name: newOpenPosition.name,
+                        description: newOpenPosition.description,
+                        requirements: newOpenPosition.requirements,
+                        projectDraftId: draftId,
+                        projectDraft: { id: draftId },
+                    });
+                },
+            );
+
+            await projectDraftOpenPositionRepository.save(
+                newOpenPositionsEntities,
+            );
         });
-
-        const newOpenPositionsEntities = newOpenPositions.map(
-            (newOpenPosition) => {
-                return this.create({
-                    name: newOpenPosition.name,
-                    description: newOpenPosition.description,
-                    requirements: newOpenPosition.requirements,
-                    projectDraftId: draftId,
-                    projectDraft: { id: draftId },
-                });
-            },
-        );
-
-        await this.save(newOpenPositionsEntities);
     }
 }

@@ -11,9 +11,9 @@ import { IProjectDraftSubmissionService } from 'src/interfaces/project-draft-sub
 import { ProjectDraftRepository } from './repositories/project-draft.repository';
 import { ProjectDraftSubmissionRepository } from './repositories/project-draft-submission.repository';
 import { ProjectRepository } from './repositories/project.repository';
-import { ProjectController } from './controllers/project/project/project.controller';
-import { ProjectDraftController } from './controllers/project-draft/project-draft/project-draft.controller';
-import { ProjectDraftSubmissionController } from './controllers/project-draft-submission/project-draft-submission/project-draft-submission.controller';
+import { ProjectController } from './controllers/project/project.controller';
+import { ProjectDraftController } from './controllers/project-draft/project-draft.controller';
+import { ProjectDraftSubmissionController } from './controllers/project-draft-submission/project-draft-submission.controller';
 import { ProjectDraftOpenPosition } from './entities/project-draft-open-position.entity';
 import { ProjectOpenPosition } from './entities/project-open-position.entity';
 import { ProjectDraftOpenPositionRepository } from './repositories/project-draft-open-position.repository';

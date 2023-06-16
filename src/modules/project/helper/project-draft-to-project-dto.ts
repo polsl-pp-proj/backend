@@ -9,7 +9,7 @@ export const convertProjectDraftToProjectDto = (projectDraft: ProjectDraft) => {
         name: projectDraft.name,
         shortDescription: projectDraft.shortDescription,
         description: projectDraft.description,
-        fundingObjectives: projectDraft.fundingObjectives,
+        fundingObjectives: projectDraft.fundingObjectives ?? '',
         organizationId: projectDraft.ownerOrganizationId,
         organizationName: projectDraft.ownerOrganization.name,
         openPositions: projectDraft.openPositions.map((openPosition) =>

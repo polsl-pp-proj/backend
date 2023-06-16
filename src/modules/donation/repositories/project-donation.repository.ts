@@ -34,4 +34,47 @@ export class ProjectDonationRepository extends Repository<ProjectDonation> {
             }
         });
     }
+
+    async getLastFunders(projectId: number) {
+        return await this.find({
+            where: { projectId },
+            relations: { user: true },
+            take: 10,
+            order: { createdAt: 'DESC' },
+        });
+    }
+
+    async getDonationStats(projectId: number) {
+        return await this.manager.transaction(async (manager) => {
+            const completedPaymentRepository = new ProjectDonationRepository(
+                manager.connection,
+                manager,
+            );
+
+            const funders = await completedPaymentRepository.getLastFunders(
+                projectId,
+            );
+
+            const raisedLastMonth = (
+                await completedPaymentRepository
+                    .createQueryBuilder('payment')
+                    .select('COALESCE(SUM(payment.amount), 0) as "amount"')
+                    .where('payment.projectId = :projectId', { projectId })
+                    .andWhere('payment.createdAt >= :date', {
+                        date: new Date(new Date().valueOf() - 2678400000),
+                    })
+                    .getRawOne<{ amount: number }>()
+            ).amount;
+
+            const raisedAllTime = (
+                await completedPaymentRepository
+                    .createQueryBuilder('payment')
+                    .select('COALESCE(SUM(payment.amount), 0) as "amount"')
+                    .where('payment.projectId = :projectId', { projectId })
+                    .getRawOne<{ amount: number }>()
+            ).amount;
+
+            return { funders, raisedLastMonth, raisedAllTime };
+        });
+    }
 }

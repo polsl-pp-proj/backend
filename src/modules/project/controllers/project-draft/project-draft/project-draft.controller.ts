@@ -27,11 +27,14 @@ export class ProjectDraftController {
     constructor(private readonly projectService: IProjectService) {}
 
     @Get('organization/:organizationId')
+    @UseGuards(AuthTokenGuard)
     async getAllOrganizationDrafts(
         @Param('organizationId', ParseIntPipe) organizationId: number,
+        @AuthTokenPayload() user: AuthTokenPayloadDto,
     ): Promise<SimpleProjectDraftDto[]> {
         return await this.projectService.getAllOrganizationsDrafts(
             organizationId,
+            user,
         );
     }
 
@@ -52,6 +55,7 @@ export class ProjectDraftController {
     }
 
     @Post()
+    @UseGuards(AuthTokenGuard)
     async createProjectDraft(
         @Body(new ValidationPipe(validationConfig))
         uploadProjectDto: UploadProjectDto,
@@ -64,6 +68,7 @@ export class ProjectDraftController {
     }
 
     @Patch(':draftId')
+    @UseGuards(AuthTokenGuard)
     async editProjectDraft(
         @Param('draftId', ParseIntPipe) draftId: number,
         @Body(new ValidationPipe(validationConfig))

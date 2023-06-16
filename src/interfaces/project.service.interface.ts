@@ -50,6 +50,7 @@ export abstract class IProjectService {
      */
     abstract getAllOrganizationsDrafts(
         organizationId: number,
+        user: AuthTokenPayloadDto,
     ): Promise<SimpleProjectDraftDto[]>;
 
     /**

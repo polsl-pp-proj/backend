@@ -62,11 +62,31 @@ export class ProjectService implements IProjectService {
         });
     }
 
-    async getAllOrganizationsDrafts(organizationId: number) {
+    async getAllOrganizationsDrafts(
+        organizationId: number,
+        user: AuthTokenPayloadDto,
+    ) {
         const drafts = await this.projectDraftRepository.find({
             where: { ownerOrganizationId: organizationId },
-            relations: { ownerOrganization: true },
+            relations: { ownerOrganization: { organizationUsers: true } },
         });
+
+        if (drafts.length === 0) {
+            throw new RecordNotFoundException(
+                'drafts_with_organization_id_not_found',
+            );
+        }
+
+        const organizartionUser =
+            drafts[0].ownerOrganization.organizationUsers.find(
+                (organizartionUser) => organizartionUser.userId === user.userId,
+            );
+
+        if (!organizartionUser && user.role === UserRole.BasicUser) {
+            throw new UserNotInOrganizationException(
+                'user_not_in_organization',
+            );
+        }
 
         return drafts.map((draft) => {
             return convertProjectDraftToSimpleProjectDraftDto(draft);

@@ -10,6 +10,7 @@ import { RecordNotFoundException } from 'src/exceptions/record-not-found.excepti
 import { ModifiedAfterReadException } from 'src/exceptions/modified-after-read.exception';
 import { IProjectDraftSubmissionService } from 'src/interfaces/project-draft-submission.service.interface';
 import { convertProjectDraftSubmissionToSubmissionDto } from '../../helper/submission-to-submission-dto';
+import { convertProjectDraftToProjectDraftDto } from '../../helper/project-draft-to-project-draft-dto';
 
 @Injectable()
 export class ProjectDraftSubmissionService
@@ -31,12 +32,15 @@ export class ProjectDraftSubmissionService
     async getSubmissionById(submissionId: number) {
         const submission = await this.projectDraftSubmissionRepository.findOne({
             where: { id: submissionId },
-            relations: { projectDraft: true },
+            relations: { projectDraft: { ownerOrganization: true } },
         });
         if (!submission) {
             throw new RecordNotFoundException('submission_with_id_not_found');
         }
-        return convertProjectDraftSubmissionToSubmissionDto(submission);
+        return convertProjectDraftToProjectDraftDto(
+            submission.projectDraft,
+            submission.projectDraft.ownerOrganization.name,
+        );
     }
 
     async rejectSubmission(

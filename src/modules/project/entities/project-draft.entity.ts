@@ -12,9 +12,6 @@ export class ProjectDraft extends ProjectBase {
     @JoinColumn({ name: 'owner_organization_id' })
     ownerOrganization: Organization;
 
-    @Column({ name: 'funding_objectives' })
-    fundingObjectives: string;
-
     @OneToMany(
         () => ProjectDraftOpenPosition,
         (projectDraftOpenPosition) => projectDraftOpenPosition.projectDraft,

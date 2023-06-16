@@ -12,9 +12,6 @@ export class Project extends ProjectBase {
     @JoinColumn({ name: 'draft_id' })
     projectDraft: ProjectDraft;
 
-    @Column({ name: 'funding_objectives' })
-    fundingObjectives: string;
-
     @OneToMany(
         () => ProjectOpenPosition,
         (openPosition) => openPosition.project,

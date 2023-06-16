@@ -12,11 +12,14 @@ export abstract class ProjectBase {
     @Column({ name: 'name' })
     name: string;
 
+    @Column({ name: 'short_description' })
+    shortDescription: string;
+
     @Column({ name: 'description' })
     description: string;
 
-    @Column({ name: 'short_description' })
-    shortDescription: string;
+    @Column({ name: 'funding_objectives' })
+    fundingObjectives: string;
 
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;

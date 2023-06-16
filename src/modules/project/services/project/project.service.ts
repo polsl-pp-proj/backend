@@ -1,0 +1,136 @@
+import { Injectable } from '@nestjs/common';
+import { ProjectRepository } from '../../repositories/project.repository';
+import { SimpleProjectDto } from '../../dtos/project.dto';
+import { CreateProjectDto } from '../../dtos/create-project.dto';
+import { ProjectDraftRepository } from '../../repositories/project-draft.repository';
+import {
+    convertProjectDraftToProjectDto,
+    convertProjectDraftToSimpleProjectDto,
+} from '../../helper/project-draft-to-project-dto';
+import {
+    convertProjectToProjectDto,
+    convertProjectToSimpleProjectDto,
+} from '../../helper/project-to-project-dto';
+import { IProjectService } from 'src/interfaces/project.service.interface';
+import { AuthTokenPayloadDto } from 'src/modules/auth/dtos/auth-token-payload.dto';
+import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
+import { UserNotInOrganizationException } from 'src/exceptions/user-not-in-organization.exception';
+import { UserRole } from 'src/modules/user/enums/user-role.enum';
+import { UpdateProjectDto } from '../../dtos/update-project.dto';
+
+@Injectable()
+export class ProjectService implements IProjectService {
+    constructor(
+        private readonly projectRepository: ProjectRepository,
+        private readonly projectDraftRepository: ProjectDraftRepository,
+    ) {}
+
+    async getAllProjects(): Promise<SimpleProjectDto[]> {
+        const projects = await this.projectRepository.find({
+            relations: { projectDraft: { ownerOrganization: true } },
+        });
+        return projects.map((project) =>
+            convertProjectToSimpleProjectDto(project),
+        );
+    }
+
+    async getAllOrganizationsProjects(organizationId: number) {
+        const projects = await this.projectRepository.find({
+            where: { projectDraft: { ownerOrganizationId: organizationId } },
+            relations: { projectDraft: { ownerOrganization: true } },
+        });
+
+        return projects.map((project) =>
+            convertProjectToSimpleProjectDto(project),
+        );
+    }
+
+    async getProjectById(projectId: number) {
+        const project = await this.projectRepository.findOne({
+            where: { id: projectId },
+            relations: { projectDraft: { ownerOrganization: true } },
+        });
+
+        return convertProjectToProjectDto(project);
+    }
+    async getAllDrafts() {
+        const drafts = await this.projectDraftRepository.find({
+            relations: { ownerOrganization: true },
+        });
+
+        return drafts.map((draft) => {
+            return convertProjectDraftToSimpleProjectDto(draft);
+        });
+    }
+
+    async getAllOrganizationsDrafts(organizationId: number) {
+        const drafts = await this.projectDraftRepository.find({
+            where: { ownerOrganizationId: organizationId },
+            relations: { ownerOrganization: true },
+        });
+
+        return drafts.map((draft) => {
+            return convertProjectDraftToSimpleProjectDto(draft);
+        });
+    }
+
+    async getDraftById(draftId: number, user: AuthTokenPayloadDto) {
+        const draft = await this.projectDraftRepository.findOne({
+            where: { id: draftId },
+            relations: {
+                ownerOrganization: true,
+                openPositions: true,
+            },
+        });
+
+        if (!draft) {
+            throw new RecordNotFoundException('draft_with_id_not_found');
+        }
+
+        if (
+            !user.organizations.some(
+                (userOrganization) =>
+                    userOrganization.organizationId ===
+                    draft.ownerOrganizationId,
+            )
+        ) {
+            throw new UserNotInOrganizationException(
+                'user_not_in_organization',
+            );
+        }
+
+        return convertProjectDraftToProjectDto(draft);
+    }
+
+    async createProjectDraft(
+        uploadProjectDto: CreateProjectDto,
+        organizationId: number,
+    ) {
+        await this.projectDraftRepository.createProjectDraft(
+            uploadProjectDto,
+            organizationId,
+        );
+    }
+
+    async updateProjectDraft(
+        projectDraftId: number,
+        updateProjectDto: UpdateProjectDto,
+        organizationId: number,
+    ) {
+        await this.projectDraftRepository.updateProjectDraft(
+            projectDraftId,
+            updateProjectDto,
+            organizationId,
+        );
+    }
+
+    async editProjectContent(
+        projectId: number,
+        updateProjectDto: UpdateProjectDto,
+    ) {
+        await this.projectRepository.editProjectContent(
+            projectId,
+            updateProjectDto,
+        );
+    }
+}

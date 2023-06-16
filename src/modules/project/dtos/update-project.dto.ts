@@ -1,16 +1,17 @@
-import { Transform, Type } from 'class-transformer';
+import { Transform } from 'class-transformer';
 import {
     IsDefined,
     IsString,
     MinLength,
     MaxLength,
     IsArray,
-    ValidateNested,
     ArrayNotEmpty,
 } from 'class-validator';
 import { CreateOpenPositionDto } from './create-open-position.dto';
 import { IsOpenPositionUpload } from 'src/decorators/validator/open-position-upload.validator';
 import { BadRequestException } from '@nestjs/common';
+import { AssetDto } from 'src/modules/asset/dtos/asset.dto';
+import { IsAssetUpload } from 'src/decorators/validator/is-asset-upload.validator';
 
 export class UpdateProjectDto {
     @IsDefined({ message: 'not_defined' })
@@ -48,4 +49,20 @@ export class UpdateProjectDto {
         message: 'not_array',
     })
     openPositions: (CreateOpenPositionDto | number)[];
+
+    @Transform((params) => {
+        try {
+            return JSON.parse(params.value);
+        } catch (e) {
+            throw new BadRequestException(
+                `${params.key} contains invalid JSON `,
+            );
+        }
+    })
+    @IsAssetUpload({ message: 'not_asset_array' })
+    @ArrayNotEmpty({ message: 'array_empty' })
+    @IsArray({
+        message: 'not_array',
+    })
+    assets: (AssetDto | number)[];
 }

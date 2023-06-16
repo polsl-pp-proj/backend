@@ -1,38 +1,13 @@
-import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { ProjectDraft } from './project-draft.entity';
+import { ProjectOpenPositionBase } from './project-open-position.entitybase';
 
 @Entity({ name: 'project_draft_open_positions' })
-export class ProjectDraftOpenPosition {
-    @PrimaryGeneratedColumn({ name: 'id' })
-    id: number;
-
+export class ProjectDraftOpenPosition extends ProjectOpenPositionBase {
     @Column({ name: 'project_draft_id' })
     projectDraftId: number;
 
     @ManyToOne(() => ProjectDraft)
     @JoinColumn({ name: 'project_draft_id' })
     projectDraft: ProjectDraft;
-
-    @Column({ name: 'name' })
-    name: string;
-
-    @Column({ name: 'description' })
-    description: string;
-
-    @Column({ name: 'requirements', default: [], type: 'jsonb' })
-    requirements: string[];
-
-    @CreateDateColumn({ name: 'created_at' })
-    createdAt: Date;
-
-    @UpdateDateColumn({ name: 'updated_at' })
-    updatedAt: Date;
 }

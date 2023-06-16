@@ -33,6 +33,7 @@ import { StudentshipController } from './controllers/studentship/studentship.con
 import { StudentshipService } from './services/studentship/studentship.service';
 import { StudentshipMailerModule } from './modules/studentship-mailer/studentship-mailer.module';
 import { StudentshipRepository } from './repositories/studentship.repository';
+import { PolonModule } from '../polon/polon.module';
 
 @Module({
     imports: [
@@ -47,6 +48,7 @@ import { StudentshipRepository } from './repositories/studentship.repository';
         SignupMailerModule,
         DonationModule,
         StudentshipMailerModule,
+        PolonModule,
     ],
     controllers: [AuthController, SignupController, StudentshipController],
     providers: [

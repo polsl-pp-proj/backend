@@ -7,5 +7,6 @@ import { PolonController } from './controllers/polon/polon.controller';
     providers: [PolonService],
     controllers: [PolonController],
     imports: [HttpModule],
+    exports: [PolonService],
 })
 export class PolonModule {}

@@ -1,4 +1,3 @@
-import { AssetType } from 'src/modules/asset/enums/asset-type.enum';
 import { OpenPositionDto } from './open-position.dto';
 import { AssetDto } from 'src/modules/asset/dtos/asset.dto';
 
@@ -15,8 +14,8 @@ export class ProjectDto {
     updatedAt: number;
     assets: AssetDto[];
 
-    constructor(partialProjectDto: Partial<ProjectDto>) {
-        Object.assign(this, partialProjectDto);
+    constructor(projectDto: ProjectDto) {
+        Object.assign(this, projectDto);
     }
 }
 
@@ -30,7 +29,7 @@ export class SimpleProjectDto {
     updatedAt: number;
     thumbnail: AssetDto;
 
-    constructor(partialSimpleProjectDto: Partial<SimpleProjectDto>) {
-        Object.assign(this, partialSimpleProjectDto);
+    constructor(simpleProjectDto: SimpleProjectDto) {
+        Object.assign(this, simpleProjectDto);
     }
 }

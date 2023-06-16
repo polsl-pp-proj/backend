@@ -3,6 +3,7 @@ import { ProjectOpenPosition } from '../entities/project-open-position.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { ProjectDraftOpenPositionRepository } from './project-draft-open-position.repository';
 import { CreateOpenPositionDto } from '../dtos/create-open-position.dto';
+import { ProjectDraftOpenPosition } from '../entities/project-draft-open-position.entity';
 
 export class ProjectOpenPositionRepository extends Repository<ProjectOpenPosition> {
     constructor(
@@ -15,26 +16,21 @@ export class ProjectOpenPositionRepository extends Repository<ProjectOpenPositio
         );
     }
 
-    async importOpenPositionsFromDraft(projectId: number, draftId: number) {
-        await this.entityManager.transaction(async (entityManager) => {
-            const projectOpenPositionRepository =
-                new ProjectOpenPositionRepository(
-                    entityManager.connection,
-                    entityManager,
-                );
-            const projectDraftOpenPositionRepository =
-                new ProjectDraftOpenPositionRepository(
-                    entityManager.connection,
-                    entityManager,
-                );
-
-            const draftOpenPositions =
-                await projectDraftOpenPositionRepository.find({
-                    where: { projectDraftId: draftId },
-                });
-
-            await this.editProjectOpenPositions(projectId, draftOpenPositions);
-        });
+    async importOpenPositionsFromDraft(
+        projectId: number,
+        projectDraftOpenPositions: ProjectDraftOpenPosition[],
+    ) {
+        await this.editProjectOpenPositions(
+            projectId,
+            projectDraftOpenPositions.map(
+                ({ name, description, requirements }) =>
+                    Object.assign(new CreateOpenPositionDto(), {
+                        name,
+                        description,
+                        requirements,
+                    } as CreateOpenPositionDto),
+            ),
+        );
     }
 
     async editProjectOpenPositions(

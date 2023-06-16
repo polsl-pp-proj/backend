@@ -42,7 +42,7 @@ export class ProjectDraftSubmissionRepository extends Repository<ProjectDraftSub
 
             const submission = await submissionRepository.findOne({
                 where: { id: submissionId },
-                relations: { projectDraft: true },
+                relations: { projectDraft: { openPositions: true } },
             });
 
             if (!submission) {
@@ -51,7 +51,7 @@ export class ProjectDraftSubmissionRepository extends Repository<ProjectDraftSub
                 );
             }
 
-            await projectRepository.importFormProjectDraft(
+            await projectRepository.importFromProjectDraft(
                 submission.projectDraft,
                 draftLastModified,
             );

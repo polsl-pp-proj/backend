@@ -30,7 +30,7 @@ export class ProjectRepository extends Repository<Project> {
         super(Project, entityManager ?? dataSource.createEntityManager());
     }
 
-    async importFormProjectDraft(
+    async importFromProjectDraft(
         projectDraft: ProjectDraft,
         draftLastModified: Date,
     ) {
@@ -80,7 +80,7 @@ export class ProjectRepository extends Repository<Project> {
 
             await projectOpenPositionRepository.importOpenPositionsFromDraft(
                 project.id,
-                projectDraft.id,
+                projectDraft.openPositions,
             );
         });
     }

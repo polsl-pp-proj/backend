@@ -2,7 +2,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import { PrepareProjectDonationDto } from '../../dtos/prepare-project-donation.dto';
 import { ProjectDonationRepository } from '../../repositories/project-donation.repository';
 import Stripe from 'stripe';
-import { checkForeignKeyViolation } from 'src/helpers/check-foreign-key-violation.helper';
+import { Not } from 'typeorm';
+import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
+import { ProjectRepository } from '../../../project/repositories/project.repository';
 
 @Injectable()
 export class DonationService {
@@ -25,29 +27,25 @@ export class DonationService {
     ) {
         return await this.projectDonationRepository.manager.transaction(
             async (manager) => {
+                const projectRepository = new ProjectRepository(
+                    manager.connection,
+                    manager,
+                );
                 const projectDonationRepository = new ProjectDonationRepository(
                     manager.connection,
                     manager,
                 );
 
-                const projectDonation = projectDonationRepository.create({
-                    user: { id: userId },
-                    userId,
-                    projectId,
-                    // project: { id: projectId },
-                    amount: prepareProjectDonationDto.amount,
-                    isAnonymous: prepareProjectDonationDto.isAnonymous,
-                    paymentFinished: false,
-                    paymentIntentId: 'TBF',
+                const project = await projectRepository.findOne({
+                    where: { id: projectId, fundingObjectives: Not(null) },
+                    select: { id: true },
+                    relations: {},
                 });
 
-                try {
-                    await projectDonationRepository.save(projectDonation, {
-                        reload: true,
-                    });
-                } catch (ex) {
-                    checkForeignKeyViolation(ex, 'project_does_not_exist');
-                    throw ex;
+                if (!project) {
+                    throw new RecordNotFoundException(
+                        'project_does_not_exist_or_not_fundable',
+                    );
                 }
 
                 const paymentIntent = await this.stripe.paymentIntents.create({
@@ -55,15 +53,20 @@ export class DonationService {
                     currency: 'pln',
                 });
 
-                await projectDonationRepository.save(
-                    {
-                        id: projectDonation.id,
-                        paymentIntentId: paymentIntent.id,
-                    },
-                    {
-                        reload: true,
-                    },
-                );
+                const projectDonation = projectDonationRepository.create({
+                    user: { id: userId },
+                    userId,
+                    projectId,
+                    project: { id: projectId },
+                    amount: prepareProjectDonationDto.amount,
+                    isAnonymous: prepareProjectDonationDto.isAnonymous,
+                    paymentFinished: false,
+                    paymentIntentId: paymentIntent.id,
+                });
+
+                await projectDonationRepository.save(projectDonation, {
+                    reload: true,
+                });
 
                 return paymentIntent.client_secret;
             },

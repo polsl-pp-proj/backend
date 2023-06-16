@@ -23,6 +23,7 @@ import {
 } from 'src/modules/project/dtos/project.dto';
 import { CreateProjectDto } from 'src/modules/project/dtos/create-project.dto';
 import { UpdateProjectDto } from 'src/modules/project/dtos/update-project.dto';
+import { UserOrganizationDto } from 'src/modules/auth/dtos/user-organization.dto';
 
 @Controller({ path: 'project/draft', version: '1' })
 export class ProjectDraftController {
@@ -34,9 +35,16 @@ export class ProjectDraftController {
         @Param('organizationId', ParseIntPipe) organizationId: number,
         @AuthTokenPayload() user: AuthTokenPayloadDto,
     ): Promise<SimpleProjectDto[]> {
+        if (
+            !user.organizations.some(
+                (userOrganization) =>
+                    userOrganization.organizationId === organizationId,
+            )
+        ) {
+            throw new ForbiddenException('user_not_in_organization');
+        }
         return await this.projectService.getAllOrganizationsDrafts(
             organizationId,
-            user,
         );
     }
 

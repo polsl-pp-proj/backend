@@ -97,19 +97,23 @@ export class ProjectService implements IProjectService {
     async getDraftById(draftId: number, user: AuthTokenPayloadDto) {
         const draft = await this.projectDraftRepository.findOne({
             where: { id: draftId },
-            relations: { ownerOrganization: { organizationUsers: true } },
+            relations: {
+                ownerOrganization: true,
+                openPositions: true,
+            },
         });
 
         if (!draft) {
             throw new RecordNotFoundException('draft_with_id_not_found');
         }
 
-        const organizartionUser =
-            draft.ownerOrganization.organizationUsers.find(
-                (organizartionUser) => organizartionUser.userId === user.userId,
-            );
-
-        if (!organizartionUser && user.role === UserRole.BasicUser) {
+        if (
+            !user.organizations.some(
+                (userOrganization) =>
+                    userOrganization.organizationId ===
+                    draft.ownerOrganizationId,
+            )
+        ) {
             throw new UserNotInOrganizationException(
                 'user_not_in_organization',
             );
@@ -121,12 +125,10 @@ export class ProjectService implements IProjectService {
     async createProjectDraft(
         uploadProjectDto: CreateProjectDto,
         organizationId: number,
-        userId: number,
     ) {
         await this.projectDraftRepository.createProjectDraft(
             uploadProjectDto,
             organizationId,
-            userId,
         );
     }
 
@@ -134,13 +136,11 @@ export class ProjectService implements IProjectService {
         projectDraftId: number,
         updateProjectDto: UpdateProjectDto,
         organizationId: number,
-        userId: number,
     ) {
         await this.projectDraftRepository.updateProjectDraft(
             projectDraftId,
             updateProjectDto,
             organizationId,
-            userId,
         );
     }
 

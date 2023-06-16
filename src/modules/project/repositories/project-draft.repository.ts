@@ -1,20 +1,12 @@
-import { DataSource, EntityManager, In, Not, Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { ProjectDraft } from '../entities/project-draft.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { CreateProjectDto } from '../dtos/create-project.dto';
-import {
-    Injectable,
-    NotFoundException,
-    UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
 import { ProjectDraftSubmissionRepository } from './project-draft-submission.repository';
 import { ProjectDraftSubmissionStatus } from '../enums/project-draft-submission-status.enum';
 import { ProjectDraftOpenPositionRepository } from './project-draft-open-position.repository';
-import { OrganizationRepository } from 'src/modules/organization/repositories/organization.repository';
-import { AuthTokenPayloadDto } from 'src/modules/auth/dtos/auth-token-payload.dto';
-import { UserNotInOrganizationException } from 'src/exceptions/user-not-in-organization.exception';
-import { UserRole } from 'src/modules/user/enums/user-role.enum';
 import { UpdateProjectDto } from '../dtos/update-project.dto';
 
 @Injectable()
@@ -29,7 +21,6 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
     async createProjectDraft(
         uploadProjectDto: CreateProjectDto,
         organizationId: number,
-        userId: number,
     ) {
         await this.entityManager.transaction(async (entityManager) => {
             const projectDraftRepository = new ProjectDraftRepository(
@@ -40,35 +31,11 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
                 entityManager.connection,
                 entityManager,
             );
-            const organizationRepository = new OrganizationRepository(
-                entityManager.connection,
-                entityManager,
-            );
             const projectDraftOpenPositionRepository =
                 new ProjectDraftOpenPositionRepository(
                     entityManager.connection,
                     entityManager,
                 );
-            const organization = await organizationRepository.findOne({
-                where: { id: organizationId },
-                relations: { organizationUsers: true },
-            });
-
-            if (!organization) {
-                throw new RecordNotFoundException(
-                    'organization_with_id_not_found',
-                );
-            }
-
-            const organizartionUser = organization.organizationUsers.find(
-                (organizationUser) => organizationUser.userId === userId,
-            );
-
-            if (!organizartionUser) {
-                throw new UserNotInOrganizationException(
-                    'user_not_in_organization',
-                );
-            }
 
             const draft = projectDraftRepository.create({
                 name: uploadProjectDto.name,
@@ -79,12 +46,13 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
                 fundingObjectives: uploadProjectDto.fundingObjectives,
             });
 
+            await projectDraftRepository.save(draft, { reload: true });
+
             await projectDraftOpenPositionRepository.updateOpenPositions(
                 draft.id,
                 uploadProjectDto.openPositions,
             );
 
-            await projectDraftRepository.save(draft, { reload: true });
             await submissionRepository.createSubmission(draft.id);
         });
     }
@@ -93,7 +61,6 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
         projectDraftId: number,
         updateProjectDto: UpdateProjectDto,
         organizationId: number,
-        userId: number,
     ) {
         this.entityManager.transaction(async (entityManager) => {
             const projectDraftRepository = new ProjectDraftRepository(
@@ -110,34 +77,11 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
                     entityManager,
                 );
 
-            const organizationRepository = new OrganizationRepository(
-                entityManager.connection,
-                entityManager,
-            );
-
-            const organization = await organizationRepository.findOne({
-                where: { id: organizationId },
-                relations: { organizationUsers: true },
-            });
-
-            if (!organization) {
-                throw new RecordNotFoundException(
-                    'organization_with_id_not_found',
-                );
-            }
-
-            const organizationUser = organization.organizationUsers.find(
-                (organizationUser) => organizationUser.userId === userId,
-            );
-
-            if (!organizationUser) {
-                throw new UserNotInOrganizationException(
-                    'user_not_in_organization',
-                );
-            }
-
             let draft = await projectDraftRepository.findOne({
-                where: { id: projectDraftId },
+                where: {
+                    id: projectDraftId,
+                    ownerOrganizationId: organizationId,
+                },
             });
 
             if (!draft) {

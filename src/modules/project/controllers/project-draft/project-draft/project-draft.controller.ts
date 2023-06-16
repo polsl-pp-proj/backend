@@ -1,6 +1,7 @@
 import {
     Body,
     Controller,
+    ForbiddenException,
     Get,
     NotFoundException,
     Param,
@@ -63,10 +64,17 @@ export class ProjectDraftController {
         uploadProjectDto: CreateProjectDto,
         @AuthTokenPayload() user: AuthTokenPayloadDto,
     ): Promise<void> {
+        if (
+            !user.organizations.some(
+                (userOrganization) =>
+                    userOrganization.organizationId === organizationId,
+            )
+        ) {
+            throw new ForbiddenException('user_not_in_organization');
+        }
         await this.projectService.createProjectDraft(
             uploadProjectDto,
             organizationId,
-            user.userId,
         );
     }
 
@@ -79,12 +87,19 @@ export class ProjectDraftController {
         updateProjectDto: UpdateProjectDto,
         @AuthTokenPayload() user: AuthTokenPayloadDto,
     ): Promise<void> {
+        if (
+            !user.organizations.some(
+                (userOrganization) =>
+                    userOrganization.organizationId === organizationId,
+            )
+        ) {
+            throw new ForbiddenException('user_not_in_organization');
+        }
         try {
             await this.projectService.updateProjectDraft(
                 draftId,
                 updateProjectDto,
                 organizationId,
-                user.userId,
             );
         } catch (ex) {
             if (ex instanceof RecordNotFoundException) {

@@ -72,7 +72,6 @@ export abstract class IProjectService {
     abstract createProjectDraft(
         uploadProjectDto: CreateProjectDto,
         organizationId: number,
-        userId: number,
     ): Promise<void>;
 
     /**
@@ -87,7 +86,6 @@ export abstract class IProjectService {
         projectDraftId: number,
         uploadProjectDto: UpdateProjectDto,
         organizationId: number,
-        userId: number,
     ): Promise<void>;
 
     /**

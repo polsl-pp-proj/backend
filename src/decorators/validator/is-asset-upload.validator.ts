@@ -30,7 +30,7 @@ class IsAssetUploadValidator implements ValidatorConstraintInterface {
                     return true;
                 } else {
                     assets[index] = asset = Object.assign(
-                        new AssetDto(),
+                        new AssetDto({} as AssetDto),
                         asset,
                     );
                     return !validateSync(asset).length;

@@ -1,3 +1,4 @@
+import { AuthTokenPayloadDto } from 'src/modules/auth/dtos/auth-token-payload.dto';
 import {
     ProjectDraftDto,
     SimpleProjectDraftDto,
@@ -61,7 +62,7 @@ export abstract class IProjectService {
      */
     abstract getDraftById(
         draftId: number,
-        userId: number,
+        user: AuthTokenPayloadDto,
     ): Promise<ProjectDraftDto>;
 
     /**

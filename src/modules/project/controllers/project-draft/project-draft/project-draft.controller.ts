@@ -7,6 +7,7 @@ import {
     ParseIntPipe,
     Patch,
     Post,
+    UseGuards,
     ValidationPipe,
 } from '@nestjs/common';
 import { validationConfig } from 'src/configs/validation.config';
@@ -14,6 +15,7 @@ import { RecordNotFoundException } from 'src/exceptions/record-not-found.excepti
 import { IProjectService } from 'src/interfaces/project.service.interface';
 import { AuthTokenPayload } from 'src/modules/auth/decorators/param/user.decorator';
 import { AuthTokenPayloadDto } from 'src/modules/auth/dtos/auth-token-payload.dto';
+import { AuthTokenGuard } from 'src/modules/auth/guards/auth-token.guard';
 import {
     ProjectDraftDto,
     SimpleProjectDraftDto,
@@ -34,12 +36,13 @@ export class ProjectDraftController {
     }
 
     @Get(':draftId')
+    @UseGuards(AuthTokenGuard)
     async getProjectDraft(
         @Param('draftId', ParseIntPipe) draftId: number,
         @AuthTokenPayload() user: AuthTokenPayloadDto,
     ): Promise<ProjectDraftDto> {
         try {
-            return await this.projectService.getDraftById(draftId, user.userId);
+            return await this.projectService.getDraftById(draftId, user);
         } catch (ex) {
             if (ex instanceof RecordNotFoundException) {
                 throw new NotFoundException(ex.message);

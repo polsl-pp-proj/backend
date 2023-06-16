@@ -8,30 +8,35 @@ import { ProjectDraftSubmissionStatus } from '../../enums/project-draft-submissi
 import { SubmissionDto } from '../../dtos/submission.dto';
 import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
 import { ModifiedAfterReadException } from 'src/exceptions/modified-after-read.exception';
+import { IProjectDraftSubmissionService } from 'src/interfaces/project-draft-submission.service.interface';
+import { convertProjectDraftSubmissionToSubmissionDto } from '../../helper/submission-to-submission-dto';
 
 @Injectable()
-export class ProjectDraftSubmissionService {
+export class ProjectDraftSubmissionService
+    implements IProjectDraftSubmissionService
+{
     constructor(
         private readonly projectDraftSubmissionRepository: ProjectDraftSubmissionRepository,
     ) {}
 
     async getSubmissions() {
-        const submissions = await this.projectDraftSubmissionRepository.find();
+        const submissions = await this.projectDraftSubmissionRepository.find({
+            relations: { projectDraft: true },
+        });
         return submissions.map((submission) => {
-            return new SubmissionDto({
-                ...submission,
-            });
+            return convertProjectDraftSubmissionToSubmissionDto(submission);
         });
     }
 
-    async getSubmissionById(submissoionId: number) {
-        const submission = this.projectDraftSubmissionRepository.findOne({
-            where: { id: submissoionId },
+    async getSubmissionById(submissionId: number) {
+        const submission = await this.projectDraftSubmissionRepository.findOne({
+            where: { id: submissionId },
+            relations: { projectDraft: true },
         });
         if (!submission) {
             throw new RecordNotFoundException('submission_with_id_not_found');
         }
-        return submission;
+        return convertProjectDraftSubmissionToSubmissionDto(submission);
     }
 
     async rejectSubmission(

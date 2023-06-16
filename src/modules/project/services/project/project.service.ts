@@ -7,28 +7,59 @@ import {
     convertProjectDraftToProjectDraftDto,
     convertProjectDraftToSimpleProjectDraftDto,
 } from '../../helper/project-draft-to-project-draft-dto';
+import {
+    convertProjectToProjectDto,
+    convertProjectToSimpleProjectDto,
+} from '../../helper/project-to-project-dto';
+import { IProjectService } from 'src/interfaces/project.service.interface';
+import { AuthTokenPayloadDto } from 'src/modules/auth/dtos/auth-token-payload.dto';
 import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
-import { error } from 'console';
+import { UserNotInOrganizationException } from 'src/exceptions/user-not-in-organization.exception';
+import { UserRole } from 'src/modules/user/enums/user-role.enum';
 
 @Injectable()
-export class ProjectService {
+export class ProjectService implements IProjectService {
     constructor(
         private readonly projectRepository: ProjectRepository,
         private readonly projectDraftRepository: ProjectDraftRepository,
     ) {}
 
     async getAllProjects(): Promise<SimpleProjectDto[]> {
-        return await this.projectRepository.getAllProjects();
+        const projects = await this.projectRepository.find({
+            relations: { projectDraft: { ownerOrganization: true } },
+        });
+        return projects.map((project) =>
+            convertProjectToSimpleProjectDto(
+                project,
+                project.projectDraft.ownerOrganization.name,
+            ),
+        );
     }
 
     async getAllOrganizationsProjects(organizationId: number) {
-        return await this.projectRepository.getAllOrganizationsProjects(
-            organizationId,
+        const projects = await this.projectRepository.find({
+            where: { projectDraft: { ownerOrganizationId: organizationId } },
+            relations: { projectDraft: { ownerOrganization: true } },
+        });
+
+        return projects.map((project) =>
+            convertProjectToSimpleProjectDto(
+                project,
+                project.projectDraft.ownerOrganization.name,
+            ),
         );
     }
 
     async getProjectById(projectId: number) {
-        return await this.projectRepository.getProjectById(projectId);
+        const project = await this.projectRepository.findOne({
+            where: { id: projectId },
+            relations: { projectDraft: { ownerOrganization: true } },
+        });
+
+        return convertProjectToProjectDto(
+            project,
+            project.projectDraft.ownerOrganization.name,
+        );
     }
     async getAllDrafts() {
         const drafts = await this.projectDraftRepository.find({
@@ -57,8 +88,27 @@ export class ProjectService {
         });
     }
 
-    async getDraftById(draftId: number, userId: number) {
-        const draft = await this.projectDraftRepository.getDraftById(draftId);
+    async getDraftById(draftId: number, user: AuthTokenPayloadDto) {
+        const draft = await this.projectDraftRepository.findOne({
+            where: { id: draftId },
+            relations: { ownerOrganization: { organizationUsers: true } },
+        });
+
+        if (!draft) {
+            throw new RecordNotFoundException('draft_with_id_not_found');
+        }
+
+        const organizartionUser =
+            draft.ownerOrganization.organizationUsers.find(
+                (organizartionUser) => organizartionUser.userId === user.userId,
+            );
+
+        if (!organizartionUser && user.role === UserRole.BasicUser) {
+            throw new UserNotInOrganizationException(
+                'user_not_in_organization',
+            );
+        }
+
         return convertProjectDraftToProjectDraftDto(
             draft,
             draft.ownerOrganization.name,
@@ -69,7 +119,10 @@ export class ProjectService {
         uploadProjectDto: UploadProjectDto,
         userId: number,
     ) {
-        await this.projectDraftRepository.createProjectDraft(uploadProjectDto);
+        await this.projectDraftRepository.createProjectDraft(
+            uploadProjectDto,
+            userId,
+        );
     }
 
     async updateProjectDraft(

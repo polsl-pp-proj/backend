@@ -1,25 +1,15 @@
-import {
-    DataSource,
-    EntityManager,
-    EntityRepository,
-    Repository,
-} from 'typeorm';
+import { DataSource, EntityManager, In, Not, Repository } from 'typeorm';
 import { Project } from '../entities/project.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { SimpleProjectDto } from '../dtos/project.dto';
-import { ProjectDraftRepository } from './project-draft.repository';
-import {
-    convertProjectToProjectDto,
-    convertProjectToSimpleProjectDto,
-} from '../helper/project-to-project-dto';
 import { Injectable } from '@nestjs/common';
 import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
-import { OrganizationRepository } from 'src/modules/organization/repositories/organization.repository';
 import { ProjectDraft } from '../entities/project-draft.entity';
 import { ModifiedAfterReadException } from 'src/exceptions/modified-after-read.exception';
 import { ProjectOpenPositionRepository } from './project-open-position.repository';
-import { CreateProjectDto } from '../dtos/create-project.dto';
 import { UpdateProjectDto } from '../dtos/update-project.dto';
+import { AssetRepository } from 'src/modules/asset/repositories/asset.repository';
+import { ProjectGalleryEntryRepository } from 'src/modules/gallery/repositories/project-gallery-entry.repository';
+import { AssetDto } from 'src/modules/asset/dtos/asset.dto';
 
 @Injectable()
 export class ProjectRepository extends Repository<Project> {
@@ -41,6 +31,11 @@ export class ProjectRepository extends Repository<Project> {
             );
             const projectOpenPositionRepository =
                 new ProjectOpenPositionRepository(
+                    entityManager.connection,
+                    entityManager,
+                );
+            const projectGalleryEntryRepository =
+                new ProjectGalleryEntryRepository(
                     entityManager.connection,
                     entityManager,
                 );
@@ -82,18 +77,17 @@ export class ProjectRepository extends Repository<Project> {
                 project.id,
                 projectDraft.openPositions,
             );
+
+            await projectGalleryEntryRepository.importFromProjectDraftGallery(
+                project.id,
+                projectDraft,
+            );
         });
     }
 
     async editProjectContent(
         projectId: number,
-        {
-            name,
-            shortDescription,
-            description,
-            fundingObjectives,
-            openPositions,
-        }: UpdateProjectDto,
+        updateProjectDto: UpdateProjectDto,
     ) {
         await this.entityManager.transaction(async (entityManager) => {
             const projectRepository = new ProjectRepository(
@@ -108,7 +102,12 @@ export class ProjectRepository extends Repository<Project> {
 
             const queryResult = await projectRepository.update(
                 { id: projectId },
-                { name, shortDescription, description, fundingObjectives },
+                {
+                    name: updateProjectDto.name,
+                    shortDescription: updateProjectDto.shortDescription,
+                    description: updateProjectDto.description,
+                    fundingObjectives: updateProjectDto.fundingObjectives,
+                },
             );
 
             if (queryResult.affected === 0) {
@@ -117,8 +116,52 @@ export class ProjectRepository extends Repository<Project> {
 
             await projectOpenPositionRepository.editProjectOpenPositions(
                 projectId,
-                openPositions,
+                updateProjectDto.openPositions,
             );
+
+            await projectRepository.putInGallery(updateProjectDto, {
+                id: projectId,
+            });
+        });
+    }
+
+    private async putInGallery(
+        uploadProjectDto: UpdateProjectDto,
+        project: Pick<Project, 'id'>,
+    ) {
+        return await this.manager.transaction(async (manager) => {
+            const assetRepository = new AssetRepository(
+                manager.connection,
+                manager,
+            );
+            const projectGalleryRepository = new ProjectGalleryEntryRepository(
+                manager.connection,
+                manager,
+            );
+
+            const galleryEntries = [];
+
+            for (let i = 0; i < uploadProjectDto.assets.length; ++i) {
+                const asset = uploadProjectDto.assets[i] as AssetDto;
+                let foundAsset = await assetRepository.findOne({
+                    where: { url: asset.url },
+                });
+                if (!foundAsset) {
+                    foundAsset = await assetRepository.createAsset(asset);
+                }
+                galleryEntries.push(
+                    await projectGalleryRepository.createOrUpdateGalleryEntry(
+                        project.id,
+                        i,
+                        foundAsset,
+                    ),
+                );
+            }
+
+            await projectGalleryRepository.delete({
+                id: Not(In(galleryEntries.map((entry) => entry.id))),
+                projectId: project.id,
+            });
         });
     }
 }

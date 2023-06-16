@@ -5,9 +5,12 @@ export class SubmissionDto {
     id: number;
     projectDraft: SimpleProjectDraftDto;
     status: ProjectDraftSubmissionStatus;
-    createdAt: Date;
+    createdAt: number;
 
-    constructor(partialSubmissionSto: Partial<SubmissionDto>) {
-        Object.assign(this, partialSubmissionSto);
+    constructor(
+        submission: Omit<SubmissionDto, 'createdAt'> & { createdAt: Date },
+    ) {
+        Object.assign(this, submission);
+        this.createdAt = submission.createdAt.valueOf();
     }
 }

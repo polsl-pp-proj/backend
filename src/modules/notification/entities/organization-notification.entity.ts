@@ -10,6 +10,7 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import { OrganizationNotificationType } from '../enums/organization-notification-type.enum';
+import { Project } from '../../project/entities/project.entity';
 
 @Entity({ name: 'organization_notifications' })
 export class OrganizationNotification {
@@ -25,9 +26,9 @@ export class OrganizationNotification {
     @Column({ name: 'project_id' })
     projectId: number;
 
-    // @ManyToOne(() => Project)
-    // @JoinColumn({ name: 'project_id' })
-    // project: Project;
+    @ManyToOne(() => Project)
+    @JoinColumn({ name: 'project_id' })
+    project: Project;
 
     @Column({ name: 'sender_user_id' })
     senderUserId: number;

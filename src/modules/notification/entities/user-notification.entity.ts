@@ -1,3 +1,4 @@
+import { Project } from '../../project/entities/project.entity';
 import { User } from '../../user/entities/user.entity';
 import {
     Column,
@@ -31,9 +32,9 @@ export class UserNotification {
     @Column({ name: 'project_id' })
     projectId: number;
 
-    // @ManyToOne(() => Project)
-    // @JoinColumn({ name: 'project_id' })
-    // project: Project;
+    @ManyToOne(() => Project)
+    @JoinColumn({ name: 'project_id' })
+    project: Project;
 
     @Column({ name: 'seen', default: false })
     seen: boolean;

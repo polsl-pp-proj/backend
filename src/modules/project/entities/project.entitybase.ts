@@ -1,6 +1,14 @@
-import { Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+    Column,
+    CreateDateColumn,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
+} from 'typeorm';
 
 export abstract class ProjectBase {
+    @PrimaryGeneratedColumn({ name: 'id' })
+    id: number;
+
     @Column({ name: 'name' })
     name: string;
 

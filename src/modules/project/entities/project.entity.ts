@@ -1,20 +1,10 @@
-import {
-    Column,
-    Entity,
-    JoinColumn,
-    OneToMany,
-    OneToOne,
-    PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 import { ProjectDraft } from './project-draft.entity';
 import { ProjectOpenPosition } from './project-open-position.entity';
 import { ProjectBase } from './project.entitybase';
 
 @Entity({ name: 'projects' })
 export class Project extends ProjectBase {
-    @PrimaryGeneratedColumn({ name: 'id' })
-    id: number;
-
     @Column({ name: 'draft_id' })
     projectDraftId: number;
 

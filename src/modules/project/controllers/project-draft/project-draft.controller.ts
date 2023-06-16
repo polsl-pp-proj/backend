@@ -8,7 +8,9 @@ import {
     ParseIntPipe,
     Patch,
     Post,
+    UploadedFiles,
     UseGuards,
+    UseInterceptors,
     ValidationPipe,
 } from '@nestjs/common';
 import { validationConfig } from 'src/configs/validation.config';
@@ -23,7 +25,8 @@ import {
 } from 'src/modules/project/dtos/project.dto';
 import { CreateProjectDto } from 'src/modules/project/dtos/create-project.dto';
 import { UpdateProjectDto } from 'src/modules/project/dtos/update-project.dto';
-import { UserOrganizationDto } from 'src/modules/auth/dtos/user-organization.dto';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { filesInterceptorConfig } from '../../configs/files-interceptor.config';
 
 @Controller({ path: 'project/draft', version: '1' })
 export class ProjectDraftController {
@@ -64,6 +67,9 @@ export class ProjectDraftController {
         }
     }
 
+    @UseInterceptors(
+        FilesInterceptor('fileAssets', undefined, filesInterceptorConfig),
+    )
     @Post('organization/:organizationId')
     @UseGuards(AuthTokenGuard)
     async createProjectDraft(
@@ -71,6 +77,7 @@ export class ProjectDraftController {
         @Body(new ValidationPipe(validationConfig))
         uploadProjectDto: CreateProjectDto,
         @AuthTokenPayload() user: AuthTokenPayloadDto,
+        @UploadedFiles() files: Express.Multer.File[],
     ): Promise<void> {
         if (
             !user.organizations.some(
@@ -81,33 +88,30 @@ export class ProjectDraftController {
             throw new ForbiddenException('user_not_in_organization');
         }
         await this.projectService.createProjectDraft(
-            uploadProjectDto,
             organizationId,
+            uploadProjectDto,
+            files,
         );
     }
 
-    @Patch(':draftId/organization/:organizationId')
+    @UseInterceptors(
+        FilesInterceptor('fileAssets', undefined, filesInterceptorConfig),
+    )
+    @Patch(':draftId')
     @UseGuards(AuthTokenGuard)
     async editProjectDraft(
         @Param('draftId', ParseIntPipe) draftId: number,
-        @Param('organizationId', ParseIntPipe) organizationId: number,
         @Body(new ValidationPipe(validationConfig))
         updateProjectDto: UpdateProjectDto,
         @AuthTokenPayload() user: AuthTokenPayloadDto,
+        @UploadedFiles() files: Express.Multer.File[],
     ): Promise<void> {
-        if (
-            !user.organizations.some(
-                (userOrganization) =>
-                    userOrganization.organizationId === organizationId,
-            )
-        ) {
-            throw new ForbiddenException('user_not_in_organization');
-        }
         try {
             await this.projectService.updateProjectDraft(
+                user.userId,
                 draftId,
                 updateProjectDto,
-                organizationId,
+                files,
             );
         } catch (ex) {
             if (ex instanceof RecordNotFoundException) {

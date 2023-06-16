@@ -9,6 +9,8 @@ import {
     Patch,
     UseGuards,
     ValidationPipe,
+    UploadedFiles,
+    UseInterceptors,
 } from '@nestjs/common';
 import { validationConfig } from 'src/configs/validation.config';
 import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
@@ -23,6 +25,8 @@ import {
 import { CreateProjectDto } from 'src/modules/project/dtos/create-project.dto';
 import { UserRole } from 'src/modules/user/enums/user-role.enum';
 import { UpdateProjectDto } from 'src/modules/project/dtos/update-project.dto';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { filesInterceptorConfig } from '../../configs/files-interceptor.config';
 
 @Controller({ path: 'project', version: '1' })
 export class ProjectController {
@@ -55,6 +59,9 @@ export class ProjectController {
         );
     }
 
+    @UseInterceptors(
+        FilesInterceptor('fileAssets', undefined, filesInterceptorConfig),
+    )
     @Patch(':projectId')
     @UseGuards(AuthTokenGuard)
     async editProjectContent(
@@ -62,6 +69,7 @@ export class ProjectController {
         @Body(new ValidationPipe(validationConfig))
         updateProjectDto: UpdateProjectDto,
         @AuthTokenPayload() user: AuthTokenPayloadDto,
+        @UploadedFiles() files: Express.Multer.File[],
     ) {
         if (user.role !== UserRole.Administrator) {
             throw new ForbiddenException('not_an_administrator');
@@ -70,6 +78,7 @@ export class ProjectController {
             await this.projectService.editProjectContent(
                 projectId,
                 updateProjectDto,
+                files,
             );
         } catch (ex) {
             if (ex instanceof RecordNotFoundException) {

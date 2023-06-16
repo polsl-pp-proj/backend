@@ -1,6 +1,7 @@
 import {
     Body,
     Controller,
+    Get,
     NotFoundException,
     Param,
     ParseIntPipe,
@@ -68,5 +69,12 @@ export class DonationController {
             }
             throw ex;
         }
+    }
+
+    @Get(':projectId/stats')
+    async getProjectDonationStats(
+        @Param('projectId', ParseIntPipe) projectId: number,
+    ) {
+        return await this.donationService.getProjectDonationStats(projectId);
     }
 }

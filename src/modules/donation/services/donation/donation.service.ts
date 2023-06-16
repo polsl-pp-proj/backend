@@ -5,6 +5,8 @@ import Stripe from 'stripe';
 import { Not } from 'typeorm';
 import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
 import { ProjectRepository } from '../../../project/repositories/project.repository';
+import { DonationStatsDto } from '../../dtos/donation-stats.dto';
+import { convertDonationToFunderDto } from '../../helpers/donation-to-funder.helper';
 
 @Injectable()
 export class DonationService {
@@ -71,5 +73,20 @@ export class DonationService {
                 return paymentIntent.client_secret;
             },
         );
+    }
+
+    async getProjectDonationStats(projectId: number) {
+        const stats = await this.projectDonationRepository.getDonationStats(
+            projectId,
+        );
+        return new DonationStatsDto({
+            raised: {
+                lastMonth: stats.raisedLastMonth,
+                total: stats.raisedAllTime,
+            },
+            lastFunders: stats.funders.map((donation) =>
+                convertDonationToFunderDto(donation),
+            ),
+        });
     }
 }

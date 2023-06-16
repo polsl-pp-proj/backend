@@ -25,10 +25,8 @@ export class FavoriteController {
     async getFavoritesList(
         @AuthTokenPayload() authTokenPayloadDto: AuthTokenPayloadDto,
     ) {
-        return convertToSimpleProjectDtoArray(
-            await this.favoriteService.getUsersFavorites(
-                authTokenPayloadDto.userId,
-            ),
+        return await this.favoriteService.getUsersFavorites(
+            authTokenPayloadDto.userId,
         );
     }
 
@@ -37,11 +35,9 @@ export class FavoriteController {
     async getSimpleFavoritesList(
         @AuthTokenPayload() authTokenPayloadDto: AuthTokenPayloadDto,
     ) {
-        return (
-            await this.favoriteService.getUsersFavorites(
-                authTokenPayloadDto.userId,
-            )
-        ).map((project) => project.id);
+        return await this.favoriteService.getUsersFavoritesIds(
+            authTokenPayloadDto.userId,
+        );
     }
 
     @Get(':projectId')

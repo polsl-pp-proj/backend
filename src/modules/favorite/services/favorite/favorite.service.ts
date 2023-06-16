@@ -4,6 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
 import { checkUniqueViolation } from 'src/helpers/check-unique-violation.helper';
 import { Repository } from 'typeorm';
+import { SimpleProjectDto } from 'src/modules/project/dtos/project.dto';
+import { convertProjectToSimpleProjectDto } from 'src/modules/project/helper/project-to-project-dto';
 
 @Injectable()
 export class FavoriteService {
@@ -19,24 +21,38 @@ export class FavoriteService {
         return !!result;
     }
 
-    async getUsersFavorites(userId: number): Promise<ProjectDto[]> {
+    async getUsersFavorites(userId: number): Promise<SimpleProjectDto[]> {
         const results = await this.favoriteProjectRepository.find({
             where: {
                 userId,
                 project: {
-                    projectGallery: { indexPosition: 0 },
+                    galleryEntries: { indexPosition: 0 },
                 },
             },
             relations: {
                 project: {
-                    projectGallery: { asset: true },
-                    projectCategory: { category: true },
+                    galleryEntries: { asset: true },
+                    projectDraft: {
+                        ownerOrganization: true,
+                    },
                 },
             },
         });
-        return convertToProjectDtoArray(
-            results.map((favorite) => favorite.project),
+        return results.map((favorite) =>
+            convertProjectToSimpleProjectDto(favorite.project),
         );
+    }
+
+    async getUsersFavoritesIds(userId: number): Promise<number[]> {
+        const results = await this.favoriteProjectRepository.find({
+            where: {
+                userId,
+            },
+            select: {
+                projectId: true,
+            },
+        });
+        return results.map((favorite) => favorite.projectId);
     }
 
     async addToUsersFavorites(

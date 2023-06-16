@@ -43,7 +43,8 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
                 description: uploadProjectDto.description,
                 ownerOrganization: { id: organizationId },
                 ownerOrganizationId: organizationId,
-                fundingObjectives: uploadProjectDto.fundingObjectives,
+                fundingObjectives:
+                    uploadProjectDto.fundingObjectives.trim() || null,
             });
 
             await projectDraftRepository.save(draft, { reload: true });

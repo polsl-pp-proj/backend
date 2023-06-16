@@ -29,10 +29,7 @@ export class ProjectService implements IProjectService {
             relations: { projectDraft: { ownerOrganization: true } },
         });
         return projects.map((project) =>
-            convertProjectToSimpleProjectDto(
-                project,
-                project.projectDraft.ownerOrganization.name,
-            ),
+            convertProjectToSimpleProjectDto(project),
         );
     }
 
@@ -43,10 +40,7 @@ export class ProjectService implements IProjectService {
         });
 
         return projects.map((project) =>
-            convertProjectToSimpleProjectDto(
-                project,
-                project.projectDraft.ownerOrganization.name,
-            ),
+            convertProjectToSimpleProjectDto(project),
         );
     }
 
@@ -56,10 +50,7 @@ export class ProjectService implements IProjectService {
             relations: { projectDraft: { ownerOrganization: true } },
         });
 
-        return convertProjectToProjectDto(
-            project,
-            project.projectDraft.ownerOrganization.name,
-        );
+        return convertProjectToProjectDto(project);
     }
     async getAllDrafts() {
         const drafts = await this.projectDraftRepository.find({
@@ -67,10 +58,7 @@ export class ProjectService implements IProjectService {
         });
 
         return drafts.map((draft) => {
-            return convertProjectDraftToSimpleProjectDraftDto(
-                draft,
-                draft.ownerOrganization.name,
-            );
+            return convertProjectDraftToSimpleProjectDraftDto(draft);
         });
     }
 
@@ -81,10 +69,7 @@ export class ProjectService implements IProjectService {
         });
 
         return drafts.map((draft) => {
-            return convertProjectDraftToSimpleProjectDraftDto(
-                draft,
-                draft.ownerOrganization.name,
-            );
+            return convertProjectDraftToSimpleProjectDraftDto(draft);
         });
     }
 
@@ -109,10 +94,7 @@ export class ProjectService implements IProjectService {
             );
         }
 
-        return convertProjectDraftToProjectDraftDto(
-            draft,
-            draft.ownerOrganization.name,
-        );
+        return convertProjectDraftToProjectDraftDto(draft);
     }
 
     async createProjectDraft(

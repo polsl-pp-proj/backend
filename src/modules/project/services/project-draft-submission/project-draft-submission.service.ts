@@ -37,10 +37,7 @@ export class ProjectDraftSubmissionService
         if (!submission) {
             throw new RecordNotFoundException('submission_with_id_not_found');
         }
-        return convertProjectDraftToProjectDraftDto(
-            submission.projectDraft,
-            submission.projectDraft.ownerOrganization.name,
-        );
+        return convertProjectDraftToProjectDraftDto(submission.projectDraft);
     }
 
     async rejectSubmission(

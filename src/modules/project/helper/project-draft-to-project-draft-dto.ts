@@ -7,12 +7,11 @@ import { ProjectDraft } from '../entities/project-draft.entity';
 
 export const convertProjectDraftToProjectDraftDto = (
     projectDraft: ProjectDraft,
-    organizationName: string,
 ) => {
     return new ProjectDraftDto({
         id: projectDraft.id,
         name: projectDraft.name,
-        organizationName,
+        organizationName: projectDraft.ownerOrganization.name,
         shortDescription: projectDraft.shortDescription,
         description: projectDraft.description,
         fundingObjectives: projectDraft.fundingObjectives,
@@ -23,12 +22,11 @@ export const convertProjectDraftToProjectDraftDto = (
 
 export const convertProjectDraftToSimpleProjectDraftDto = (
     projectDraft: ProjectDraft,
-    organizationName: string,
 ) => {
     return new SimpleProjectDraftDto({
         id: projectDraft.id,
         name: projectDraft.name,
-        organizationName,
+        organizationName: projectDraft.ownerOrganization.name,
         shortDescription: projectDraft.shortDescription,
     });
 };

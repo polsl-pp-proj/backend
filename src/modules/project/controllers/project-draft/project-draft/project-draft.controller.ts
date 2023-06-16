@@ -20,7 +20,8 @@ import {
     ProjectDto,
     SimpleProjectDto,
 } from 'src/modules/project/dtos/project.dto';
-import { UploadProjectDto } from 'src/modules/project/dtos/upload-project.dto';
+import { CreateProjectDto } from 'src/modules/project/dtos/create-project.dto';
+import { UpdateProjectDto } from 'src/modules/project/dtos/update-project.dto';
 
 @Controller({ path: 'project/draft', version: '1' })
 export class ProjectDraftController {
@@ -59,7 +60,7 @@ export class ProjectDraftController {
     async createProjectDraft(
         @Param('organizationId', ParseIntPipe) organizationId: number,
         @Body(new ValidationPipe(validationConfig))
-        uploadProjectDto: UploadProjectDto,
+        uploadProjectDto: CreateProjectDto,
         @AuthTokenPayload() user: AuthTokenPayloadDto,
     ): Promise<void> {
         await this.projectService.createProjectDraft(
@@ -75,13 +76,13 @@ export class ProjectDraftController {
         @Param('draftId', ParseIntPipe) draftId: number,
         @Param('organizationId', ParseIntPipe) organizationId: number,
         @Body(new ValidationPipe(validationConfig))
-        uploadProjectDto: UploadProjectDto,
+        updateProjectDto: UpdateProjectDto,
         @AuthTokenPayload() user: AuthTokenPayloadDto,
     ): Promise<void> {
         try {
             await this.projectService.updateProjectDraft(
                 draftId,
-                uploadProjectDto,
+                updateProjectDto,
                 organizationId,
                 user.userId,
             );

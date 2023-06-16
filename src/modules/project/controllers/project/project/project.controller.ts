@@ -20,8 +20,9 @@ import {
     ProjectDto,
     SimpleProjectDto,
 } from 'src/modules/project/dtos/project.dto';
-import { UploadProjectDto } from 'src/modules/project/dtos/upload-project.dto';
+import { CreateProjectDto } from 'src/modules/project/dtos/create-project.dto';
 import { UserRole } from 'src/modules/user/enums/user-role.enum';
+import { UpdateProjectDto } from 'src/modules/project/dtos/update-project.dto';
 
 @Controller({ path: 'project', version: '1' })
 export class ProjectController {
@@ -59,7 +60,7 @@ export class ProjectController {
     async editProjectContent(
         @Param('projectId', ParseIntPipe) projectId: number,
         @Body(new ValidationPipe(validationConfig))
-        uploadProjectDto: UploadProjectDto,
+        updateProjectDto: UpdateProjectDto,
         @AuthTokenPayload() user: AuthTokenPayloadDto,
     ) {
         if (user.role !== UserRole.Administrator) {
@@ -68,7 +69,7 @@ export class ProjectController {
         try {
             await this.projectService.editProjectContent(
                 projectId,
-                uploadProjectDto,
+                updateProjectDto,
             );
         } catch (ex) {
             if (ex instanceof RecordNotFoundException) {

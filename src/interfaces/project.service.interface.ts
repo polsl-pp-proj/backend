@@ -3,7 +3,8 @@ import {
     ProjectDto,
     SimpleProjectDto,
 } from 'src/modules/project/dtos/project.dto';
-import { UploadProjectDto } from 'src/modules/project/dtos/upload-project.dto';
+import { CreateProjectDto } from 'src/modules/project/dtos/create-project.dto';
+import { UpdateProjectDto } from 'src/modules/project/dtos/update-project.dto';
 
 export abstract class IProjectService {
     /**
@@ -69,7 +70,7 @@ export abstract class IProjectService {
      * @param userId user's ID
      */
     abstract createProjectDraft(
-        uploadProjectDto: UploadProjectDto,
+        uploadProjectDto: CreateProjectDto,
         organizationId: number,
         userId: number,
     ): Promise<void>;
@@ -84,7 +85,7 @@ export abstract class IProjectService {
      */
     abstract updateProjectDraft(
         projectDraftId: number,
-        uploadProjectDto: UploadProjectDto,
+        uploadProjectDto: UpdateProjectDto,
         organizationId: number,
         userId: number,
     ): Promise<void>;
@@ -97,6 +98,6 @@ export abstract class IProjectService {
      */
     abstract editProjectContent(
         projectId: number,
-        uploadProjectDto: UploadProjectDto,
+        uploadProjectDto: UpdateProjectDto,
     ): Promise<void>;
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ProjectRepository } from '../../repositories/project.repository';
 import { SimpleProjectDto } from '../../dtos/project.dto';
-import { UploadProjectDto } from '../../dtos/upload-project.dto';
+import { CreateProjectDto } from '../../dtos/create-project.dto';
 import { ProjectDraftRepository } from '../../repositories/project-draft.repository';
 import {
     convertProjectDraftToProjectDto,
@@ -16,6 +16,7 @@ import { AuthTokenPayloadDto } from 'src/modules/auth/dtos/auth-token-payload.dt
 import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
 import { UserNotInOrganizationException } from 'src/exceptions/user-not-in-organization.exception';
 import { UserRole } from 'src/modules/user/enums/user-role.enum';
+import { UpdateProjectDto } from '../../dtos/update-project.dto';
 
 @Injectable()
 export class ProjectService implements IProjectService {
@@ -118,7 +119,7 @@ export class ProjectService implements IProjectService {
     }
 
     async createProjectDraft(
-        uploadProjectDto: UploadProjectDto,
+        uploadProjectDto: CreateProjectDto,
         organizationId: number,
         userId: number,
     ) {
@@ -131,7 +132,7 @@ export class ProjectService implements IProjectService {
 
     async updateProjectDraft(
         projectDraftId: number,
-        updateProjectDto: UploadProjectDto,
+        updateProjectDto: UpdateProjectDto,
         organizationId: number,
         userId: number,
     ) {
@@ -145,11 +146,11 @@ export class ProjectService implements IProjectService {
 
     async editProjectContent(
         projectId: number,
-        uploadProjectDto: UploadProjectDto,
+        updateProjectDto: UpdateProjectDto,
     ) {
         await this.projectRepository.editProjectContent(
             projectId,
-            uploadProjectDto,
+            updateProjectDto,
         );
     }
 }

@@ -1,18 +1,12 @@
 import {
     IsArray,
     IsDefined,
-    IsNumber,
-    IsPositive,
     IsString,
     MaxLength,
     MinLength,
 } from 'class-validator';
 
-export class UploadOpenPositionDto {
-    @IsNumber({ maxDecimalPlaces: 0 }, { message: 'not_a_number' })
-    @IsPositive({ message: 'not_positive_number' })
-    id?: number;
-
+export class CreateOpenPositionDto {
     @IsDefined({ message: 'not_defined' })
     @IsString({ message: 'not_a_string' })
     @MinLength(2, { message: 'too_short' })
@@ -27,6 +21,6 @@ export class UploadOpenPositionDto {
 
     @IsDefined({ message: 'not_defined' })
     @IsArray({ message: 'not_an_array' })
-    @IsString({ each: true })
+    @IsString({ message: 'not_a_string', each: true })
     requirements: string[];
 }

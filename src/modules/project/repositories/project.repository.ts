@@ -18,7 +18,8 @@ import { OrganizationRepository } from 'src/modules/organization/repositories/or
 import { ProjectDraft } from '../entities/project-draft.entity';
 import { ModifiedAfterReadException } from 'src/exceptions/modified-after-read.exception';
 import { ProjectOpenPositionRepository } from './project-open-position.repository';
-import { UploadProjectDto } from '../dtos/upload-project.dto';
+import { CreateProjectDto } from '../dtos/create-project.dto';
+import { UpdateProjectDto } from '../dtos/update-project.dto';
 
 @Injectable()
 export class ProjectRepository extends Repository<Project> {
@@ -90,7 +91,7 @@ export class ProjectRepository extends Repository<Project> {
             description,
             fundingObjectives,
             openPositions,
-        }: UploadProjectDto,
+        }: UpdateProjectDto,
     ) {
         await this.entityManager.transaction(async (entityManager) => {
             const projectRepository = new ProjectRepository(

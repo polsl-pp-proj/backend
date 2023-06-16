@@ -1,8 +1,8 @@
-import { DataSource, EntityManager, Repository } from 'typeorm';
+import { DataSource, EntityManager, In, Not, Repository } from 'typeorm';
 import { ProjectOpenPosition } from '../entities/project-open-position.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { ProjectDraftOpenPositionRepository } from './project-draft-open-position.repository';
-import { UploadOpenPositionDto } from '../dtos/upload-open-position.dto';
+import { CreateOpenPositionDto } from '../dtos/create-open-position.dto';
 
 export class ProjectOpenPositionRepository extends Repository<ProjectOpenPosition> {
     constructor(
@@ -39,7 +39,7 @@ export class ProjectOpenPositionRepository extends Repository<ProjectOpenPositio
 
     async editProjectOpenPositions(
         projectId: number,
-        uploadOpenPositionDto: UploadOpenPositionDto[],
+        openPositions: (CreateOpenPositionDto | number)[],
     ) {
         await this.entityManager.transaction(async (entityManager) => {
             const projectOpenPositionRepository =
@@ -48,29 +48,33 @@ export class ProjectOpenPositionRepository extends Repository<ProjectOpenPositio
                     entityManager,
                 );
 
-            await projectOpenPositionRepository.delete({ projectId });
+            const newOpenPositions: CreateOpenPositionDto[] = [];
+            const oldOpenPositionsIds: number[] = [];
+            openPositions.forEach((openPosition) => {
+                if (typeof openPosition !== 'number') {
+                    newOpenPositions.push(openPosition);
+                } else {
+                    oldOpenPositionsIds.push(openPosition);
+                }
+            });
 
-            if (uploadOpenPositionDto.length === 0) {
-                return;
-            }
+            await projectOpenPositionRepository.delete({
+                projectId,
+                id: Not(In(oldOpenPositionsIds)),
+            });
 
-            const projectOpenPositionsPromise = uploadOpenPositionDto.map(
-                async (openPosition) => {
-                    return projectOpenPositionRepository.create({
-                        name: openPosition.name,
-                        description: openPosition.description,
-                        projectId: projectId,
+            const newOpenPositionsEntities = newOpenPositions.map(
+                (newOpenPosition) =>
+                    this.create({
+                        name: newOpenPosition.name,
+                        description: newOpenPosition.description,
+                        requirements: newOpenPosition.requirements,
+                        projectId,
                         project: { id: projectId },
-                        requirements: openPosition.requirements,
-                    });
-                },
+                    }),
             );
 
-            const createdOpenPositions = await Promise.all(
-                projectOpenPositionsPromise,
-            );
-
-            await projectOpenPositionRepository.save(createdOpenPositions);
+            await projectOpenPositionRepository.save(newOpenPositionsEntities);
         });
     }
 }

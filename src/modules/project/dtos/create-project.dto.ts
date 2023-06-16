@@ -9,10 +9,11 @@ import {
     MinLength,
     ValidateNested,
 } from 'class-validator';
-import { UploadOpenPositionDto } from './upload-open-position.dto';
-import { Type } from 'class-transformer';
+import { CreateOpenPositionDto } from './create-open-position.dto';
+import { Transform, Type } from 'class-transformer';
+import { BadRequestException } from '@nestjs/common';
 
-export class UploadProjectDto {
+export class CreateProjectDto {
     @IsDefined({ message: 'not_defined' })
     @IsString({ message: 'not_a_string' })
     @MinLength(2, { message: 'too_short' })
@@ -34,9 +35,18 @@ export class UploadProjectDto {
     @MinLength(2, { message: 'too_short' })
     fundingObjectives?: string;
 
+    @Transform((params) => {
+        try {
+            return JSON.parse(params.value);
+        } catch (e) {
+            throw new BadRequestException(
+                `${params.key} contains invalid JSON `,
+            );
+        }
+    })
     @IsDefined({ message: 'not_defined' })
     @IsArray({ message: 'not_an_array' })
     @ValidateNested()
-    @Type(() => UploadOpenPositionDto)
-    openPositions: UploadOpenPositionDto[];
+    @Type(() => CreateOpenPositionDto)
+    openPositions: CreateOpenPositionDto[];
 }

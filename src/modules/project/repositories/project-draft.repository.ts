@@ -1,7 +1,7 @@
 import { DataSource, EntityManager, In, Not, Repository } from 'typeorm';
 import { ProjectDraft } from '../entities/project-draft.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { UploadProjectDto } from '../dtos/upload-project.dto';
+import { CreateProjectDto } from '../dtos/create-project.dto';
 import {
     Injectable,
     NotFoundException,
@@ -15,6 +15,7 @@ import { OrganizationRepository } from 'src/modules/organization/repositories/or
 import { AuthTokenPayloadDto } from 'src/modules/auth/dtos/auth-token-payload.dto';
 import { UserNotInOrganizationException } from 'src/exceptions/user-not-in-organization.exception';
 import { UserRole } from 'src/modules/user/enums/user-role.enum';
+import { UpdateProjectDto } from '../dtos/update-project.dto';
 
 @Injectable()
 export class ProjectDraftRepository extends Repository<ProjectDraft> {
@@ -26,7 +27,7 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
     }
 
     async createProjectDraft(
-        uploadProjectDto: UploadProjectDto,
+        uploadProjectDto: CreateProjectDto,
         organizationId: number,
         userId: number,
     ) {
@@ -79,8 +80,8 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
             });
 
             await projectDraftOpenPositionRepository.updateOpenPositions(
-                uploadProjectDto.openPositions,
                 draft.id,
+                uploadProjectDto.openPositions,
             );
 
             await projectDraftRepository.save(draft, { reload: true });
@@ -90,7 +91,7 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
 
     async updateProjectDraft(
         projectDraftId: number,
-        updateProjectDto: UploadProjectDto,
+        updateProjectDto: UpdateProjectDto,
         organizationId: number,
         userId: number,
     ) {
@@ -154,8 +155,8 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
             });
 
             await projectDraftOpenPositionRepository.updateOpenPositions(
-                updateProjectDto.openPositions,
                 draft.id,
+                updateProjectDto.openPositions,
             );
 
             const submission = await submissionRepository.findOne({

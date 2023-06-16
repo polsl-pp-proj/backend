@@ -75,11 +75,13 @@ export class ProjectRepository extends Repository<Project> {
                     projectDraftId: projectDraft.id,
                 });
             }
+
+            project = await projectRepository.save(project, { reload: true });
+
             await projectOpenPositionRepository.importOpenPositionsFromDraft(
                 project.id,
                 projectDraft.id,
             );
-            await projectRepository.save(project, { reload: true });
         });
     }
 

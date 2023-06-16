@@ -5,6 +5,7 @@ import { FavoriteController } from './controllers/favorite/favorite.controller';
 import { UserModule } from '../user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FavoriteProject } from './entities/favorite-project.entity';
+import { ProjectModule } from '../project/project.module';
 
 @Module({
     controllers: [FavoriteController],

@@ -21,7 +21,7 @@ export class ProjectDraftSubmissionService
 
     async getSubmissions() {
         const submissions = await this.projectDraftSubmissionRepository.find({
-            relations: { projectDraft: true },
+            relations: { projectDraft: { ownerOrganization: true } },
         });
         return submissions.map((submission) => {
             return convertProjectDraftSubmissionToSubmissionDto(submission);

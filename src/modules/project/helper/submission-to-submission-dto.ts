@@ -6,8 +6,12 @@ export const convertProjectDraftSubmissionToSubmissionDto = (
 ) => {
     return new SubmissionDto({
         id: submission.id,
-        projectDraftId: submission.projectDraftId,
-        projectDraftName: submission.projectDraft.name,
+        projectDraft: {
+            id: submission.projectDraftId,
+            name: submission.projectDraft.name,
+            organizationName: submission.projectDraft.ownerOrganization.name,
+            shortDescription: submission.projectDraft.shortDescription,
+        },
         status: submission.status,
         createdAt: submission.createdAt,
     });

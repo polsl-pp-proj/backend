@@ -4,6 +4,8 @@ import {
     Column,
     ManyToOne,
     JoinColumn,
+    CreateDateColumn,
+    UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { CredentialType } from '../enums/credential-type.enum';
@@ -30,4 +32,10 @@ export class Credential {
     @ManyToOne(() => User)
     @JoinColumn({ name: 'user_id' })
     user: User;
+
+    @CreateDateColumn({ name: 'created_at' })
+    createdAt: Date;
+
+    @UpdateDateColumn({ name: 'updated_at' })
+    updatedAt: Date;
 }

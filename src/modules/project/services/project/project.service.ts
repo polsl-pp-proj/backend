@@ -119,10 +119,12 @@ export class ProjectService implements IProjectService {
 
     async createProjectDraft(
         uploadProjectDto: UploadProjectDto,
+        organizationId: number,
         userId: number,
     ) {
         await this.projectDraftRepository.createProjectDraft(
             uploadProjectDto,
+            organizationId,
             userId,
         );
     }
@@ -130,11 +132,13 @@ export class ProjectService implements IProjectService {
     async updateProjectDraft(
         projectDraftId: number,
         updateProjectDto: UploadProjectDto,
+        organizationId: number,
         userId: number,
     ) {
         await this.projectDraftRepository.updateProjectDraft(
             projectDraftId,
             updateProjectDto,
+            organizationId,
             userId,
         );
     }

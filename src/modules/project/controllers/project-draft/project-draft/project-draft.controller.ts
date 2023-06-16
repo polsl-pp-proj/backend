@@ -54,23 +54,26 @@ export class ProjectDraftController {
         }
     }
 
-    @Post()
+    @Post('organization/:organizationId')
     @UseGuards(AuthTokenGuard)
     async createProjectDraft(
+        @Param('organizationId', ParseIntPipe) organizationId: number,
         @Body(new ValidationPipe(validationConfig))
         uploadProjectDto: UploadProjectDto,
         @AuthTokenPayload() user: AuthTokenPayloadDto,
     ): Promise<void> {
         await this.projectService.createProjectDraft(
             uploadProjectDto,
+            organizationId,
             user.userId,
         );
     }
 
-    @Patch(':draftId')
+    @Patch(':draftId/organization/:organizationId')
     @UseGuards(AuthTokenGuard)
     async editProjectDraft(
         @Param('draftId', ParseIntPipe) draftId: number,
+        @Param('organizationId', ParseIntPipe) organizationId: number,
         @Body(new ValidationPipe(validationConfig))
         uploadProjectDto: UploadProjectDto,
         @AuthTokenPayload() user: AuthTokenPayloadDto,
@@ -79,6 +82,7 @@ export class ProjectDraftController {
             await this.projectService.updateProjectDraft(
                 draftId,
                 uploadProjectDto,
+                organizationId,
                 user.userId,
             );
         } catch (ex) {

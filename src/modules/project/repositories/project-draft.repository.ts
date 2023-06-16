@@ -27,6 +27,7 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
 
     async createProjectDraft(
         uploadProjectDto: UploadProjectDto,
+        organizationId: number,
         userId: number,
     ) {
         await this.entityManager.transaction(async (entityManager) => {
@@ -48,7 +49,7 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
                     entityManager,
                 );
             const organization = await organizationRepository.findOne({
-                where: { id: uploadProjectDto.ownerOrganizationId },
+                where: { id: organizationId },
                 relations: { organizationUsers: true },
             });
 
@@ -72,8 +73,8 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
                 name: uploadProjectDto.name,
                 shortDescription: uploadProjectDto.shortDescription,
                 description: uploadProjectDto.description,
-                ownerOrganization: { id: uploadProjectDto.ownerOrganizationId },
-                ownerOrganizationId: uploadProjectDto.ownerOrganizationId,
+                ownerOrganization: { id: organizationId },
+                ownerOrganizationId: organizationId,
                 fundingObjectives: uploadProjectDto.fundingObjectives,
             });
 
@@ -90,6 +91,7 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
     async updateProjectDraft(
         projectDraftId: number,
         updateProjectDto: UploadProjectDto,
+        organizationId: number,
         userId: number,
     ) {
         this.entityManager.transaction(async (entityManager) => {
@@ -113,7 +115,7 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
             );
 
             const organization = await organizationRepository.findOne({
-                where: { id: updateProjectDto.ownerOrganizationId },
+                where: { id: organizationId },
                 relations: { organizationUsers: true },
             });
 
@@ -147,8 +149,8 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
                 shortDescription: updateProjectDto.shortDescription,
                 name: updateProjectDto.name,
                 fundingObjectives: updateProjectDto.fundingObjectives,
-                ownerOrganization: { id: updateProjectDto.ownerOrganizationId },
-                ownerOrganizationId: updateProjectDto.ownerOrganizationId,
+                ownerOrganization: { id: organizationId },
+                ownerOrganizationId: organizationId,
             });
 
             await projectDraftOpenPositionRepository.updateOpenPositions(

@@ -22,7 +22,15 @@ export class ProjectDraftSubmissionService
 
     async getSubmissions() {
         const submissions = await this.projectDraftSubmissionRepository.find({
-            relations: { projectDraft: { ownerOrganization: true } },
+            where: {
+                projectDraft: { galleryEntries: { indexPosition: 0 } },
+            },
+            relations: {
+                projectDraft: {
+                    ownerOrganization: true,
+                    galleryEntries: { asset: true },
+                },
+            },
         });
         return submissions.map((submission) => {
             return convertProjectDraftSubmissionToSubmissionDto(submission);
@@ -33,7 +41,11 @@ export class ProjectDraftSubmissionService
         const submission = await this.projectDraftSubmissionRepository.findOne({
             where: { id: submissionId },
             relations: {
-                projectDraft: { ownerOrganization: true, openPositions: true },
+                projectDraft: {
+                    ownerOrganization: true,
+                    openPositions: true,
+                    galleryEntries: { asset: true },
+                },
             },
         });
         if (!submission) {

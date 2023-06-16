@@ -69,8 +69,9 @@ export abstract class IProjectService {
      * @param userId user's ID
      */
     abstract createProjectDraft(
-        uploadProjectDto: CreateProjectDto,
         organizationId: number,
+        uploadProjectDto: CreateProjectDto,
+        files: Express.Multer.File[],
     ): Promise<void>;
 
     /**
@@ -82,9 +83,10 @@ export abstract class IProjectService {
      * @param userId User's ID
      */
     abstract updateProjectDraft(
+        userId: number,
         projectDraftId: number,
         uploadProjectDto: UpdateProjectDto,
-        organizationId: number,
+        files: Express.Multer.File[],
     ): Promise<void>;
 
     /**
@@ -96,5 +98,6 @@ export abstract class IProjectService {
     abstract editProjectContent(
         projectId: number,
         uploadProjectDto: UpdateProjectDto,
+        files: Express.Multer.File[],
     ): Promise<void>;
 }

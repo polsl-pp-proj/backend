@@ -1,9 +1,9 @@
 import { ProjectDraftSubmissionStatus } from '../enums/project-draft-submission-status.enum';
-import { SimpleProjectDraftDto } from './project-draft.dto';
+import { SimpleProjectDto } from './project.dto';
 
 export class SubmissionDto {
     id: number;
-    projectDraft: SimpleProjectDraftDto;
+    projectDraft: SimpleProjectDto;
     status: ProjectDraftSubmissionStatus;
     createdAt: number;
 

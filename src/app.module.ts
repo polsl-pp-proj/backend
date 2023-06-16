@@ -7,8 +7,10 @@ import * as dotenv from 'dotenv';
 import { OrganizationModule } from './modules/organization/organization.module';
 import { AssetModule } from './modules/asset/asset.module';
 import { DonationModule } from './modules/donation/donation.module';
+import { ProjectModule } from './modules/project/project.module';
 import { PolonModule } from './modules/polon/polon.module';
 import { FavoriteModule } from './modules/favorite/favorite.module';
+import { GalleryModule } from './modules/gallery/gallery.module';
 dotenv.config();
 
 @Module({
@@ -28,8 +30,10 @@ dotenv.config();
         OrganizationModule,
         AssetModule,
         DonationModule,
+        ProjectModule,
         PolonModule,
         FavoriteModule,
+        GalleryModule,
     ],
     controllers: [AppController],
 })

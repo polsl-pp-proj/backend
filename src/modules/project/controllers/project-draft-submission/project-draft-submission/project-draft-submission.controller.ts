@@ -14,7 +14,7 @@ import { IProjectDraftSubmissionService } from 'src/interfaces/project-draft-sub
 import { AuthTokenPayload } from 'src/modules/auth/decorators/param/user.decorator';
 import { AuthTokenPayloadDto } from 'src/modules/auth/dtos/auth-token-payload.dto';
 import { AuthTokenGuard } from 'src/modules/auth/guards/auth-token.guard';
-import { ProjectDraftDto } from 'src/modules/project/dtos/project-draft.dto';
+import { ProjectDto } from 'src/modules/project/dtos/project.dto';
 import { SubmissionDto } from 'src/modules/project/dtos/submission.dto';
 import { UserRole } from 'src/modules/user/enums/user-role.enum';
 import { ParseDatePipe } from 'src/pipes/parse-date.pipe';
@@ -41,7 +41,7 @@ export class ProjectDraftSubmissionController {
     async getSubmission(
         @Param('submissionId', ParseIntPipe) submissionId: number,
         @AuthTokenPayload() user: AuthTokenPayloadDto,
-    ): Promise<ProjectDraftDto> {
+    ): Promise<ProjectDto> {
         if (user.role === UserRole.BasicUser) {
             throw new ForbiddenException('not_moderator_or_admin');
         }

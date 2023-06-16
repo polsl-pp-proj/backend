@@ -6,8 +6,11 @@ export class ProjectDto {
     shortDescription: string;
     description: string;
     fundingObjectives?: string;
+    organizationId: number;
     organizationName: string;
     openPositions?: OpenPositionDto[];
+    createdAt: number;
+    updatedAt: number;
     // TO DO
     // Add assets
 
@@ -20,7 +23,10 @@ export class SimpleProjectDto {
     id: number;
     name: string;
     shortDescription: string;
+    organizationId: number;
     organizationName: string;
+    createdAt: number;
+    updatedAt: number;
     // Add thumbnail
 
     constructor(partialSimpleProjectDto: Partial<SimpleProjectDto>) {

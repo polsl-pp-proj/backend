@@ -10,7 +10,7 @@ import { RecordNotFoundException } from 'src/exceptions/record-not-found.excepti
 import { ModifiedAfterReadException } from 'src/exceptions/modified-after-read.exception';
 import { IProjectDraftSubmissionService } from 'src/interfaces/project-draft-submission.service.interface';
 import { convertProjectDraftSubmissionToSubmissionDto } from '../../helper/submission-to-submission-dto';
-import { convertProjectDraftToProjectDraftDto } from '../../helper/project-draft-to-project-draft-dto';
+import { convertProjectDraftToProjectDto } from '../../helper/project-draft-to-project-dto';
 
 @Injectable()
 export class ProjectDraftSubmissionService
@@ -37,7 +37,7 @@ export class ProjectDraftSubmissionService
         if (!submission) {
             throw new RecordNotFoundException('submission_with_id_not_found');
         }
-        return convertProjectDraftToProjectDraftDto(submission.projectDraft);
+        return convertProjectDraftToProjectDto(submission.projectDraft);
     }
 
     async rejectSubmission(

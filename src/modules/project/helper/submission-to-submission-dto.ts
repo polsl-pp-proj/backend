@@ -11,6 +11,8 @@ export const convertProjectDraftSubmissionToSubmissionDto = (
             name: submission.projectDraft.name,
             organizationName: submission.projectDraft.ownerOrganization.name,
             shortDescription: submission.projectDraft.shortDescription,
+            createdAt: submission.projectDraft.createdAt.valueOf(),
+            updatedAt: submission.projectDraft.updatedAt.valueOf(),
         },
         status: submission.status,
         createdAt: submission.createdAt,

@@ -4,9 +4,9 @@ import { SimpleProjectDto } from '../../dtos/project.dto';
 import { UploadProjectDto } from '../../dtos/upload-project.dto';
 import { ProjectDraftRepository } from '../../repositories/project-draft.repository';
 import {
-    convertProjectDraftToProjectDraftDto,
-    convertProjectDraftToSimpleProjectDraftDto,
-} from '../../helper/project-draft-to-project-draft-dto';
+    convertProjectDraftToProjectDto,
+    convertProjectDraftToSimpleProjectDto,
+} from '../../helper/project-draft-to-project-dto';
 import {
     convertProjectToProjectDto,
     convertProjectToSimpleProjectDto,
@@ -58,7 +58,7 @@ export class ProjectService implements IProjectService {
         });
 
         return drafts.map((draft) => {
-            return convertProjectDraftToSimpleProjectDraftDto(draft);
+            return convertProjectDraftToSimpleProjectDto(draft);
         });
     }
 
@@ -89,7 +89,7 @@ export class ProjectService implements IProjectService {
         }
 
         return drafts.map((draft) => {
-            return convertProjectDraftToSimpleProjectDraftDto(draft);
+            return convertProjectDraftToSimpleProjectDto(draft);
         });
     }
 
@@ -114,7 +114,7 @@ export class ProjectService implements IProjectService {
             );
         }
 
-        return convertProjectDraftToProjectDraftDto(draft);
+        return convertProjectDraftToProjectDto(draft);
     }
 
     async createProjectDraft(

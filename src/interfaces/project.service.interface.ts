@@ -1,9 +1,5 @@
 import { AuthTokenPayloadDto } from 'src/modules/auth/dtos/auth-token-payload.dto';
 import {
-    ProjectDraftDto,
-    SimpleProjectDraftDto,
-} from 'src/modules/project/dtos/project-draft.dto';
-import {
     ProjectDto,
     SimpleProjectDto,
 } from 'src/modules/project/dtos/project.dto';
@@ -40,7 +36,7 @@ export abstract class IProjectService {
      *
      * @returns ProjectDraftDto[] all projects' drafts
      */
-    abstract getAllDrafts(): Promise<SimpleProjectDraftDto[]>;
+    abstract getAllDrafts(): Promise<SimpleProjectDto[]>;
 
     /**
      * Returns all drafts belonging to given organization
@@ -51,7 +47,7 @@ export abstract class IProjectService {
     abstract getAllOrganizationsDrafts(
         organizationId: number,
         user: AuthTokenPayloadDto,
-    ): Promise<SimpleProjectDraftDto[]>;
+    ): Promise<SimpleProjectDto[]>;
 
     /**
      * Returns project draft with given ID
@@ -64,7 +60,7 @@ export abstract class IProjectService {
     abstract getDraftById(
         draftId: number,
         user: AuthTokenPayloadDto,
-    ): Promise<ProjectDraftDto>;
+    ): Promise<ProjectDto>;
 
     /**
      * Creates new project draft and new project draft submission

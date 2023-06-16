@@ -11,6 +11,8 @@ export const convertProjectToProjectDto = (project: Project): ProjectDto => {
         fundingObjectives: project.fundingObjectives,
         organizationName: project.projectDraft.ownerOrganization.name,
         openPositions: project.openPositions,
+        createdAt: project.createdAt.valueOf(),
+        updatedAt: project.updatedAt.valueOf(),
     });
 };
 
@@ -20,5 +22,7 @@ export const convertProjectToSimpleProjectDto = (project: Project) => {
         name: project.name,
         shortDescription: project.shortDescription,
         organizationName: project.projectDraft.ownerOrganization.name,
+        createdAt: project.createdAt.valueOf(),
+        updatedAt: project.updatedAt.valueOf(),
     });
 };

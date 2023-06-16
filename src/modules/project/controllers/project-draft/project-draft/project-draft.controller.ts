@@ -17,9 +17,9 @@ import { AuthTokenPayload } from 'src/modules/auth/decorators/param/user.decorat
 import { AuthTokenPayloadDto } from 'src/modules/auth/dtos/auth-token-payload.dto';
 import { AuthTokenGuard } from 'src/modules/auth/guards/auth-token.guard';
 import {
-    ProjectDraftDto,
-    SimpleProjectDraftDto,
-} from 'src/modules/project/dtos/project-draft.dto';
+    ProjectDto,
+    SimpleProjectDto,
+} from 'src/modules/project/dtos/project.dto';
 import { UploadProjectDto } from 'src/modules/project/dtos/upload-project.dto';
 
 @Controller({ path: 'project/draft', version: '1' })
@@ -31,7 +31,7 @@ export class ProjectDraftController {
     async getAllOrganizationDrafts(
         @Param('organizationId', ParseIntPipe) organizationId: number,
         @AuthTokenPayload() user: AuthTokenPayloadDto,
-    ): Promise<SimpleProjectDraftDto[]> {
+    ): Promise<SimpleProjectDto[]> {
         return await this.projectService.getAllOrganizationsDrafts(
             organizationId,
             user,
@@ -43,7 +43,7 @@ export class ProjectDraftController {
     async getProjectDraft(
         @Param('draftId', ParseIntPipe) draftId: number,
         @AuthTokenPayload() user: AuthTokenPayloadDto,
-    ): Promise<ProjectDraftDto> {
+    ): Promise<ProjectDto> {
         try {
             return await this.projectService.getDraftById(draftId, user);
         } catch (ex) {

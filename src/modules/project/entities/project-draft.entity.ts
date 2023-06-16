@@ -2,6 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { ProjectDraftOpenPosition } from './project-draft-open-position.entity';
 import { ProjectBase } from './project.entitybase';
 import { Organization } from '../../organization/entities/organization.entity';
+import { ProjectDraftGalleryEntry } from 'src/modules/gallery/entities/project-draft-gallery-entry.entity';
 
 @Entity({ name: 'project_drafts' })
 export class ProjectDraft extends ProjectBase {
@@ -18,6 +19,13 @@ export class ProjectDraft extends ProjectBase {
         { cascade: true },
     )
     openPositions: ProjectDraftOpenPosition[];
+
+    @OneToMany(
+        () => ProjectDraftGalleryEntry,
+        (galleryEntry) => galleryEntry.projectDraft,
+        { cascade: true },
+    )
+    galleryEntries: ProjectDraftGalleryEntry[];
 
     // TO DO
     // Connect to: Category

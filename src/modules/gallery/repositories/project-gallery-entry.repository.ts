@@ -71,8 +71,8 @@ export class ProjectGalleryEntryRepository extends Repository<ProjectGalleryEntr
             );
 
             const galleryEntries: ProjectGalleryEntry[] = [];
-            for (let i = 0; i < projectDraft.projectDraftGallery.length; ++i) {
-                const galleryEntry = projectDraft.projectDraftGallery[i];
+            for (let i = 0; i < projectDraft.galleryEntries.length; ++i) {
+                const galleryEntry = projectDraft.galleryEntries[i];
                 galleryEntries.push(
                     await projectGalleryRepository.createOrUpdateGalleryEntry(
                         projectId,

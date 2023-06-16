@@ -1,4 +1,5 @@
 import { OpenPositionDto } from './open-position.dto';
+import { AssetDto } from 'src/modules/asset/dtos/asset.dto';
 
 export class ProjectDto {
     id: number;
@@ -11,11 +12,10 @@ export class ProjectDto {
     openPositions?: OpenPositionDto[];
     createdAt: number;
     updatedAt: number;
-    // TO DO
-    // Add assets
+    assets: AssetDto[];
 
-    constructor(partialProjectDto: Partial<ProjectDto>) {
-        Object.assign(this, partialProjectDto);
+    constructor(projectDto: ProjectDto) {
+        Object.assign(this, projectDto);
     }
 }
 
@@ -27,9 +27,9 @@ export class SimpleProjectDto {
     organizationName: string;
     createdAt: number;
     updatedAt: number;
-    // Add thumbnail
+    thumbnail: AssetDto;
 
-    constructor(partialSimpleProjectDto: Partial<SimpleProjectDto>) {
-        Object.assign(this, partialSimpleProjectDto);
+    constructor(simpleProjectDto: SimpleProjectDto) {
+        Object.assign(this, simpleProjectDto);
     }
 }

@@ -1,4 +1,4 @@
-import { DataSource, EntityManager, Repository } from 'typeorm';
+import { DataSource, EntityManager, In, Not, Repository } from 'typeorm';
 import { ProjectDraft } from '../entities/project-draft.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { CreateProjectDto } from '../dtos/create-project.dto';
@@ -8,6 +8,9 @@ import { ProjectDraftSubmissionRepository } from './project-draft-submission.rep
 import { ProjectDraftSubmissionStatus } from '../enums/project-draft-submission-status.enum';
 import { ProjectDraftOpenPositionRepository } from './project-draft-open-position.repository';
 import { UpdateProjectDto } from '../dtos/update-project.dto';
+import { AssetRepository } from 'src/modules/asset/repositories/asset.repository';
+import { ProjectDraftGalleryEntryRepository } from 'src/modules/gallery/repositories/project-draft-gallery-entry.repository';
+import { AssetDto } from 'src/modules/asset/dtos/asset.dto';
 
 @Injectable()
 export class ProjectDraftRepository extends Repository<ProjectDraft> {
@@ -19,8 +22,8 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
     }
 
     async createProjectDraft(
-        uploadProjectDto: CreateProjectDto,
         organizationId: number,
+        createProjectDto: CreateProjectDto,
     ) {
         await this.entityManager.transaction(async (entityManager) => {
             const projectDraftRepository = new ProjectDraftRepository(
@@ -38,30 +41,31 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
                 );
 
             const draft = projectDraftRepository.create({
-                name: uploadProjectDto.name,
-                shortDescription: uploadProjectDto.shortDescription,
-                description: uploadProjectDto.description,
+                name: createProjectDto.name,
+                shortDescription: createProjectDto.shortDescription,
+                description: createProjectDto.description,
                 ownerOrganization: { id: organizationId },
                 ownerOrganizationId: organizationId,
                 fundingObjectives:
-                    uploadProjectDto.fundingObjectives.trim() || null,
+                    createProjectDto.fundingObjectives.trim() || null,
             });
 
             await projectDraftRepository.save(draft, { reload: true });
 
             await projectDraftOpenPositionRepository.updateOpenPositions(
                 draft.id,
-                uploadProjectDto.openPositions,
+                createProjectDto.openPositions,
             );
 
             await submissionRepository.createSubmission(draft.id);
+            await projectDraftRepository.putInGallery(createProjectDto, draft);
         });
     }
 
     async updateProjectDraft(
+        userId: number,
         projectDraftId: number,
         updateProjectDto: UpdateProjectDto,
-        organizationId: number,
     ) {
         this.entityManager.transaction(async (entityManager) => {
             const projectDraftRepository = new ProjectDraftRepository(
@@ -78,10 +82,10 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
                     entityManager,
                 );
 
-            let draft = await projectDraftRepository.findOne({
+            const draft = await projectDraftRepository.findOne({
                 where: {
                     id: projectDraftId,
-                    ownerOrganizationId: organizationId,
+                    ownerOrganization: { organizationUsers: { userId } }, // TODO: check if this is correct
                 },
             });
 
@@ -89,15 +93,16 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
                 throw new RecordNotFoundException('draft_with_id_not_found');
             }
 
-            draft = await projectDraftRepository.save({
-                ...draft,
-                description: updateProjectDto.description,
-                shortDescription: updateProjectDto.shortDescription,
-                name: updateProjectDto.name,
-                fundingObjectives: updateProjectDto.fundingObjectives,
-                ownerOrganization: { id: organizationId },
-                ownerOrganizationId: organizationId,
-            });
+            await projectDraftRepository.save(
+                {
+                    ...draft,
+                    description: updateProjectDto.description,
+                    shortDescription: updateProjectDto.shortDescription,
+                    name: updateProjectDto.name,
+                    fundingObjectives: updateProjectDto.fundingObjectives,
+                },
+                { reload: true },
+            );
 
             await projectDraftOpenPositionRepository.updateOpenPositions(
                 draft.id,
@@ -110,10 +115,52 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
                     status: ProjectDraftSubmissionStatus.ToBeResolved,
                 },
             });
-
             if (!submission) {
                 await submissionRepository.createSubmission(draft.id);
             }
+
+            await projectDraftRepository.putInGallery(updateProjectDto, draft);
+        });
+    }
+
+    private async putInGallery(
+        uploadProjectDto: CreateProjectDto | UpdateProjectDto,
+        draft: Pick<ProjectDraft, 'id'>,
+    ) {
+        return await this.manager.transaction(async (manager) => {
+            const assetRepository = new AssetRepository(
+                manager.connection,
+                manager,
+            );
+            const projectDraftGalleryRepository =
+                new ProjectDraftGalleryEntryRepository(
+                    manager.connection,
+                    manager,
+                );
+
+            const galleryEntries = [];
+
+            for (let i = 0; i < uploadProjectDto.assets.length; ++i) {
+                const asset = uploadProjectDto.assets[i] as AssetDto;
+                let foundAsset = await assetRepository.findOne({
+                    where: { url: asset.url },
+                });
+                if (!foundAsset) {
+                    foundAsset = await assetRepository.createAsset(asset);
+                }
+                galleryEntries.push(
+                    await projectDraftGalleryRepository.createOrUpdateGalleryEntry(
+                        draft.id,
+                        i,
+                        foundAsset,
+                    ),
+                );
+            }
+
+            await projectDraftGalleryRepository.delete({
+                id: Not(In(galleryEntries.map((entry) => entry.id))),
+                projectDraftId: draft.id,
+            });
         });
     }
 }

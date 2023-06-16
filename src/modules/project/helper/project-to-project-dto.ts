@@ -1,6 +1,7 @@
 import { OpenPositionDto } from '../dtos/open-position.dto';
 import { ProjectDto, SimpleProjectDto } from '../dtos/project.dto';
 import { Project } from '../entities/project.entity';
+import { convertProjectOpenPositionToOpenPositionDto } from './project-open-position-to-open-position-dto';
 
 export const convertProjectToProjectDto = (project: Project): ProjectDto => {
     return new ProjectDto({
@@ -10,7 +11,9 @@ export const convertProjectToProjectDto = (project: Project): ProjectDto => {
         description: project.description,
         fundingObjectives: project.fundingObjectives,
         organizationName: project.projectDraft.ownerOrganization.name,
-        openPositions: project.openPositions,
+        openPositions: project.openPositions.map((openPosition) =>
+            convertProjectOpenPositionToOpenPositionDto(openPosition),
+        ),
         createdAt: project.createdAt.valueOf(),
         updatedAt: project.updatedAt.valueOf(),
     });

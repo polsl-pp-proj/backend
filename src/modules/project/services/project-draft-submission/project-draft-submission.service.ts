@@ -32,7 +32,9 @@ export class ProjectDraftSubmissionService
     async getSubmissionById(submissionId: number) {
         const submission = await this.projectDraftSubmissionRepository.findOne({
             where: { id: submissionId },
-            relations: { projectDraft: { ownerOrganization: true } },
+            relations: {
+                projectDraft: { ownerOrganization: true, openPositions: true },
+            },
         });
         if (!submission) {
             throw new RecordNotFoundException('submission_with_id_not_found');

@@ -45,6 +45,6 @@ export class Project extends ProjectBase {
     searchVector?: string[];
 
     rank?: number;
-    paymentAmount?: number;
+    donationAmount?: number;
     favoriteCount?: number;
 }

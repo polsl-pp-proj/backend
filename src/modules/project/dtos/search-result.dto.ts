@@ -2,7 +2,7 @@ import { SimpleProjectDto } from './project.dto';
 
 export class SearchResultDto extends SimpleProjectDto {
     rank?: number;
-    paymentAmount?: number;
+    donationAmount?: number;
     favoriteCount?: number;
 
     constructor(searchResult: SearchResultDto) {

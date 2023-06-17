@@ -2,6 +2,7 @@ import { AssetDto } from 'src/modules/asset/dtos/asset.dto';
 import { ProjectDto, SimpleProjectDto } from '../dtos/project.dto';
 import { ProjectDraft } from '../entities/project-draft.entity';
 import { convertProjectDraftOpenPositionToOpenPositionDto } from './project-open-position-to-open-position-dto';
+import { convertCategoryToCategoryDto } from 'src/modules/category/helpers/category-to-category-dto.helper';
 
 export const convertProjectDraftToProjectDto = (projectDraft: ProjectDraft) => {
     return new ProjectDto({
@@ -14,6 +15,9 @@ export const convertProjectDraftToProjectDto = (projectDraft: ProjectDraft) => {
         organizationName: projectDraft.ownerOrganization.name,
         openPositions: projectDraft.openPositions.map((openPosition) =>
             convertProjectDraftOpenPositionToOpenPositionDto(openPosition),
+        ),
+        categories: projectDraft.categories.map((category) =>
+            convertCategoryToCategoryDto(category.category),
         ),
         assets: projectDraft.galleryEntries.map(
             (galleryEntry) =>

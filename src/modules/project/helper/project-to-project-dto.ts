@@ -2,6 +2,7 @@ import { AssetDto } from 'src/modules/asset/dtos/asset.dto';
 import { ProjectDto, SimpleProjectDto } from '../dtos/project.dto';
 import { Project } from '../entities/project.entity';
 import { convertProjectOpenPositionToOpenPositionDto } from './project-open-position-to-open-position-dto';
+import { convertCategoryToCategoryDto } from 'src/modules/category/helpers/category-to-category-dto.helper';
 
 export const convertProjectToProjectDto = (project: Project): ProjectDto => {
     return new ProjectDto({
@@ -22,6 +23,9 @@ export const convertProjectToProjectDto = (project: Project): ProjectDto => {
                     url: galleryEntry.asset.url,
                     type: galleryEntry.asset.type,
                 }),
+        ),
+        categories: project.categories.map((category) =>
+            convertCategoryToCategoryDto(category.category),
         ),
         createdAt: project.createdAt.valueOf(),
         updatedAt: project.updatedAt.valueOf(),

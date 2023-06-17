@@ -1,3 +1,4 @@
+import { CategoryDto } from 'src/modules/category/dtos/category.dto';
 import { OpenPositionDto } from './open-position.dto';
 import { AssetDto } from 'src/modules/asset/dtos/asset.dto';
 
@@ -9,10 +10,11 @@ export class ProjectDto {
     fundingObjectives?: string;
     organizationId: number;
     organizationName: string;
-    openPositions?: OpenPositionDto[];
+    openPositions: OpenPositionDto[];
+    categories: CategoryDto[];
+    assets: AssetDto[];
     createdAt: number;
     updatedAt: number;
-    assets: AssetDto[];
 
     constructor(projectDto: ProjectDto) {
         Object.assign(this, projectDto);

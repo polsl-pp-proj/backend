@@ -33,4 +33,18 @@ export class Project extends ProjectBase {
         cascade: true,
     })
     categories: ProjectCategory[];
+
+    @Column({
+        type: 'tsvector',
+        nullable: true,
+        select: false,
+        insert: false,
+        update: false,
+        name: 'search_vector',
+    })
+    searchVector?: string[];
+
+    rank?: number;
+    paymentAmount?: number;
+    favoriteCount?: number;
 }

@@ -58,6 +58,23 @@ export class CreateProjectDto {
             );
         }
     })
+    @IsDefined({ message: 'not_defined' })
+    @IsArray({ message: 'not_an_array' })
+    @IsNumber(
+        { allowInfinity: false, allowNaN: false, maxDecimalPlaces: 0 },
+        { each: true, message: 'not_a_number' },
+    )
+    categories: number[];
+
+    @Transform((params) => {
+        try {
+            return JSON.parse(params.value);
+        } catch (e) {
+            throw new BadRequestException(
+                `${params.key} contains invalid JSON `,
+            );
+        }
+    })
     @ArrayNotEmpty({ message: 'array_empty' })
     @IsArray({
         message: 'not_array',

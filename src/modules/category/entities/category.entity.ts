@@ -1,4 +1,9 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity({ name: 'categories' })
 export class Category {
@@ -7,4 +12,7 @@ export class Category {
 
     @Column({ name: 'name' })
     name: string;
+
+    @CreateDateColumn({ name: 'created_at' })
+    createdAt: Date;
 }

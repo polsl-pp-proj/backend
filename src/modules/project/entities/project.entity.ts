@@ -3,6 +3,7 @@ import { ProjectDraft } from './project-draft.entity';
 import { ProjectOpenPosition } from './project-open-position.entity';
 import { ProjectBase } from './project.entitybase';
 import { ProjectGalleryEntry } from '../../gallery/entities/project-gallery-entry.entity';
+import { ProjectCategory } from './project-category.entity';
 
 @Entity({ name: 'projects' })
 export class Project extends ProjectBase {
@@ -27,7 +28,9 @@ export class Project extends ProjectBase {
     )
     galleryEntries: ProjectGalleryEntry[];
 
-    // TO DO
-    // Connect to: Category, ProjectDonation,
-    // ProjectMessage and FavouriteProject
+    @OneToMany(() => ProjectCategory, (category) => category.project, {
+        eager: true,
+        cascade: true,
+    })
+    categories: ProjectCategory[];
 }

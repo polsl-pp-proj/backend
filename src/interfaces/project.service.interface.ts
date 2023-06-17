@@ -5,6 +5,8 @@ import {
 } from 'src/modules/project/dtos/project.dto';
 import { CreateProjectDto } from 'src/modules/project/dtos/create-project.dto';
 import { UpdateProjectDto } from 'src/modules/project/dtos/update-project.dto';
+import { SearchSortBy } from 'src/modules/project/enums/search-sort-by.enum';
+import { SearchResultsDto } from 'src/modules/project/dtos/search-results.dto';
 
 export abstract class IProjectService {
     /**
@@ -13,6 +15,14 @@ export abstract class IProjectService {
      * @returns ProjectDto[] all projects
      */
     abstract getAllProjects(): Promise<SimpleProjectDto[]>;
+
+    abstract search(
+        page: number,
+        elementsPerPage: number,
+        query?: string,
+        category?: number,
+        sort?: SearchSortBy,
+    ): Promise<SearchResultsDto>;
 
     /**
      * Returns all projects belonging to given organization

@@ -72,14 +72,16 @@ export class ProjectService implements IProjectService {
             relations: {
                 projectDraft: {
                     ownerOrganization: true,
-                    openPositions: true,
-                    galleryEntries: { asset: true },
                 },
+                openPositions: true,
+                galleryEntries: { asset: true },
+                categories: { category: true },
             },
         });
 
         return convertProjectToProjectDto(project);
     }
+
     async getAllDrafts() {
         const drafts = await this.projectDraftRepository.find({
             where: { galleryEntries: { indexPosition: 0 } },
@@ -118,6 +120,7 @@ export class ProjectService implements IProjectService {
                 ownerOrganization: true,
                 openPositions: true,
                 galleryEntries: { asset: true },
+                categories: { category: true },
             },
         });
 

@@ -12,6 +12,7 @@ import { ProjectModule } from './modules/project/project.module';
 import { PolonModule } from './modules/polon/polon.module';
 import { FavoriteModule } from './modules/favorite/favorite.module';
 import { GalleryModule } from './modules/gallery/gallery.module';
+import { CategoryModule } from './modules/category/category.module';
 dotenv.config();
 
 @Module({
@@ -36,6 +37,7 @@ dotenv.config();
         PolonModule,
         FavoriteModule,
         GalleryModule,
+        CategoryModule,
     ],
     controllers: [AppController],
 })

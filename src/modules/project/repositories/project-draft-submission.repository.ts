@@ -42,7 +42,9 @@ export class ProjectDraftSubmissionRepository extends Repository<ProjectDraftSub
 
             const submission = await submissionRepository.findOne({
                 where: { id: submissionId },
-                relations: { projectDraft: { openPositions: true } },
+                relations: {
+                    projectDraft: { openPositions: true, categories: true },
+                },
             });
 
             if (!submission) {

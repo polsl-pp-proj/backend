@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { Asset } from 'src/modules/asset/entities/asset.entity';
-import { ProjectDraft } from 'src/modules/project/entities/project-draft.entity';
 import { Repository, DataSource, EntityManager } from 'typeorm';
 import { ProjectGalleryEntry } from '../entities/project-gallery-entry.entity';
+import { ProjectDraftGalleryEntry } from '../entities/project-draft-gallery-entry.entity';
 
 @Injectable()
 export class ProjectGalleryEntryRepository extends Repository<ProjectGalleryEntry> {
@@ -62,7 +62,7 @@ export class ProjectGalleryEntryRepository extends Repository<ProjectGalleryEntr
 
     async importFromProjectDraftGallery(
         projectId: number,
-        projectDraft: ProjectDraft,
+        projectDraftGalleryEntries: ProjectDraftGalleryEntry[],
     ) {
         return await this.manager.transaction(async (manager) => {
             const projectGalleryRepository = new ProjectGalleryEntryRepository(
@@ -71,8 +71,8 @@ export class ProjectGalleryEntryRepository extends Repository<ProjectGalleryEntr
             );
 
             const galleryEntries: ProjectGalleryEntry[] = [];
-            for (let i = 0; i < projectDraft.galleryEntries.length; ++i) {
-                const galleryEntry = projectDraft.galleryEntries[i];
+            for (let i = 0; i < projectDraftGalleryEntries.length; ++i) {
+                const galleryEntry = projectDraftGalleryEntries[i];
                 galleryEntries.push(
                     await projectGalleryRepository.createOrUpdateGalleryEntry(
                         projectId,

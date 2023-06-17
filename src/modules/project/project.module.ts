@@ -18,6 +18,11 @@ import { ProjectDraftOpenPosition } from './entities/project-draft-open-position
 import { ProjectOpenPosition } from './entities/project-open-position.entity';
 import { ProjectDraftOpenPositionRepository } from './repositories/project-draft-open-position.repository';
 import { ProjectOpenPositionRepository } from './repositories/project-open-position.repository';
+import { CategoryModule } from '../category/category.module';
+import { ProjectCategory } from './entities/project-category.entity';
+import { ProjectDraftCategory } from './entities/project-draft-category.entity';
+import { ProjectCategoryRepository } from './repositories/project-category.repository';
+import { ProjectDraftCategoryRepository } from './repositories/project-draft-category.repository';
 
 @Module({
     imports: [
@@ -25,11 +30,14 @@ import { ProjectOpenPositionRepository } from './repositories/project-open-posit
         OrganizationModule,
         TypeOrmModule.forFeature([
             Project,
-            ProjectDraft,
-            ProjectDraftSubmission,
-            ProjectDraftOpenPosition,
             ProjectOpenPosition,
+            ProjectCategory,
+            ProjectDraft,
+            ProjectDraftOpenPosition,
+            ProjectDraftCategory,
+            ProjectDraftSubmission,
         ]),
+        CategoryModule,
     ],
     controllers: [
         ProjectController,
@@ -42,11 +50,13 @@ import { ProjectOpenPositionRepository } from './repositories/project-open-posit
             provide: IProjectDraftSubmissionService,
             useClass: ProjectDraftSubmission,
         },
-        ProjectDraftRepository,
-        ProjectDraftSubmissionRepository,
         ProjectRepository,
-        ProjectDraftOpenPositionRepository,
         ProjectOpenPositionRepository,
+        ProjectCategoryRepository,
+        ProjectDraftRepository,
+        ProjectDraftOpenPositionRepository,
+        ProjectDraftCategoryRepository,
+        ProjectDraftSubmissionRepository,
     ],
 })
 export class ProjectModule {}

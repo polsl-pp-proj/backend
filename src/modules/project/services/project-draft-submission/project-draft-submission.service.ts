@@ -45,6 +45,7 @@ export class ProjectDraftSubmissionService
                     ownerOrganization: true,
                     openPositions: true,
                     galleryEntries: { asset: true },
+                    categories: { category: true },
                 },
             },
         });

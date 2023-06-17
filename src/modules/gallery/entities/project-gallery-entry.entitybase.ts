@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { Asset } from 'src/modules/asset/entities/asset.entity';
+import { Asset } from '../../asset/entities/asset.entity';
 import {
     Column,
     CreateDateColumn,

@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { ProjectGalleryEntryBase } from './project-gallery-entry.entitybase';
-import { ProjectDraft } from 'src/modules/project/entities/project-draft.entity';
+import { ProjectDraft } from '../../project/entities/project-draft.entity';
 
 @Entity({ name: 'project_draft_gallery_entries' })
 export class ProjectDraftGalleryEntry extends ProjectGalleryEntryBase {

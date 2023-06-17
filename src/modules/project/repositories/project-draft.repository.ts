@@ -11,6 +11,7 @@ import { UpdateProjectDto } from '../dtos/update-project.dto';
 import { AssetRepository } from 'src/modules/asset/repositories/asset.repository';
 import { ProjectDraftGalleryEntryRepository } from 'src/modules/gallery/repositories/project-draft-gallery-entry.repository';
 import { AssetDto } from 'src/modules/asset/dtos/asset.dto';
+import { ProjectDraftCategoryRepository } from './project-draft-category.repository';
 
 @Injectable()
 export class ProjectDraftRepository extends Repository<ProjectDraft> {
@@ -39,6 +40,11 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
                     entityManager.connection,
                     entityManager,
                 );
+            const projectDraftCategoryRepository =
+                new ProjectDraftCategoryRepository(
+                    entityManager.connection,
+                    entityManager,
+                );
 
             const draft = projectDraftRepository.create({
                 name: createProjectDto.name,
@@ -57,8 +63,14 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
                 createProjectDto.openPositions,
             );
 
-            await submissionRepository.createSubmission(draft.id);
+            await projectDraftCategoryRepository.updateProjectDraftCategories(
+                draft.id,
+                createProjectDto.categories,
+            );
+
             await projectDraftRepository.putInGallery(createProjectDto, draft);
+
+            await submissionRepository.createSubmission(draft.id);
         });
     }
 
@@ -81,8 +93,13 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
                     entityManager.connection,
                     entityManager,
                 );
+            const projectDraftCategoryRepository =
+                new ProjectDraftCategoryRepository(
+                    entityManager.connection,
+                    entityManager,
+                );
 
-            const draft = await projectDraftRepository.findOne({
+            let draft = await projectDraftRepository.findOne({
                 where: {
                     id: projectDraftId,
                     ownerOrganization: { organizationUsers: { userId } }, // TODO: check if this is correct
@@ -93,33 +110,38 @@ export class ProjectDraftRepository extends Repository<ProjectDraft> {
                 throw new RecordNotFoundException('draft_with_id_not_found');
             }
 
-            await projectDraftRepository.save(
+            draft = await projectDraftRepository.save(
                 {
-                    ...draft,
+                    id: projectDraftId,
                     description: updateProjectDto.description,
                     shortDescription: updateProjectDto.shortDescription,
                     name: updateProjectDto.name,
                     fundingObjectives: updateProjectDto.fundingObjectives,
-                },
+                } as ProjectDraft,
                 { reload: true },
             );
 
             await projectDraftOpenPositionRepository.updateOpenPositions(
-                draft.id,
+                projectDraftId,
                 updateProjectDto.openPositions,
             );
 
+            await projectDraftCategoryRepository.updateProjectDraftCategories(
+                projectDraftId,
+                updateProjectDto.categories,
+            );
+
+            await projectDraftRepository.putInGallery(updateProjectDto, draft);
+
             const submission = await submissionRepository.findOne({
                 where: {
-                    projectDraftId: draft.id,
+                    projectDraftId,
                     status: ProjectDraftSubmissionStatus.ToBeResolved,
                 },
             });
             if (!submission) {
-                await submissionRepository.createSubmission(draft.id);
+                await submissionRepository.createSubmission(projectDraftId);
             }
-
-            await projectDraftRepository.putInGallery(updateProjectDto, draft);
         });
     }
 

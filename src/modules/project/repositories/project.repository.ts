@@ -10,6 +10,7 @@ import { UpdateProjectDto } from '../dtos/update-project.dto';
 import { AssetRepository } from 'src/modules/asset/repositories/asset.repository';
 import { ProjectGalleryEntryRepository } from 'src/modules/gallery/repositories/project-gallery-entry.repository';
 import { AssetDto } from 'src/modules/asset/dtos/asset.dto';
+import { ProjectCategoryRepository } from './project-category.repository';
 
 @Injectable()
 export class ProjectRepository extends Repository<Project> {
@@ -39,6 +40,10 @@ export class ProjectRepository extends Repository<Project> {
                     entityManager.connection,
                     entityManager,
                 );
+            const projectCategoryRepository = new ProjectCategoryRepository(
+                entityManager.connection,
+                entityManager,
+            );
 
             if (
                 projectDraft.updatedAt.valueOf() !== draftLastModified.valueOf()
@@ -77,10 +82,13 @@ export class ProjectRepository extends Repository<Project> {
                 project.id,
                 projectDraft.openPositions,
             );
-
+            await projectCategoryRepository.importCategoriesFromProjectDraft(
+                project.id,
+                projectDraft.categories,
+            );
             await projectGalleryEntryRepository.importFromProjectDraftGallery(
                 project.id,
-                projectDraft,
+                projectDraft.galleryEntries,
             );
         });
     }
@@ -99,6 +107,10 @@ export class ProjectRepository extends Repository<Project> {
                     entityManager.connection,
                     entityManager,
                 );
+            const projectCategoryRepository = new ProjectCategoryRepository(
+                entityManager.connection,
+                entityManager,
+            );
 
             const queryResult = await projectRepository.update(
                 { id: projectId },
@@ -117,6 +129,11 @@ export class ProjectRepository extends Repository<Project> {
             await projectOpenPositionRepository.editProjectOpenPositions(
                 projectId,
                 updateProjectDto.openPositions,
+            );
+
+            await projectCategoryRepository.updateProjectCategories(
+                projectId,
+                updateProjectDto.categories,
             );
 
             await projectRepository.putInGallery(updateProjectDto, {

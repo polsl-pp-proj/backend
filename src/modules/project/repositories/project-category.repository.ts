@@ -18,30 +18,31 @@ export class ProjectCategoryRepository extends Repository<ProjectCategory> {
         projectId: number,
         projectDraftCategories: ProjectDraftCategory[],
     ) {
+        return await this.updateProjectCategories(
+            projectId,
+            projectDraftCategories.map((category) => category.categoryId),
+        );
+    }
+
+    async updateProjectCategories(projectId: number, categories: number[]) {
         return await this.entityManager.transaction(async (manager) => {
             const projectCategoryRepository = new ProjectCategoryRepository(
                 manager.connection,
                 manager,
             );
-
-            const projectCategories: ProjectCategory[] = [];
-            const projectCategoryIds: number[] = [];
-
-            projectDraftCategories.forEach((category) => {
-                projectCategories.push(
+            const projectCategories: ProjectCategory[] = categories.map(
+                (categoryId) =>
                     projectCategoryRepository.create({
                         projectId,
                         project: { id: projectId },
-                        categoryId: category.categoryId,
-                        category: { id: category.categoryId },
+                        categoryId,
+                        category: { id: categoryId },
                     }),
-                );
-                projectCategoryIds.push(category.categoryId);
-            });
+            );
 
             await projectCategoryRepository.delete({
                 projectId,
-                categoryId: Not(In(projectCategoryIds)),
+                categoryId: Not(In(categories)),
             });
 
             await projectCategoryRepository

@@ -21,6 +21,8 @@ import { ProjectOpenPositionRepository } from './repositories/project-open-posit
 import { CategoryModule } from '../category/category.module';
 import { ProjectCategory } from './entities/project-category.entity';
 import { ProjectDraftCategory } from './entities/project-draft-category.entity';
+import { ProjectCategoryRepository } from './repositories/project-category.repository';
+import { ProjectDraftCategoryRepository } from './repositories/project-draft-category.repository';
 
 @Module({
     imports: [
@@ -48,11 +50,13 @@ import { ProjectDraftCategory } from './entities/project-draft-category.entity';
             provide: IProjectDraftSubmissionService,
             useClass: ProjectDraftSubmission,
         },
-        ProjectDraftRepository,
-        ProjectDraftSubmissionRepository,
         ProjectRepository,
-        ProjectDraftOpenPositionRepository,
         ProjectOpenPositionRepository,
+        ProjectCategoryRepository,
+        ProjectDraftRepository,
+        ProjectDraftOpenPositionRepository,
+        ProjectDraftCategoryRepository,
+        ProjectDraftSubmissionRepository,
     ],
 })
 export class ProjectModule {}

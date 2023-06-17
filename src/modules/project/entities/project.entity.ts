@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 import { ProjectDraft } from './project-draft.entity';
 import { ProjectOpenPosition } from './project-open-position.entity';
 import { ProjectBase } from './project.entitybase';
-import { ProjectGalleryEntry } from 'src/modules/gallery/entities/project-gallery-entry.entity';
+import { ProjectGalleryEntry } from '../../gallery/entities/project-gallery-entry.entity';
 
 @Entity({ name: 'projects' })
 export class Project extends ProjectBase {

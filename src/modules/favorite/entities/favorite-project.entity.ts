@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
-import { Project } from 'src/modules/project/entities/project.entity';
-import { User } from 'src/modules/user/entities/user.entity';
+import { Project } from '../../project/entities/project.entity';
+import { User } from '../../user/entities/user.entity';
 import {
     CreateDateColumn,
     Entity,

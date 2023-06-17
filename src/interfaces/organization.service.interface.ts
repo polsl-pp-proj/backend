@@ -8,9 +8,16 @@ export abstract class IOrganizationService {
     /**
      * Returns all organizations
      *
-     * @returns OrganizatonDto[] All organizations
+     * @returns OrganizationDto[] All organizations
      */
     abstract getAllOrganizations(): Promise<OrganizationDto[]>;
+
+    /**
+     * Returns organization containing requesting user
+     *
+     * @returns OrganizationDto[] Organizations, user is member of
+     */
+    abstract getOwnOrganizations(userId: number): Promise<OrganizationDto[]>;
 
     /**
      * Returns organization with given id with it's members
@@ -27,7 +34,7 @@ export abstract class IOrganizationService {
      * Returns organization with given id
      *
      * @param id Organization id
-     * @returns OrganizatonDto
+     * @returns OrganizationDto
      */
     abstract getOrganizationById(id: number): Promise<OrganizationDto>;
 
@@ -53,7 +60,7 @@ export abstract class IOrganizationService {
     ): Promise<void>;
 
     /**
-     * Deletes memeber from organization
+     * Deletes member from organization
      *
      * @param memberId Id of the organization member to delete
      */

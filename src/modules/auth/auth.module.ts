@@ -27,6 +27,13 @@ import { IOneTimeTokenService } from 'src/interfaces/one-time-token.service.inte
 import { OneTimeTokenRepository } from './repositories/one-time-token.repository';
 import { AuthMailerModule } from './modules/auth-mailer/auth-mailer.module';
 import { SignupMailerModule } from './modules/signup-mailer/signup-mailer.module';
+import { StripeWebhookStrategy } from './strategies/stripe-webhook.strategy';
+import { DonationModule } from '../donation/donation.module';
+import { StudentshipController } from './controllers/studentship/studentship.controller';
+import { StudentshipService } from './services/studentship/studentship.service';
+import { StudentshipMailerModule } from './modules/studentship-mailer/studentship-mailer.module';
+import { StudentshipRepository } from './repositories/studentship.repository';
+import { PolonModule } from '../polon/polon.module';
 
 @Module({
     imports: [
@@ -39,8 +46,11 @@ import { SignupMailerModule } from './modules/signup-mailer/signup-mailer.module
         JwtModule.register(jwtModuleConfig),
         AuthMailerModule,
         SignupMailerModule,
+        DonationModule,
+        StudentshipMailerModule,
+        PolonModule,
     ],
-    controllers: [AuthController, SignupController],
+    controllers: [AuthController, SignupController, StudentshipController],
     providers: [
         { provide: IAuthService, useClass: AuthService },
         { provide: IAuthTokenService, useClass: AuthTokenService },
@@ -54,6 +64,9 @@ import { SignupMailerModule } from './modules/signup-mailer/signup-mailer.module
         { provide: ISignupService, useClass: SignupService },
         OneTimeTokenRepository,
         { provide: IOneTimeTokenService, useClass: OneTimeTokenService },
+        StripeWebhookStrategy,
+        StudentshipService,
+        StudentshipRepository,
     ],
 })
 export class AuthModule {}

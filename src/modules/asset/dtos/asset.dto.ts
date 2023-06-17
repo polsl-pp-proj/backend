@@ -15,4 +15,8 @@ export class AssetDto {
     @IsEnum(AssetType, { message: 'not_asset_type' })
     @IsDefined({ message: 'not_defined' })
     type: AssetType;
+
+    constructor(assetDto: AssetDto) {
+        Object.assign(this, assetDto);
+    }
 }

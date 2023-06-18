@@ -4,8 +4,6 @@ import {
     NotFoundException,
 } from '@nestjs/common';
 import { ProjectDraftSubmissionRepository } from '../../repositories/project-draft-submission.repository';
-import { ProjectDraftSubmissionStatus } from '../../enums/project-draft-submission-status.enum';
-import { SubmissionDto } from '../../dtos/submission.dto';
 import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
 import { ModifiedAfterReadException } from 'src/exceptions/modified-after-read.exception';
 import { IProjectDraftSubmissionService } from 'src/interfaces/project-draft-submission.service.interface';

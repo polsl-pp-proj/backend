@@ -11,6 +11,7 @@ import {
     ValidationPipe,
     UploadedFiles,
     UseInterceptors,
+    Query,
 } from '@nestjs/common';
 import { validationConfig } from 'src/configs/validation.config';
 import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
@@ -22,11 +23,11 @@ import {
     ProjectDto,
     SimpleProjectDto,
 } from 'src/modules/project/dtos/project.dto';
-import { CreateProjectDto } from 'src/modules/project/dtos/create-project.dto';
 import { UserRole } from 'src/modules/user/enums/user-role.enum';
 import { UpdateProjectDto } from 'src/modules/project/dtos/update-project.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { filesInterceptorConfig } from '../../configs/files-interceptor.config';
+import { SearchQueryParamsDto } from '../../dtos/search-query-params.dto';
 
 @Controller({ path: 'project', version: '1' })
 export class ProjectController {
@@ -34,6 +35,20 @@ export class ProjectController {
     @Get()
     async getAllProjects(): Promise<SimpleProjectDto[]> {
         return await this.projectService.getAllProjects();
+    }
+
+    @Get('search')
+    async search(
+        @Query(new ValidationPipe(validationConfig))
+        { sort, query, category, page, elementsPerPage }: SearchQueryParamsDto,
+    ) {
+        return await this.projectService.search(
+            page,
+            elementsPerPage,
+            query,
+            category,
+            sort,
+        );
     }
 
     @Get(':projectId')

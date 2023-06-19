@@ -7,16 +7,19 @@ import {
 } from '../helpers/organization-to-organization-dto.helper';
 import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
 import { CreateOrganizationDto } from '../dtos/create-organization.dto';
-import { MemberDto } from '../dtos/member.dto';
 import { RemoveMembersDto } from '../dtos/remove-members.dto';
 import { FullOrganizationDto } from '../dtos/full-organization.dto';
 import { IOrganizationService } from 'src/interfaces/organization.service.interface';
 import { AddMembersDto } from '../dtos/add-members.dto';
+import { OrganizationMemberDto } from '../dtos/organization-member.dto';
+import { OrganizationUserRepository } from '../repositories/organization-user.repository';
+import { convertOrganizationUserToOrganizationMemberDto } from '../helpers/organization-user-to-organization-member-dto.helper';
 
 @Injectable()
 export class OrganizationService implements IOrganizationService {
     constructor(
         private readonly organizationRepository: OrganizationRepository,
+        private readonly organizationUserRepository: OrganizationUserRepository,
     ) {}
 
     async getAllOrganizations(): Promise<OrganizationDto[]> {
@@ -72,6 +75,19 @@ export class OrganizationService implements IOrganizationService {
         await this.organizationRepository.createOrganization(
             organizationOwnerId,
             createOrganizationDto,
+        );
+    }
+
+    async getOrganizationMembers(
+        organizationId: number,
+    ): Promise<OrganizationMemberDto[]> {
+        const organizationUsers = await this.organizationUserRepository.find({
+            where: { organizationId },
+            relations: { user: true },
+        });
+
+        return organizationUsers.map((orgUser) =>
+            convertOrganizationUserToOrganizationMemberDto(orgUser),
         );
     }
 

@@ -30,4 +30,8 @@ export class OrganizationMemberDto {
         { message: 'not_orgnizaiton_member_role_enum' },
     )
     role: OrganizationMemberRole;
+
+    constructor(organizationMemberDto: OrganizationMemberDto) {
+        Object.assign(this, organizationMemberDto);
+    }
 }

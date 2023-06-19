@@ -1,6 +1,7 @@
 import { FullOrganizationDto } from '../dtos/full-organization.dto';
 import { OrganizationDto } from '../dtos/organization.dto';
 import { Organization } from '../entities/organization.entity';
+import { convertOrganizationUserToOrganizationMemberDto } from './organization-user-to-organization-member-dto.helper';
 
 export const convertOrganizationToOrganizationDto = (
     organization: Organization,
@@ -14,21 +15,11 @@ export const convertOrganizationToOrganizationDto = (
 export const convertOrganizationToFullOrganizationDto = (
     organization: Organization,
 ) => {
-    const organizationMembers = organization.organizationUsers.map(
-        (organizationUser) => {
-            return {
-                id: organizationUser.userId,
-                firstName: organizationUser.user.firstName,
-                lastName: organizationUser.user.lastName,
-                emailAddress: organizationUser.user.emailAddress,
-                role: organizationUser.role,
-            };
-        },
-    );
-
     return new FullOrganizationDto({
         id: organization.id,
         name: organization.name,
-        members: organizationMembers,
+        members: organization.organizationUsers.map((organizationUser) =>
+            convertOrganizationUserToOrganizationMemberDto(organizationUser),
+        ),
     });
 };

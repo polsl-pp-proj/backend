@@ -1,10 +1,10 @@
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { Project } from './project.entity';
 import { ProjectCategoryBase } from './project-category.entitybase';
 
 @Entity({ name: 'project_categories' })
 export class ProjectCategory extends ProjectCategoryBase {
-    @Column({ name: 'project_id' })
+    @PrimaryColumn({ name: 'project_id' })
     projectId: number;
 
     @ManyToOne(() => Project, { onDelete: 'CASCADE' })

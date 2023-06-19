@@ -34,6 +34,7 @@ export class StudentshipController {
                 user,
                 requestStudentshipVerificationDto,
             );
+            return;
         }
         throw new ConflictException('user_is_verified_student');
     }

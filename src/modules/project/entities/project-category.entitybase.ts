@@ -1,18 +1,14 @@
 import { Type } from 'class-transformer';
 import { Category } from '../../category/entities/category.entity';
 import {
-    PrimaryGeneratedColumn,
-    Column,
     ManyToOne,
     JoinColumn,
     CreateDateColumn,
+    PrimaryColumn,
 } from 'typeorm';
 
 export class ProjectCategoryBase {
-    @PrimaryGeneratedColumn({ name: 'id' })
-    id: number;
-
-    @Column({ name: 'category_id' })
+    @PrimaryColumn({ name: 'category_id' })
     categoryId: number;
 
     @ManyToOne(() => Category, { onDelete: 'CASCADE', eager: true })

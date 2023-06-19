@@ -44,10 +44,10 @@ import { NotificationModule } from '../notification/notification.module';
         NotificationModule,
     ],
     controllers: [
-        ProjectController,
-        ProjectDraftController,
         ProjectDraftSubmissionController,
+        ProjectDraftController,
         OpenPositionController,
+        ProjectController,
     ],
     providers: [
         { provide: IProjectService, useClass: ProjectService },

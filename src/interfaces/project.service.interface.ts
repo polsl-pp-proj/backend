@@ -24,6 +24,11 @@ export abstract class IProjectService {
         sort?: SearchSortBy,
     ): Promise<SearchResultsDto>;
 
+    abstract getMostLikedProjects(): Promise<
+        (SimpleProjectDto & { likes: number })[]
+    >;
+    abstract getNewestProjects(): Promise<SimpleProjectDto[]>;
+
     /**
      * Returns all projects belonging to given organization
      *

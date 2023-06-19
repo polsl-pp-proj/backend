@@ -51,6 +51,27 @@ export class ProjectController {
         );
     }
 
+    @Get('newest')
+    async getNewestProjects(): Promise<SimpleProjectDto[]> {
+        return await this.projectService.getNewestProjects();
+    }
+
+    @Get('favorite')
+    async getMostLikedProjects(): Promise<
+        (SimpleProjectDto & { likes: number })[]
+    > {
+        return await this.projectService.getMostLikedProjects();
+    }
+
+    @Get('organization/:organizationId')
+    async getAllOrganizationsProjects(
+        @Param('organizationId', ParseIntPipe) organizationId: number,
+    ): Promise<SimpleProjectDto[]> {
+        return await this.projectService.getAllOrganizationsProjects(
+            organizationId,
+        );
+    }
+
     @Get(':projectId')
     async getProjectById(
         @Param('projectId', ParseIntPipe) projectId: number,
@@ -63,15 +84,6 @@ export class ProjectController {
             }
             throw ex;
         }
-    }
-
-    @Get('organization/:organizationId')
-    async getAllOrganizationsProjects(
-        @Param('organizationId', ParseIntPipe) organizationId: number,
-    ): Promise<SimpleProjectDto[]> {
-        return await this.projectService.getAllOrganizationsProjects(
-            organizationId,
-        );
     }
 
     @UseInterceptors(

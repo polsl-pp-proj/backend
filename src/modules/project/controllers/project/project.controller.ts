@@ -28,6 +28,7 @@ import { UpdateProjectDto } from 'src/modules/project/dtos/update-project.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { filesInterceptorConfig } from '../../configs/files-interceptor.config';
 import { SearchQueryParamsDto } from '../../dtos/search-query-params.dto';
+import { OpenPositionForProjectDto } from '../../dtos/open-position-for-project.dto';
 
 @Controller({ path: 'project', version: '1' })
 export class ProjectController {
@@ -51,6 +52,27 @@ export class ProjectController {
         );
     }
 
+    @Get('newest')
+    async getNewestProjects(): Promise<SimpleProjectDto[]> {
+        return await this.projectService.getNewestProjects();
+    }
+
+    @Get('favorite')
+    async getMostLikedProjects(): Promise<
+        (SimpleProjectDto & { likes: number })[]
+    > {
+        return await this.projectService.getMostLikedProjects();
+    }
+
+    @Get('organization/:organizationId')
+    async getAllOrganizationsProjects(
+        @Param('organizationId', ParseIntPipe) organizationId: number,
+    ): Promise<SimpleProjectDto[]> {
+        return await this.projectService.getAllOrganizationsProjects(
+            organizationId,
+        );
+    }
+
     @Get(':projectId')
     async getProjectById(
         @Param('projectId', ParseIntPipe) projectId: number,
@@ -63,15 +85,6 @@ export class ProjectController {
             }
             throw ex;
         }
-    }
-
-    @Get('organization/:organizationId')
-    async getAllOrganizationsProjects(
-        @Param('organizationId', ParseIntPipe) organizationId: number,
-    ): Promise<SimpleProjectDto[]> {
-        return await this.projectService.getAllOrganizationsProjects(
-            organizationId,
-        );
     }
 
     @UseInterceptors(

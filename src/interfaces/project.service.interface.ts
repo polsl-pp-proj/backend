@@ -7,6 +7,8 @@ import { CreateProjectDto } from 'src/modules/project/dtos/create-project.dto';
 import { UpdateProjectDto } from 'src/modules/project/dtos/update-project.dto';
 import { SearchSortBy } from 'src/modules/project/enums/search-sort-by.enum';
 import { SearchResultsDto } from 'src/modules/project/dtos/search-results.dto';
+import { OpenPositionDto } from 'src/modules/project/dtos/open-position.dto';
+import { OpenPositionForProjectDto } from 'src/modules/project/dtos/open-position-for-project.dto';
 
 export abstract class IProjectService {
     /**
@@ -23,6 +25,11 @@ export abstract class IProjectService {
         category?: number,
         sort?: SearchSortBy,
     ): Promise<SearchResultsDto>;
+
+    abstract getMostLikedProjects(): Promise<
+        (SimpleProjectDto & { likes: number })[]
+    >;
+    abstract getNewestProjects(): Promise<SimpleProjectDto[]>;
 
     /**
      * Returns all projects belonging to given organization

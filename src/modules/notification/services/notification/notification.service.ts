@@ -282,8 +282,10 @@ export class NotificationService {
         notificationData: CreateNotificationDto & {
             type: OrganizationOnlyNotificationType;
         },
+        organizationNotificationRepository = this
+            .organizationNotificationRepository,
     ) {
-        await this.organizationNotificationRepository.manager.transaction(
+        await organizationNotificationRepository.manager.transaction(
             async (manager) => {
                 const organizationNotificationRepository =
                     new OrganizationNotificationRepository(

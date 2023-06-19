@@ -23,6 +23,10 @@ import { SearchSortBy } from '../../enums/search-sort-by.enum';
 import { ProjectDonation } from 'src/modules/donation/entities/project-donation.entity';
 import { SearchResultDto } from '../../dtos/search-result.dto';
 import { SearchResultsDto } from '../../dtos/search-results.dto';
+import { Project } from '../../entities/project.entity';
+import { OpenPositionDto } from '../../dtos/open-position.dto';
+import { ProjectOpenPosition } from '../../entities/project-open-position.entity';
+import { OpenPositionForProjectDto } from '../../dtos/open-position-for-project.dto';
 
 @Injectable()
 export class ProjectService implements IProjectService {
@@ -74,7 +78,7 @@ export class ProjectService implements IProjectService {
                 `gallery.id, gallery.indexPosition, gallery.projectId, gallery.assetId, gallery.createdAt, gallery.updatedAt`,
             )
             .addGroupBy(
-                `asset.id, asset.title, asset.url, asset.assetType, asset.createdAt`,
+                `asset.id, asset.title, asset.url, asset.type, asset.createdAt`,
             )
             .addGroupBy(
                 `projectDraft.id, projectDraft.name, projectDraft.shortDescription, projectDraft.description, projectDraft.fundingObjectives, projectDraft.createdAt, projectDraft.updatedAt, projectDraft.ownerOrganizationId`,
@@ -155,6 +159,46 @@ export class ProjectService implements IProjectService {
                     }),
             ),
         });
+    }
+
+    async getMostLikedProjects(): Promise<
+        (SimpleProjectDto & { likes: number })[]
+    > {
+        const favorites = await this.projectRepository.manager
+            .createQueryBuilder(FavoriteProject, 'favorite')
+            .leftJoinAndSelect('favorite.project', 'project')
+            .leftJoinAndSelect('project.projectDraft', 'projectDraft')
+            .leftJoinAndSelect(
+                'projectDraft.ownerOrganization',
+                'ownerOrganization',
+            )
+            .leftJoinAndSelect('project.galleryEntries', 'gallery')
+            .leftJoinAndSelect('gallery.asset', 'asset')
+            .andWhere('gallery.indexPosition = 0')
+            .addGroupBy(
+                'favorite.projectId, favorite.userId, favorite.createdAt, project.id, projectDraft.id, ownerOrganization.id, gallery.id, asset.id',
+            )
+            .addSelect('COALESCE(COUNT(project.id), 0)', 'numberOfLikes')
+            .addOrderBy('numberOfLikes', 'DESC', 'NULLS LAST')
+            .take(10)
+            .getMany();
+
+        return favorites.map((favorite) => ({
+            ...convertProjectToSimpleProjectDto(favorite.project),
+            likes: (favorite as unknown as Project & { numberOfLikes: number })
+                .numberOfLikes,
+        }));
+    }
+
+    async getNewestProjects(): Promise<SimpleProjectDto[]> {
+        const newest = await this.projectRepository.find({
+            take: 10,
+            order: { createdAt: 'DESC' },
+        });
+
+        return newest.map((project) =>
+            convertProjectToSimpleProjectDto(project),
+        );
     }
 
     async getAllOrganizationsProjects(organizationId: number) {

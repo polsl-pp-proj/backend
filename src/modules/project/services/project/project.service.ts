@@ -75,7 +75,7 @@ export class ProjectService implements IProjectService {
                 `gallery.id, gallery.indexPosition, gallery.projectId, gallery.assetId, gallery.createdAt, gallery.updatedAt`,
             )
             .addGroupBy(
-                `asset.id, asset.title, asset.url, asset.assetType, asset.createdAt`,
+                `asset.id, asset.title, asset.url, asset.type, asset.createdAt`,
             )
             .addGroupBy(
                 `projectDraft.id, projectDraft.name, projectDraft.shortDescription, projectDraft.description, projectDraft.fundingObjectives, projectDraft.createdAt, projectDraft.updatedAt, projectDraft.ownerOrganizationId`,

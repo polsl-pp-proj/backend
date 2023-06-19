@@ -256,10 +256,13 @@ export class NotificationService {
                         sqlParameters,
                     ) as SelectQueryBuilder<INotification>;
 
-                const [notifications, count] = await unionQueryBuilder
+                const paginatedQuery = unionQueryBuilder
                     .take(elementsPerPage)
-                    .skip(elementsPerPage * (page - 1))
-                    .getManyAndCount();
+                    .skip(elementsPerPage * (page - 1));
+
+                const notifications =
+                        await paginatedQuery.getRawMany<INotification>(),
+                    count = await paginatedQuery.getCount();
 
                 let pageCount = Math.ceil(count / elementsPerPage);
 

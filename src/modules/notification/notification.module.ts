@@ -22,5 +22,6 @@ import { RedisPubSubModule } from 'nest-pubsub';
         UserNotificationRepository,
     ],
     controllers: [NotificationController],
+    exports: [NotificationService],
 })
 export class NotificationModule {}

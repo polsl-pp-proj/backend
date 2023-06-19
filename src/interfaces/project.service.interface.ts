@@ -41,10 +41,6 @@ export abstract class IProjectService {
         organizationId: number,
     ): Promise<SimpleProjectDto[]>;
 
-    abstract getOpenPositionsForOrganization(
-        organizationId: number,
-    ): Promise<OpenPositionForProjectDto[]>;
-
     /**
      * Returns project with given ID
      * @param projectId ID of the project

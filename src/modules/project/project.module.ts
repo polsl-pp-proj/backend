@@ -23,6 +23,9 @@ import { ProjectCategory } from './entities/project-category.entity';
 import { ProjectDraftCategory } from './entities/project-draft-category.entity';
 import { ProjectCategoryRepository } from './repositories/project-category.repository';
 import { ProjectDraftCategoryRepository } from './repositories/project-draft-category.repository';
+import { OpenPositionController } from './controllers/open-position/open-position.controller';
+import { OpenPositionService } from './services/open-position/open-position.service';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
     imports: [
@@ -38,11 +41,13 @@ import { ProjectDraftCategoryRepository } from './repositories/project-draft-cat
             ProjectDraftSubmission,
         ]),
         CategoryModule,
+        NotificationModule,
     ],
     controllers: [
         ProjectController,
         ProjectDraftController,
         ProjectDraftSubmissionController,
+        OpenPositionController,
     ],
     providers: [
         { provide: IProjectService, useClass: ProjectService },
@@ -57,6 +62,7 @@ import { ProjectDraftCategoryRepository } from './repositories/project-draft-cat
         ProjectDraftOpenPositionRepository,
         ProjectDraftCategoryRepository,
         ProjectDraftSubmissionRepository,
+        OpenPositionService,
     ],
 })
 export class ProjectModule {}

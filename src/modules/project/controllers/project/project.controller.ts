@@ -73,15 +73,6 @@ export class ProjectController {
         );
     }
 
-    @Get('open-positions/organization/:organizationId')
-    async getAllOrganizationsOpenPositions(
-        @Param('organizationId', ParseIntPipe) organizationId: number,
-    ): Promise<OpenPositionForProjectDto[]> {
-        return await this.projectService.getOpenPositionsForOrganization(
-            organizationId,
-        );
-    }
-
     @Get(':projectId')
     async getProjectById(
         @Param('projectId', ParseIntPipe) projectId: number,

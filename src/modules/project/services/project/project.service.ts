@@ -222,29 +222,6 @@ export class ProjectService implements IProjectService {
         );
     }
 
-    async getOpenPositionsForOrganization(
-        organizationId: number,
-    ): Promise<OpenPositionForProjectDto[]> {
-        const projectsWithOpenPositions = await this.projectRepository.find({
-            where: { projectDraft: { ownerOrganizationId: organizationId } },
-            relations: { openPositions: true },
-        });
-
-        return projectsWithOpenPositions.flatMap((project) =>
-            project.openPositions.map(
-                (openPosition) =>
-                    new OpenPositionForProjectDto({
-                        id: openPosition.id,
-                        name: openPosition.name,
-                        description: openPosition.description,
-                        requirements: openPosition.requirements,
-                        projectId: project.id,
-                        projectName: project.name,
-                    }),
-            ),
-        );
-    }
-
     async getProjectById(projectId: number) {
         const project = await this.projectRepository.findOne({
             where: { id: projectId },

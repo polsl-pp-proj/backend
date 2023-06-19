@@ -26,6 +26,7 @@ import { ProjectDraftCategoryRepository } from './repositories/project-draft-cat
 import { OpenPositionController } from './controllers/open-position/open-position.controller';
 import { OpenPositionService } from './services/open-position/open-position.service';
 import { NotificationModule } from '../notification/notification.module';
+import { ProjectDraftSubmissionService } from './services/project-draft-submission/project-draft-submission.service';
 
 @Module({
     imports: [
@@ -53,7 +54,7 @@ import { NotificationModule } from '../notification/notification.module';
         { provide: IProjectService, useClass: ProjectService },
         {
             provide: IProjectDraftSubmissionService,
-            useClass: ProjectDraftSubmission,
+            useClass: ProjectDraftSubmissionService,
         },
         ProjectRepository,
         ProjectOpenPositionRepository,

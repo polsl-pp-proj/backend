@@ -24,15 +24,18 @@ import { ProjectDonation } from 'src/modules/donation/entities/project-donation.
 import { SearchResultDto } from '../../dtos/search-result.dto';
 import { SearchResultsDto } from '../../dtos/search-results.dto';
 import { Project } from '../../entities/project.entity';
-import { OpenPositionDto } from '../../dtos/open-position.dto';
-import { ProjectOpenPosition } from '../../entities/project-open-position.entity';
-import { OpenPositionForProjectDto } from '../../dtos/open-position-for-project.dto';
+import { ProjectMessageDto } from '../../dtos/project-message.dto';
+import { OrganizationNotificationRepository } from 'src/modules/notification/repositories/organization-notification.repository';
+import { NotificationService } from 'src/modules/notification/services/notification/notification.service';
+import { NotificationType } from 'src/modules/notification/enums/notification-type.enum';
+import { checkForeignKeyViolation } from 'src/helpers/check-foreign-key-violation.helper';
 
 @Injectable()
 export class ProjectService implements IProjectService {
     constructor(
         private readonly projectRepository: ProjectRepository,
         private readonly projectDraftRepository: ProjectDraftRepository,
+        private readonly notificationService: NotificationService,
     ) {}
 
     async getAllProjects(): Promise<SimpleProjectDto[]> {
@@ -236,6 +239,36 @@ export class ProjectService implements IProjectService {
         });
 
         return convertProjectToProjectDto(project);
+    }
+
+    async sendProjectMessage(
+        userId: number,
+        projectId: number,
+        projectMessageDto: ProjectMessageDto,
+    ): Promise<void> {
+        await this.projectRepository.manager.transaction(async (manager) => {
+            const organizationNotificationRepository =
+                new OrganizationNotificationRepository(
+                    manager.connection,
+                    manager,
+                );
+
+            try {
+                await this.notificationService.createOrganizationNotification(
+                    {
+                        userId: userId,
+                        projectId: projectId,
+                        subject: projectMessageDto.subject,
+                        message: projectMessageDto.message,
+                        type: NotificationType.ProjectMessage,
+                    },
+                    organizationNotificationRepository,
+                );
+            } catch (ex) {
+                checkForeignKeyViolation(ex, 'project_does_not_exist');
+                throw ex;
+            }
+        });
     }
 
     async getAllDrafts() {

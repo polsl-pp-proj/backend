@@ -7,8 +7,7 @@ import { CreateProjectDto } from 'src/modules/project/dtos/create-project.dto';
 import { UpdateProjectDto } from 'src/modules/project/dtos/update-project.dto';
 import { SearchSortBy } from 'src/modules/project/enums/search-sort-by.enum';
 import { SearchResultsDto } from 'src/modules/project/dtos/search-results.dto';
-import { OpenPositionDto } from 'src/modules/project/dtos/open-position.dto';
-import { OpenPositionForProjectDto } from 'src/modules/project/dtos/open-position-for-project.dto';
+import { ProjectMessageDto } from 'src/modules/project/dtos/project-message.dto';
 
 export abstract class IProjectService {
     /**
@@ -48,6 +47,12 @@ export abstract class IProjectService {
      * @returns ProjectDto searched project
      */
     abstract getProjectById(projectId: number): Promise<ProjectDto>;
+
+    abstract sendProjectMessage(
+        userId: number,
+        projectId: number,
+        projectMessageDto: ProjectMessageDto,
+    ): Promise<void>;
 
     /**
      * Returns all projects' drafts

@@ -3,6 +3,7 @@ import { OrganizationDto } from '../modules/organization/dtos/organization.dto';
 import { AddMembersDto } from '../modules/organization/dtos/add-members.dto';
 import { RemoveMembersDto } from '../modules/organization/dtos/remove-members.dto';
 import { FullOrganizationDto } from 'src/modules/organization/dtos/full-organization.dto';
+import { OrganizationMemberDto } from 'src/modules/organization/dtos/organization-member.dto';
 
 export abstract class IOrganizationService {
     /**
@@ -47,6 +48,10 @@ export abstract class IOrganizationService {
         organizationOwnerId: number,
         createOrganizationDto: CreateOrganizationDto,
     ): Promise<void>;
+
+    abstract getOrganizationMembers(
+        organizationId: number,
+    ): Promise<OrganizationMemberDto[]>;
 
     /**
      * Add users to organization

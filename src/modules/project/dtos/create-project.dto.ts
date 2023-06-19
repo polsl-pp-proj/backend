@@ -31,7 +31,6 @@ export class CreateProjectDto {
     description: string;
 
     @IsString({ message: 'not_a_string' })
-    @MinLength(2, { message: 'too_short' })
     fundingObjectives?: string;
 
     @Transform((params) => {

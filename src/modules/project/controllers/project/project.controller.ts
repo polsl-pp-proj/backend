@@ -12,6 +12,7 @@ import {
     UploadedFiles,
     UseInterceptors,
     Query,
+    Post,
 } from '@nestjs/common';
 import { validationConfig } from 'src/configs/validation.config';
 import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
@@ -28,7 +29,8 @@ import { UpdateProjectDto } from 'src/modules/project/dtos/update-project.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { filesInterceptorConfig } from '../../configs/files-interceptor.config';
 import { SearchQueryParamsDto } from '../../dtos/search-query-params.dto';
-import { OpenPositionForProjectDto } from '../../dtos/open-position-for-project.dto';
+import { ProjectMessageDto } from '../../dtos/project-message.dto';
+import { ForeignKeyConstraintViolationException } from 'src/exceptions/foreign-key-constraint-violation.exception';
 
 @Controller({ path: 'project', version: '1' })
 export class ProjectController {
@@ -81,6 +83,28 @@ export class ProjectController {
             return await this.projectService.getProjectById(projectId);
         } catch (ex) {
             if (ex instanceof RecordNotFoundException) {
+                throw new NotFoundException(ex.message);
+            }
+            throw ex;
+        }
+    }
+
+    @Post(':projectId/message')
+    @UseGuards(AuthTokenGuard)
+    async sendProjectMessage(
+        @Param('projectId', ParseIntPipe) projectId: number,
+        @Body(new ValidationPipe(validationConfig))
+        projectMessageDto: ProjectMessageDto,
+        @AuthTokenPayload() user: AuthTokenPayloadDto,
+    ) {
+        try {
+            await this.projectService.sendProjectMessage(
+                user.userId,
+                projectId,
+                projectMessageDto,
+            );
+        } catch (ex) {
+            if (ex instanceof ForeignKeyConstraintViolationException) {
                 throw new NotFoundException(ex.message);
             }
             throw ex;

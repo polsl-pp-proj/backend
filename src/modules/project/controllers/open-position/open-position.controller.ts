@@ -40,7 +40,7 @@ export class OpenPositionController {
     ): Promise<void> {
         if (user.isVerifiedStudent) {
             await this.openPositionService.applyForOpenPosition(
-                user.userId,
+                user,
                 openPositionId,
                 applyForOpenPositionDto.candidateSummary,
             );

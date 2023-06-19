@@ -28,6 +28,7 @@ import { UpdateProjectDto } from 'src/modules/project/dtos/update-project.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { filesInterceptorConfig } from '../../configs/files-interceptor.config';
 import { SearchQueryParamsDto } from '../../dtos/search-query-params.dto';
+import { OpenPositionForProjectDto } from '../../dtos/open-position-for-project.dto';
 
 @Controller({ path: 'project', version: '1' })
 export class ProjectController {
@@ -68,6 +69,15 @@ export class ProjectController {
         @Param('organizationId', ParseIntPipe) organizationId: number,
     ): Promise<SimpleProjectDto[]> {
         return await this.projectService.getAllOrganizationsProjects(
+            organizationId,
+        );
+    }
+
+    @Get('open-positions/organization/:organizationId')
+    async getAllOrganizationsOpenPositions(
+        @Param('organizationId', ParseIntPipe) organizationId: number,
+    ): Promise<OpenPositionForProjectDto[]> {
+        return await this.projectService.getOpenPositionsForOrganization(
             organizationId,
         );
     }

@@ -24,6 +24,9 @@ import { ProjectDonation } from 'src/modules/donation/entities/project-donation.
 import { SearchResultDto } from '../../dtos/search-result.dto';
 import { SearchResultsDto } from '../../dtos/search-results.dto';
 import { Project } from '../../entities/project.entity';
+import { OpenPositionDto } from '../../dtos/open-position.dto';
+import { ProjectOpenPosition } from '../../entities/project-open-position.entity';
+import { OpenPositionForProjectDto } from '../../dtos/open-position-for-project.dto';
 
 @Injectable()
 export class ProjectService implements IProjectService {
@@ -216,6 +219,29 @@ export class ProjectService implements IProjectService {
 
         return projects.map((project) =>
             convertProjectToSimpleProjectDto(project),
+        );
+    }
+
+    async getOpenPositionsForOrganization(
+        organizationId: number,
+    ): Promise<OpenPositionForProjectDto[]> {
+        const projectsWithOpenPositions = await this.projectRepository.find({
+            where: { projectDraft: { ownerOrganizationId: organizationId } },
+            relations: { openPositions: true },
+        });
+
+        return projectsWithOpenPositions.flatMap((project) =>
+            project.openPositions.map(
+                (openPosition) =>
+                    new OpenPositionForProjectDto({
+                        id: openPosition.id,
+                        name: openPosition.name,
+                        description: openPosition.description,
+                        requirements: openPosition.requirements,
+                        projectId: project.id,
+                        projectName: project.name,
+                    }),
+            ),
         );
     }
 

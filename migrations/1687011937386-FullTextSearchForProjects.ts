@@ -5,13 +5,13 @@ export class FullTextSearchForProjects1687011937386
 {
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(
-            `ALTER TABLE "project" ADD "search_vector" tsvector`,
+            `ALTER TABLE "projects" ADD "search_vector" tsvector`,
         );
         await queryRunner.query(
-            `CREATE INDEX "project_name_idx" ON "project" USING GIST ("name" gist_trgm_ops)`,
+            `CREATE INDEX "project_name_idx" ON "projects" USING GIST ("name" gist_trgm_ops)`,
         );
         await queryRunner.query(
-            `CREATE INDEX "project_description_idx" ON "project" USING GIST ("description" gist_trgm_ops)`,
+            `CREATE INDEX "project_description_idx" ON "projects" USING GIST ("description" gist_trgm_ops)`,
         );
         await queryRunner.query(
             `CREATE OR REPLACE FUNCTION update_project_search_vector()
@@ -19,7 +19,7 @@ RETURNS trigger AS $$
 BEGIN 
     NEW.search_vector :=
         setweight(to_tsvector(coalesce(NEW."name", '')),'A') 
-        || setweight(to_tsvector(coalesce(NEW."description", '')),'B') 
+        || setweight(to_tsvector(coalesce(NEW."description", '')),'B');
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;`,
@@ -27,7 +27,7 @@ $$ LANGUAGE plpgsql;`,
         await queryRunner.query(
             `CREATE TRIGGER trigger_project_search_vector_update
 BEFORE INSERT OR UPDATE
-ON "project"
+ON "projects"
 FOR EACH ROW
 EXECUTE FUNCTION update_project_search_vector();`,
         );
@@ -43,7 +43,7 @@ EXECUTE FUNCTION update_project_search_vector();`,
         await queryRunner.query(`DROP INDEX "project_description_idx"`);
         await queryRunner.query(`DROP INDEX "project_name_idx"`);
         await queryRunner.query(
-            `ALTER TABLE "project" DROP COLUMN "search_vector"`,
+            `ALTER TABLE "projects" DROP COLUMN "search_vector"`,
         );
     }
 }

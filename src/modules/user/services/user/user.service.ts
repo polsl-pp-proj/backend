@@ -15,6 +15,7 @@ export class UserService {
         const users = await this.userRepository.find({
             take: elementsPerPage,
             skip: elementsPerPage * (page - 1),
+            order: { createdAt: 'DESC' },
         });
 
         return users.map((user) => userToSimpleUserDto(user));

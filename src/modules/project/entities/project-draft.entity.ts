@@ -4,6 +4,7 @@ import { ProjectBase } from './project.entitybase';
 import { Organization } from '../../organization/entities/organization.entity';
 import { ProjectDraftGalleryEntry } from '../../gallery/entities/project-draft-gallery-entry.entity';
 import { ProjectDraftCategory } from './project-draft-category.entity';
+import { Project } from './project.entity';
 
 @Entity({ name: 'project_drafts' })
 export class ProjectDraft extends ProjectBase {

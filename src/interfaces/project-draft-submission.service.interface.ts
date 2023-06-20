@@ -7,12 +7,14 @@ export abstract class IProjectDraftSubmissionService {
     abstract getSubmissionById(submissionId: number): Promise<ProjectDto>;
 
     abstract rejectSubmission(
+        userId: number,
         submissionId: number,
         draftLastModified: Date,
         reason: string,
     ): Promise<void>;
 
     abstract publishSubmission(
+        userId: number,
         submissionId: number,
         draftLastModified: Date,
     ): Promise<void>;

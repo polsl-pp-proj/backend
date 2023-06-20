@@ -9,6 +9,10 @@ import { ModifiedAfterReadException } from 'src/exceptions/modified-after-read.e
 import { IProjectDraftSubmissionService } from 'src/interfaces/project-draft-submission.service.interface';
 import { convertProjectDraftSubmissionToSubmissionDto } from '../../helper/submission-to-submission-dto';
 import { convertProjectDraftToProjectDto } from '../../helper/project-draft-to-project-dto';
+import { ProjectDraftSubmissionStatus } from '../../enums/project-draft-submission-status.enum';
+import { NotificationService } from 'src/modules/notification/services/notification/notification.service';
+import { NotificationType } from 'src/modules/notification/enums/notification-type.enum';
+import { OrganizationNotificationRepository } from 'src/modules/notification/repositories/organization-notification.repository';
 
 @Injectable()
 export class ProjectDraftSubmissionService
@@ -16,12 +20,14 @@ export class ProjectDraftSubmissionService
 {
     constructor(
         private readonly projectDraftSubmissionRepository: ProjectDraftSubmissionRepository,
+        private readonly notificationService: NotificationService,
     ) {}
 
     async getSubmissions() {
         const submissions = await this.projectDraftSubmissionRepository.find({
             where: {
                 projectDraft: { galleryEntries: { indexPosition: 0 } },
+                status: ProjectDraftSubmissionStatus.ToBeResolved,
             },
             relations: {
                 projectDraft: {
@@ -37,7 +43,10 @@ export class ProjectDraftSubmissionService
 
     async getSubmissionById(submissionId: number) {
         const submission = await this.projectDraftSubmissionRepository.findOne({
-            where: { id: submissionId },
+            where: {
+                id: submissionId,
+                status: ProjectDraftSubmissionStatus.ToBeResolved,
+            },
             relations: {
                 projectDraft: {
                     ownerOrganization: true,
@@ -54,15 +63,43 @@ export class ProjectDraftSubmissionService
     }
 
     async rejectSubmission(
+        userId: number,
         submissionId: number,
         draftLastModified: Date,
         reason: string,
     ) {
         try {
-            await this.projectDraftSubmissionRepository.rejectSubmission(
-                submissionId,
-                draftLastModified,
-                reason,
+            await this.projectDraftSubmissionRepository.manager.transaction(
+                async (manager) => {
+                    const projectDraftSubmissionRepository =
+                        new ProjectDraftSubmissionRepository(
+                            manager.connection,
+                            manager,
+                        );
+                    const organizationNotificationRepository =
+                        new OrganizationNotificationRepository(
+                            manager.connection,
+                            manager,
+                        );
+
+                    const projectDraft =
+                        await projectDraftSubmissionRepository.rejectSubmission(
+                            submissionId,
+                            draftLastModified,
+                            reason,
+                        );
+
+                    await this.notificationService.createOrganizationNotification(
+                        {
+                            subject: 'Zgłoszenie odrzucone',
+                            message: `Zgłoszenie projektu ${projectDraft.name} Twojej organizacji zostało odrzucone.\nPowód:\n${reason}`,
+                            type: NotificationType.ProjectDraftRejection,
+                            userId,
+                            projectId: projectDraft.id,
+                        },
+                        organizationNotificationRepository,
+                    );
+                },
             );
         } catch (ex) {
             if (ex instanceof RecordNotFoundException) {
@@ -75,11 +112,42 @@ export class ProjectDraftSubmissionService
         }
     }
 
-    async publishSubmission(submissionId: number, draftLastModified: Date) {
+    async publishSubmission(
+        userId: number,
+        submissionId: number,
+        draftLastModified: Date,
+    ) {
         try {
-            await this.projectDraftSubmissionRepository.updateProjectFromSubmission(
-                submissionId,
-                draftLastModified,
+            await this.projectDraftSubmissionRepository.manager.transaction(
+                async (manager) => {
+                    const projectDraftSubmissionRepository =
+                        new ProjectDraftSubmissionRepository(
+                            manager.connection,
+                            manager,
+                        );
+                    const organizationNotificationRepository =
+                        new OrganizationNotificationRepository(
+                            manager.connection,
+                            manager,
+                        );
+
+                    const projectDraft =
+                        await projectDraftSubmissionRepository.updateProjectFromSubmission(
+                            submissionId,
+                            draftLastModified,
+                        );
+
+                    await this.notificationService.createOrganizationNotification(
+                        {
+                            subject: 'Zgłoszenie zatwierdzone',
+                            message: `Zgłoszenie projektu ${projectDraft.name} Twojej organizacji zostało zatwierdzone.`,
+                            type: NotificationType.ProjectDraftPublication,
+                            userId,
+                            projectId: projectDraft.id,
+                        },
+                        organizationNotificationRepository,
+                    );
+                },
             );
         } catch (ex) {
             if (ex instanceof RecordNotFoundException) {

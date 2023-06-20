@@ -20,6 +20,7 @@ import { NotificationReceiver } from '../../types/notification-receiver.type';
 import { CreateNotificationDto } from '../../dtos/create-notification.dto';
 import { OrganizationNotificationType } from '../../enums/organization-notification-type.enum';
 import { NotificationEventType } from '../../types/notification-event-type.type';
+import { ProjectDraft } from 'src/modules/project/entities/project-draft.entity';
 
 @Injectable()
 export class NotificationService {
@@ -329,15 +330,28 @@ export class NotificationService {
                     senderUser: { id: notificationData.userId },
                     type: notificationData.type as unknown as OrganizationNotificationType,
                 });
+                if (
+                    notification.type ===
+                        OrganizationNotificationType.ProjectDraftPublication ||
+                    notification.type ===
+                        OrganizationNotificationType.ProjectDraftRejection
+                ) {
+                    notification.projectDraftId = notification.projectId;
+                    notification.projectDraft =
+                        notification.project as unknown as ProjectDraft;
+                    delete notification.project;
+                    delete notification.projectId;
+                }
                 await organizationNotificationRepository.save(notification);
                 Object.assign(
                     notification,
-                    organizationNotificationRepository.findOne({
+                    await organizationNotificationRepository.findOne({
                         where: { id: notification.id },
                         relations: {
                             project: {
                                 projectDraft: { ownerOrganization: true },
                             },
+                            projectDraft: { ownerOrganization: true },
                         },
                         select: {
                             project: {
@@ -346,6 +360,11 @@ export class NotificationService {
                                 projectDraft: {
                                     ownerOrganization: { id: true, name: true },
                                 },
+                            },
+                            projectDraft: {
+                                id: true,
+                                name: true,
+                                ownerOrganization: { id: true, name: true },
                             },
                         },
                     }),
@@ -358,14 +377,20 @@ export class NotificationService {
                         id: notification.id,
                         subject: notification.subject,
                         message: notification.message,
-                        projectId: notification.project.id,
-                        projectName: notification.project.name,
+                        projectId:
+                            notification.project.id ??
+                            notification.projectDraft.id,
+                        projectName:
+                            notification.project.name ??
+                            notification.projectDraft.name,
                         organizationId:
                             notification.project.projectDraft.ownerOrganization
-                                .id,
+                                .id ??
+                            notification.projectDraft.ownerOrganization.id,
                         organizationName:
                             notification.project.projectDraft.ownerOrganization
-                                .name,
+                                .name ??
+                            notification.projectDraft.ownerOrganization.name,
                         type: notificationData.type,
                         seen: notification.seen,
                         createdAt: notification.createdAt,

@@ -27,13 +27,14 @@ export const NotificationQuery = (limit: number, offset: number) => {
                     "organizationNotifications"."seen" AS "seen",
                     "organizationNotifications"."created_at" AS "createdAt",
                     "organizationNotifications"."updated_at" AS "updatedAt",
-                    "project"."id" AS "projectId",
-                    "project"."name" AS "projectName",
+                    COALESCE("project"."id", "directProjectDraft"."id") AS "projectId",
+                    COALESCE("project"."name", "directProjectDraft"."name") AS "projectName",
                     "organization"."id" AS "organizationId",
                     "organization"."name" AS "organizationName",
                     "organizationNotifications"."type" :: TEXT AS "type"
                 FROM
                     "organization_notifications" "organizationNotifications"
+                    LEFT JOIN "project_drafts" "directProjectDraft" ON "directProjectDraft"."id" = "organizationNotifications"."project_draft_id"
                     LEFT JOIN "projects" "project" ON "project"."id" = "organizationNotifications"."project_id"
                     LEFT JOIN "project_drafts" "projectDraft" ON "projectDraft"."id" = "project"."draft_id"
                     LEFT JOIN "organizations" "organization" ON "organization"."id" = "projectDraft"."owner_organization_id"

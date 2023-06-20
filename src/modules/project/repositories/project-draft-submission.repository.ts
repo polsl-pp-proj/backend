@@ -30,7 +30,7 @@ export class ProjectDraftSubmissionRepository extends Repository<ProjectDraftSub
         submissionId: number,
         draftLastModified: Date,
     ) {
-        await this.entityManager.transaction(async (entityManager) => {
+        return await this.entityManager.transaction(async (entityManager) => {
             const projectRepository = new ProjectRepository(
                 entityManager.connection,
                 entityManager,
@@ -41,7 +41,10 @@ export class ProjectDraftSubmissionRepository extends Repository<ProjectDraftSub
             );
 
             const submission = await submissionRepository.findOne({
-                where: { id: submissionId },
+                where: {
+                    id: submissionId,
+                    status: ProjectDraftSubmissionStatus.ToBeResolved,
+                },
                 relations: {
                     projectDraft: { openPositions: true, categories: true },
                 },
@@ -61,6 +64,7 @@ export class ProjectDraftSubmissionRepository extends Repository<ProjectDraftSub
                 submissionId,
                 ProjectDraftSubmissionStatus.Published,
             );
+            return submission.projectDraft;
         });
     }
 
@@ -69,13 +73,16 @@ export class ProjectDraftSubmissionRepository extends Repository<ProjectDraftSub
         draftLastModified: Date,
         reason: string,
     ) {
-        await this.manager.transaction(async (entityManager) => {
+        return await this.manager.transaction(async (entityManager) => {
             const submissionRepository = new ProjectDraftSubmissionRepository(
                 entityManager.connection,
                 entityManager,
             );
             const submission = await submissionRepository.findOne({
-                where: { id: submissionId },
+                where: {
+                    id: submissionId,
+                    status: ProjectDraftSubmissionStatus.ToBeResolved,
+                },
                 relations: { projectDraft: true },
             });
             if (!submission) {
@@ -95,6 +102,7 @@ export class ProjectDraftSubmissionRepository extends Repository<ProjectDraftSub
                 ProjectDraftSubmissionStatus.Rejected,
                 reason,
             );
+            return submission.projectDraft;
         });
     }
 

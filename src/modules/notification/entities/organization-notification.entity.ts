@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { OrganizationNotificationType } from '../enums/organization-notification-type.enum';
 import { Project } from '../../project/entities/project.entity';
+import { ProjectDraft } from '../../project/entities/project-draft.entity';
 
 @Entity({ name: 'organization_notifications' })
 export class OrganizationNotification {
@@ -23,12 +24,19 @@ export class OrganizationNotification {
     @Column({ name: 'message' })
     message: string;
 
-    @Column({ name: 'project_id' })
-    projectId: number;
+    @Column({ name: 'project_id', nullable: true })
+    projectId?: number;
 
-    @ManyToOne(() => Project)
+    @ManyToOne(() => Project, { nullable: true })
     @JoinColumn({ name: 'project_id' })
-    project: Project;
+    project?: Project;
+
+    @Column({ name: 'project_draft_id', nullable: true })
+    projectDraftId?: number;
+
+    @ManyToOne(() => ProjectDraft, { nullable: true })
+    @JoinColumn({ name: 'project_draft_id' })
+    projectDraft?: ProjectDraft;
 
     @Column({ name: 'sender_user_id' })
     senderUserId: number;

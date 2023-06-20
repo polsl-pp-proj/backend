@@ -372,7 +372,8 @@ export class NotificationService {
 
                 await this.sendNotificationCreated(
                     'org',
-                    notification.project.projectDraft.ownerOrganization.id,
+                    notification.project.projectDraft.ownerOrganization.id ??
+                        notification.projectDraft.ownerOrganization.id,
                     new NotificationDto({
                         id: notification.id,
                         subject: notification.subject,

@@ -179,11 +179,8 @@ export class ProjectService implements IProjectService {
             .addGroupBy(
                 'favorite.projectId, favorite.userId, favorite.createdAt, project.id, projectDraft.id, ownerOrganization.id, gallery.id, asset.id',
             )
-            .addOrderBy(
-                'COALESCE(COUNT(favorite.projectId), 0)',
-                'DESC',
-                'NULLS LAST',
-            )
+            .addSelect('COALESCE(COUNT(project.id), 0)', 'numberOfLikes')
+            .addOrderBy('"numberOfLikes"', 'DESC', 'NULLS LAST')
             .take(10)
             .getMany();
 

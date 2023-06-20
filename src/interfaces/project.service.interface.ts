@@ -25,7 +25,9 @@ export abstract class IProjectService {
         sort?: SearchSortBy,
     ): Promise<SearchResultsDto>;
 
-    abstract getMostLikedProjects(): Promise<SimpleProjectDto[]>;
+    abstract getMostLikedProjects(): Promise<
+        (SimpleProjectDto & { likes: number })[]
+    >;
     abstract getNewestProjects(): Promise<SimpleProjectDto[]>;
 
     /**

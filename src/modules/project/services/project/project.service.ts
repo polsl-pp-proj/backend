@@ -165,9 +165,8 @@ export class ProjectService implements IProjectService {
     }
 
     async getMostLikedProjects(): Promise<SimpleProjectDto[]> {
-        const favorites = await this.projectRepository.manager
-            .createQueryBuilder(FavoriteProject, 'favorite')
-            .leftJoinAndSelect('favorite.project', 'project')
+        const favoriteProjects = await this.projectRepository
+            .createQueryBuilder('project')
             .leftJoinAndSelect('project.projectDraft', 'projectDraft')
             .leftJoinAndSelect(
                 'projectDraft.ownerOrganization',
@@ -176,16 +175,26 @@ export class ProjectService implements IProjectService {
             .leftJoinAndSelect('project.galleryEntries', 'gallery')
             .leftJoinAndSelect('gallery.asset', 'asset')
             .andWhere('gallery.indexPosition = 0')
-            .addGroupBy(
-                'favorite.projectId, favorite.userId, favorite.createdAt, project.id, projectDraft.id, ownerOrganization.id, gallery.id, asset.id',
+            .innerJoin(
+                (qb) => {
+                    return qb
+                        .from(FavoriteProject, 'favorite')
+                        .select('favorite.projectId', 'favorite_project_id')
+                        .addSelect(
+                            'COUNT("favorite"."project_id")',
+                            'numberOfLikes',
+                        )
+                        .addGroupBy('favorite.projectId')
+                        .addOrderBy('"numberOfLikes"', 'DESC', 'NULLS LAST')
+                        .take(10);
+                },
+                'favoriteProjectIds',
+                '"favoriteProjectIds"."favorite_project_id" = project.id',
             )
-            .addSelect('COALESCE(COUNT(project.id), 0)', 'numberOfLikes')
-            .addOrderBy('"numberOfLikes"', 'DESC', 'NULLS LAST')
-            .take(10)
             .getMany();
 
-        return favorites.map((favorite) => ({
-            ...convertProjectToSimpleProjectDto(favorite.project),
+        return favoriteProjects.map((favoriteProject) => ({
+            ...convertProjectToSimpleProjectDto(favoriteProject),
             // likes: (favorite as unknown as Project & { numberOfLikes: number })
             //     .numberOfLikes,
         }));

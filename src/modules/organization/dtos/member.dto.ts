@@ -7,9 +7,8 @@ export class MemberDto {
     emailAddress: string;
 
     @IsDefined({ message: 'not_defined' })
-    @IsEnum(
-        { enum: { OrganizationMemberRole } },
-        { message: 'not_organization_member_role_enum' },
-    )
+    @IsEnum(OrganizationMemberRole, {
+        message: 'not_organization_member_role_enum',
+    })
     memberRole: OrganizationMemberRole;
 }

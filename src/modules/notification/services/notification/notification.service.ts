@@ -1,14 +1,16 @@
 import { Injectable, MessageEvent } from '@nestjs/common';
 import { OrganizationNotificationRepository } from '../../repositories/organization-notification.repository';
 import { UserNotificationRepository } from '../../repositories/user-notification.repository';
-import { SelectQueryBuilder } from 'typeorm';
 import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
 import { PaginationDto } from 'src/dtos/pagination.dto';
 import {
     OrganizationOnlyNotificationType,
     UserOnlyNotificationType,
 } from '../../enums/notification-type.enum';
-import { INotification } from '../../interfaces/notification.interface';
+import {
+    INotification,
+    NotificationQuery,
+} from '../../interfaces/notification.interface';
 import { NotificationsDto } from '../../dtos/notifications.dto';
 import { AuthTokenPayloadDto } from 'src/modules/auth/dtos/auth-token-payload.dto';
 import { Observable, Subscription } from 'rxjs';
@@ -142,6 +144,7 @@ export class NotificationService {
     ) {
         return await this.userNotificationRepository.manager.transaction(
             async (manager) => {
+                /*
                 const organizationNotificationRepository =
                         new OrganizationNotificationRepository(
                             manager.connection,
@@ -152,117 +155,137 @@ export class NotificationService {
                         manager,
                     );
 
-                const organizationNotificationsQueryBuilder =
-                    organizationNotificationRepository
-                        .createQueryBuilder('organizationNotifications')
-                        .leftJoin(
-                            'organizationNotifications.project',
-                            'project',
-                        )
-                        .leftJoin('project.projectDraft', 'projectDraft')
-                        .leftJoin(
-                            'projectDraft.ownerOrganization',
-                            'organization',
-                        )
-                        .innerJoin(
-                            'organization.organizationUsers',
-                            'organizationUsers',
-                            'organization.id = organizationUsers.organizationId AND organizationUsers.userId = :organizationUserId',
-                            { organizationUserId: userId },
-                        )
-                        .addSelect('organizationNotifications.id', 'id')
-                        .addSelect(
-                            'organizationNotifications.subject',
-                            'subject',
-                        )
-                        .addSelect(
-                            'organizationNotifications.message',
-                            'message',
-                        )
-                        .addSelect('project.id', 'projectId')
-                        .addSelect('project.name', 'projectName')
-                        .addSelect('organization.id', 'organizationId')
-                        .addSelect('organization.name', 'organizationName')
-                        .addSelect('organizationNotifications.type', 'type')
-                        .addSelect('organizationNotifications.seen', 'seen')
-                        .addSelect(
-                            'organizationNotifications.createdAt',
-                            'createdAt',
-                        )
-                        .addSelect(
-                            'organizationNotifications.updatedAt',
-                            'updatedAt',
-                        )
-                        .addOrderBy('createdAt', 'DESC', 'NULLS LAST')
-                        .andWhere(
-                            'organizationNotifications.deletedAt IS NULL',
-                        );
+                // const organizationNotificationsQueryBuilder =
+                //     organizationNotificationRepository
+                //         .createQueryBuilder('organizationNotifications')
+                //         .leftJoin(
+                //             'organizationNotifications.project',
+                //             'project',
+                //         )
+                //         .leftJoin('project.projectDraft', 'projectDraft')
+                //         .leftJoin(
+                //             'projectDraft.ownerOrganization',
+                //             'organization',
+                //         )
+                //         .innerJoin(
+                //             'organization.organizationUsers',
+                //             'organizationUsers',
+                //             'organization.id = organizationUsers.organizationId AND organizationUsers.userId = :organizationUserId',
+                //             { organizationUserId: userId },
+                //         )
+                //         .select('organizationNotifications.id', 'id')
+                //         .addSelect(
+                //             'organizationNotifications.subject',
+                //             'subject',
+                //         )
+                //         .addSelect(
+                //             'organizationNotifications.message',
+                //             'message',
+                //         )
+                //         .addSelect('project.id', 'projectId')
+                //         .addSelect('project.name', 'projectName')
+                //         .addSelect('organization.id', 'organizationId')
+                //         .addSelect('organization.name', 'organizationName')
+                //         .addSelect(
+                //             '"organizationNotifications"."type"::TEXT',
+                //             'type',
+                //         )
+                //         .addSelect('organizationNotifications.seen', 'seen')
+                //         .addSelect(
+                //             'organizationNotifications.createdAt',
+                //             'createdAt',
+                //         )
+                //         .addSelect(
+                //             'organizationNotifications.updatedAt',
+                //             'updatedAt',
+                //         )
+                //         .addOrderBy(
+                //             'organizationNotifications.createdAt',
+                //             'DESC',
+                //             'NULLS LAST',
+                //         );
 
-                const userNotificationsQueryBuilder = userNotificationRepository
-                    .createQueryBuilder('userNotifications')
-                    .leftJoin('userNotifications.project', 'project')
-                    .leftJoin('project.projectDraft', 'projectDraft')
-                    .leftJoin('projectDraft.ownerOrganization', 'organization')
-                    .addSelect('userNotifications.id', 'id')
-                    .addSelect('userNotifications.subject', 'subject')
-                    .addSelect('userNotifications.message', 'message')
-                    .addSelect('project.id', 'projectId')
-                    .addSelect('project.name', 'projectName')
-                    .addSelect('organization.id', 'organizationId')
-                    .addSelect('organization.name', 'organizationName')
-                    .addSelect('"message_answer"', 'type')
-                    .addSelect('userNotifications.seen', 'seen')
-                    .addSelect('userNotifications.createdAt', 'createdAt')
-                    .addSelect('userNotifications.updatedAt', 'updatedAt')
-                    .addOrderBy('createdAt', 'DESC', 'NULLS LAST')
-                    .andWhere('userNotifications.deletedAt IS NULL')
-                    .andWhere('userNotifications.userId = :usersUserId', {
-                        usersUserId: userId,
-                    });
+                // const userNotificationsQueryBuilder = userNotificationRepository
+                //     .createQueryBuilder('userNotifications')
+                //     .leftJoin('userNotifications.project', 'project')
+                //     .leftJoin('project.projectDraft', 'projectDraft')
+                //     .leftJoin('projectDraft.ownerOrganization', 'organization')
+                //     .select('userNotifications.id', 'id')
+                //     .addSelect('userNotifications.subject', 'subject')
+                //     .addSelect('userNotifications.message', 'message')
+                //     .addSelect('project.id', 'projectId')
+                //     .addSelect('project.name', 'projectName')
+                //     .addSelect('organization.id', 'organizationId')
+                //     .addSelect('organization.name', 'organizationName')
+                //     .addSelect("'message_answer'", 'type')
+                //     .addSelect('userNotifications.seen', 'seen')
+                //     .addSelect('userNotifications.createdAt', 'createdAt')
+                //     .addSelect('userNotifications.updatedAt', 'updatedAt')
+                //     .addOrderBy(
+                //         'userNotifications.createdAt',
+                //         'DESC',
+                //         'NULLS LAST',
+                //     )
+                //     .andWhere('userNotifications.userId = :usersUserId', {
+                //         usersUserId: userId,
+                //     });
 
-                const queryBuilders = [
-                    organizationNotificationsQueryBuilder,
-                    userNotificationsQueryBuilder,
-                ];
+                // const queryBuilders = [
+                //     organizationNotificationsQueryBuilder,
+                //     userNotificationsQueryBuilder,
+                // ];
 
-                const sqlQueries = queryBuilders.map((b) => b.getQuery());
+                // const sqlQueries = queryBuilders.map((b) => b.getQuery());
 
-                // Merge all the parameters from the other queries into a single object.
-                // All parameters have to have unique names.
-                const sqlParameters = queryBuilders
-                    .map((b) => b.getParameters())
-                    .reduce((prev, curr) => ({ ...prev, ...curr }), {});
+                // // Merge all the parameters from the other queries into a single object.
+                // // All parameters have to have unique names.
+                // const sqlParameters = queryBuilders
+                //     .map((b) => b.getParameters())
+                //     .reduce((prev, curr) => ({ ...prev, ...curr }), {});
 
-                // Join all your queries into a single SQL string
-                const unionedQuery = '(' + sqlQueries.join(') UNION (') + ')';
+                // // Join all your queries into a single SQL string
+                // const unionedQuery = '(' + sqlQueries.join(') UNION (') + ')';
 
-                // Create a new querybuilder with the joined SQL string as a FROM subquery
-                const unionQueryBuilder = manager
-                    .createQueryBuilder()
-                    .addSelect('id')
-                    .addSelect('subject')
-                    .addSelect('message')
-                    .addSelect('projectId')
-                    .addSelect('projectName')
-                    .addSelect('organizationId')
-                    .addSelect('organizationName')
-                    .addSelect('type')
-                    .addSelect('seen')
-                    .addSelect('createdAt')
-                    .addSelect('updatedAt')
-                    .from(`(${unionedQuery})`, 'combined_queries_alias')
-                    .addOrderBy('createdAt', 'DESC', 'NULLS LAST')
-                    .setParameters(
-                        sqlParameters,
-                    ) as SelectQueryBuilder<INotification>;
+                // // Create a new querybuilder with the joined SQL string as a FROM subquery
+                // const unionQueryBuilder = manager
+                //     .createQueryBuilder()
+                //     .select('"combined_queries_alias"."id"')
+                //     .addSelect('"combined_queries_alias"."subject"')
+                //     .addSelect('"combined_queries_alias"."message"')
+                //     .addSelect('"combined_queries_alias"."projectId"')
+                //     .addSelect('"combined_queries_alias"."projectName"')
+                //     .addSelect('"combined_queries_alias"."organizationId"')
+                //     .addSelect('"combined_queries_alias"."organizationName"')
+                //     .addSelect('"combined_queries_alias"."type"')
+                //     .addSelect('"combined_queries_alias"."seen"')
+                //     .addSelect('"combined_queries_alias"."createdAt"')
+                //     .addSelect('"combined_queries_alias"."updatedAt"')
+                //     .from(`(${unionedQuery})`, 'combined_queries_alias')
+                //     .addOrderBy(
+                //         '"combined_queries_alias"."createdAt"',
+                //         'DESC',
+                //         'NULLS LAST',
+                //     )
+                //     .setParameters(sqlParameters);
 
-                const paginatedQuery = unionQueryBuilder
-                    .take(elementsPerPage)
-                    .skip(elementsPerPage * (page - 1));
+                // const paginatedQuery = unionQueryBuilder
+                //     .take(elementsPerPage)
+                //     .skip(elementsPerPage * (page - 1));
 
-                const notifications =
-                        await paginatedQuery.getRawMany<INotification>(),
-                    count = await paginatedQuery.getCount();
+                // const notifications = await paginatedQuery.getRawMany(),
+                //       count = await paginatedQuery.getCount();
+                */
+
+                const notifications = (await manager.query(
+                    NotificationQuery(
+                        elementsPerPage,
+                        elementsPerPage * (page - 1),
+                    ),
+                    [userId],
+                )) as INotification[];
+                const count = +(
+                    notifications[0] as INotification & { count: string }
+                ).count;
 
                 let pageCount = Math.ceil(count / elementsPerPage);
 
@@ -273,9 +296,11 @@ export class NotificationService {
                 return new NotificationsDto({
                     page,
                     pageCount,
-                    notifications: notifications.map(
-                        (notification) => new NotificationDto(notification),
-                    ),
+                    notifications: notifications
+                        .filter((notification) => notification.id !== null)
+                        .map(
+                            (notification) => new NotificationDto(notification),
+                        ),
                 });
             },
         );

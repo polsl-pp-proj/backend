@@ -1,8 +1,8 @@
 export enum NotificationType {
     ProjectMessage = 'project_message',
-    OpenPositionApplication = 'open_position_application',
-    ProjectDraftPublication = 'project_draft_publication',
-    ProjectDraftRejection = 'project_draft_rejection',
+    OpenPositionApplication = 'project_open_position_application',
+    ProjectDraftPublication = 'project_draft_submission_published',
+    ProjectDraftRejection = 'project_draft_submission_rejected',
     MessageAnswer = 'message_answer',
 }
 

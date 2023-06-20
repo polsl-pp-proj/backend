@@ -73,6 +73,7 @@ export class ProjectDraftSubmissionController {
     }
 
     @Patch(':submissionId/reject')
+    @UseGuards(AuthTokenGuard)
     async rejectSubmission(
         @Param('submissionId', ParseIntPipe) submissionId: number,
         @Body('draftLastModified', ParseDatePipe) draftLastModified: Date,

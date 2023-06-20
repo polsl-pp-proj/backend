@@ -60,9 +60,7 @@ export class ProjectController {
     }
 
     @Get('favorite')
-    async getMostLikedProjects(): Promise<
-        (SimpleProjectDto & { likes: number })[]
-    > {
+    async getMostLikedProjects(): Promise<SimpleProjectDto[]> {
         return await this.projectService.getMostLikedProjects();
     }
 

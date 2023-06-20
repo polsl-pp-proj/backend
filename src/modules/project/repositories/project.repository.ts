@@ -65,6 +65,10 @@ export class ProjectRepository extends Repository<Project> {
                 project.description = projectDraft.description;
                 project.shortDescription = projectDraft.shortDescription;
                 project.fundingObjectives = projectDraft.fundingObjectives;
+
+                delete project.galleryEntries;
+                delete project.openPositions;
+                delete project.categories;
             } else {
                 project = projectRepository.create({
                     name: projectDraft.name,

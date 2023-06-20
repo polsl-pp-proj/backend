@@ -179,10 +179,13 @@ export class ProjectService implements IProjectService {
             .addGroupBy(
                 'favorite.projectId, favorite.userId, favorite.createdAt, project.id, projectDraft.id, ownerOrganization.id, gallery.id, asset.id',
             )
-            .addSelect('COALESCE(COUNT(project.id), 0)', 'numberOfLikes')
-            .addOrderBy('COALESCE(COUNT(project.id), 0)', 'DESC', 'NULLS LAST')
+            .addOrderBy(
+                'COALESCE(COUNT(favorite.projectId), 0)',
+                'DESC',
+                'NULLS LAST',
+            )
             .take(10)
-            .getRawMany();
+            .getMany();
 
         return favorites.map((favorite) => ({
             ...convertProjectToSimpleProjectDto(favorite.project),

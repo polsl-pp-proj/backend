@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { PrepareProjectDonationDto } from '../../dtos/prepare-project-donation.dto';
 import { ProjectDonationRepository } from '../../repositories/project-donation.repository';
 import Stripe from 'stripe';
-import { Not } from 'typeorm';
+import { IsNull, Not } from 'typeorm';
 import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
 import { ProjectRepository } from '../../../project/repositories/project.repository';
 import { DonationStatsDto } from '../../dtos/donation-stats.dto';
@@ -39,7 +39,7 @@ export class DonationService {
                 );
 
                 const project = await projectRepository.findOne({
-                    where: { id: projectId, fundingObjectives: Not(null) },
+                    where: { id: projectId, fundingObjectives: Not(IsNull()) },
                     select: { id: true },
                     relations: {},
                 });

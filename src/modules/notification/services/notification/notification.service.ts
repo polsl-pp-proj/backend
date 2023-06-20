@@ -372,26 +372,26 @@ export class NotificationService {
 
                 await this.sendNotificationCreated(
                     'org',
-                    notification.project.projectDraft.ownerOrganization.id ??
-                        notification.projectDraft.ownerOrganization.id,
+                    notification.project?.projectDraft?.ownerOrganization?.id ??
+                        notification.projectDraft?.ownerOrganization?.id,
                     new NotificationDto({
                         id: notification.id,
                         subject: notification.subject,
                         message: notification.message,
                         projectId:
-                            notification.project.id ??
-                            notification.projectDraft.id,
+                            notification.project?.id ??
+                            notification.projectDraft?.id,
                         projectName:
-                            notification.project.name ??
-                            notification.projectDraft.name,
+                            notification.project?.name ??
+                            notification.projectDraft?.name,
                         organizationId:
-                            notification.project.projectDraft.ownerOrganization
-                                .id ??
-                            notification.projectDraft.ownerOrganization.id,
+                            notification.project?.projectDraft
+                                ?.ownerOrganization?.id ??
+                            notification.projectDraft?.ownerOrganization?.id,
                         organizationName:
-                            notification.project.projectDraft.ownerOrganization
-                                .name ??
-                            notification.projectDraft.ownerOrganization.name,
+                            notification.project?.projectDraft
+                                ?.ownerOrganization?.name ??
+                            notification.projectDraft?.ownerOrganization?.name,
                         type: notificationData.type,
                         seen: notification.seen,
                         createdAt: notification.createdAt,

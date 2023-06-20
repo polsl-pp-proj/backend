@@ -184,7 +184,7 @@ export class ProjectService implements IProjectService {
             .addSelect('COALESCE(COUNT(project.id), 0)', 'numberOfLikes')
             .addOrderBy('numberOfLikes', 'DESC', 'NULLS LAST')
             .take(10)
-            .getMany();
+            .getRawMany();
 
         return favorites.map((favorite) => ({
             ...convertProjectToSimpleProjectDto(favorite.project),
@@ -195,6 +195,11 @@ export class ProjectService implements IProjectService {
 
     async getNewestProjects(): Promise<SimpleProjectDto[]> {
         const newest = await this.projectRepository.find({
+            where: { galleryEntries: { indexPosition: 0 } },
+            relations: {
+                galleryEntries: { asset: true },
+                projectDraft: { ownerOrganization: true },
+            },
             take: 10,
             order: { createdAt: 'DESC' },
         });

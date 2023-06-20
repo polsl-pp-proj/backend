@@ -194,13 +194,13 @@ export class ProjectService implements IProjectService {
                 'favoriteProjectIds',
                 '"favoriteProjectIds"."favorite_project_id" = project.id',
             )
-            .getRawMany<Project & { numberOfLikes: number }>();
+            .getRawAndEntities();
 
         console.log(favoriteProjects);
 
-        return favoriteProjects.map((favoriteProject) => ({
+        return favoriteProjects.entities.map((favoriteProject, i) => ({
             ...convertProjectToSimpleProjectDto(favoriteProject),
-            likes: favoriteProject.numberOfLikes,
+            likes: favoriteProjects.raw[i].numberOfLikes,
         }));
     }
 

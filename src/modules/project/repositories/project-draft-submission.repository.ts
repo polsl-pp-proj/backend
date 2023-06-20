@@ -46,7 +46,11 @@ export class ProjectDraftSubmissionRepository extends Repository<ProjectDraftSub
                     status: ProjectDraftSubmissionStatus.ToBeResolved,
                 },
                 relations: {
-                    projectDraft: { openPositions: true, categories: true },
+                    projectDraft: {
+                        openPositions: true,
+                        categories: true,
+                        galleryEntries: { asset: true },
+                    },
                 },
             });
 

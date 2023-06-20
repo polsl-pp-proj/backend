@@ -67,6 +67,7 @@ export class ProjectDraftSubmissionController {
             throw new ForbiddenException('not_moderator_or_admin');
         }
         await this.projectDraftSubmissionService.publishSubmission(
+            user.userId,
             submissionId,
             draftLastModified,
         );
@@ -84,6 +85,7 @@ export class ProjectDraftSubmissionController {
             throw new ForbiddenException('not_moderator_or_admin');
         }
         await this.projectDraftSubmissionService.rejectSubmission(
+            user.userId,
             submissionId,
             draftLastModified,
             reason,

@@ -164,9 +164,7 @@ export class ProjectService implements IProjectService {
         });
     }
 
-    async getMostLikedProjects(): Promise<
-        (SimpleProjectDto & { likes: number })[]
-    > {
+    async getMostLikedProjects(): Promise<SimpleProjectDto[]> {
         const favorites = await this.projectRepository.manager
             .createQueryBuilder(FavoriteProject, 'favorite')
             .leftJoinAndSelect('favorite.project', 'project')
@@ -182,14 +180,14 @@ export class ProjectService implements IProjectService {
                 'favorite.projectId, favorite.userId, favorite.createdAt, project.id, projectDraft.id, ownerOrganization.id, gallery.id, asset.id',
             )
             .addSelect('COALESCE(COUNT(project.id), 0)', 'numberOfLikes')
-            .addOrderBy('numberOfLikes', 'DESC', 'NULLS LAST')
+            .addOrderBy('COALESCE(COUNT(project.id), 0)', 'DESC', 'NULLS LAST')
             .take(10)
             .getRawMany();
 
         return favorites.map((favorite) => ({
             ...convertProjectToSimpleProjectDto(favorite.project),
-            likes: (favorite as unknown as Project & { numberOfLikes: number })
-                .numberOfLikes,
+            // likes: (favorite as unknown as Project & { numberOfLikes: number })
+            //     .numberOfLikes,
         }));
     }
 

@@ -27,22 +27,23 @@ export const NotificationQuery = (limit: number, offset: number) => {
                     "organizationNotifications"."seen" AS "seen",
                     "organizationNotifications"."created_at" AS "createdAt",
                     "organizationNotifications"."updated_at" AS "updatedAt",
-                    COALESCE("project"."id", "directProjectDraft"."id") AS "projectId",
-                    COALESCE("project"."name", "directProjectDraft"."name") AS "projectName",
+                    COALESCE("project"."id", "projectDraft"."id") AS "projectId",
+                    COALESCE("project"."name", "projectDraft"."name") AS "projectName",
                     "organization"."id" AS "organizationId",
                     "organization"."name" AS "organizationName",
-                    "organizationNotifications"."type" :: TEXT AS "type"
+                    "organizationNotifications"."type"::TEXT AS "type"
                 FROM
                     "organization_notifications" "organizationNotifications"
-                    LEFT JOIN "project_drafts" "directProjectDraft" ON "directProjectDraft"."id" = "organizationNotifications"."project_draft_id"
-                    LEFT JOIN "projects" "project" ON "project"."id" = "organizationNotifications"."project_id"
-                    LEFT JOIN "project_drafts" "projectDraft" ON "projectDraft"."id" = "project"."draft_id"
-                    LEFT JOIN "organizations" "organization" ON "organization"."id" = "projectDraft"."owner_organization_id"
-                    INNER JOIN "organizations_users" "organizationUsers" ON "organizationUsers"."organization_id" = "organization"."id"
-                    AND (
-                        "organization"."id" = "organizationUsers"."organization_id"
-                        AND "organizationUsers"."user_id" = $1
-                    )
+                    LEFT JOIN "projects" "project" 
+                        ON "project"."id" = "organizationNotifications"."project_id"
+                    LEFT JOIN "project_drafts" "projectDraft" 
+                        ON "projectDraft"."id" = "project"."draft_id"
+                            OR "projectDraft"."id" = "organizationNotifications"."project_draft_id"
+                    LEFT JOIN "organizations" "organization" 
+                        ON "organization"."id" = "projectDraft"."owner_organization_id"
+                    INNER JOIN "organizations_users" "organizationUsers" 
+                        ON "organizationUsers"."organization_id" = "organization"."id"
+                            AND "organizationUsers"."user_id" = $1
                 WHERE
                     "organizationNotifications"."deleted_at" IS NULL
                 ORDER BY
@@ -64,9 +65,12 @@ export const NotificationQuery = (limit: number, offset: number) => {
                     'message_answer' AS "type"
                 FROM
                     "user_notifications" "userNotifications"
-                    LEFT JOIN "projects" "project" ON "project"."id" = "userNotifications"."project_id"
-                    LEFT JOIN "project_drafts" "projectDraft" ON "projectDraft"."id" = "project"."draft_id"
-                    LEFT JOIN "organizations" "organization" ON "organization"."id" = "projectDraft"."owner_organization_id"
+                    LEFT JOIN "projects" "project" 
+                        ON "project"."id" = "userNotifications"."project_id"
+                    LEFT JOIN "project_drafts" "projectDraft" 
+                        ON "projectDraft"."id" = "project"."draft_id"
+                    LEFT JOIN "organizations" "organization" 
+                        ON "organization"."id" = "projectDraft"."owner_organization_id"
                 WHERE
                     ("userNotifications"."user_id" = $1)
                     AND ("userNotifications"."deleted_at" IS NULL)

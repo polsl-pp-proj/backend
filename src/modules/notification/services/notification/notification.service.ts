@@ -159,6 +159,7 @@ export class NotificationService {
                 // const organizationNotificationsQueryBuilder =
                 //     organizationNotificationRepository
                 //         .createQueryBuilder('organizationNotifications')
+                //         .leftJoin('organizationNotifications.projectDraft', 'directProjectDraft')
                 //         .leftJoin(
                 //             'organizationNotifications.project',
                 //             'project',
@@ -167,6 +168,7 @@ export class NotificationService {
                 //         .leftJoin(
                 //             'projectDraft.ownerOrganization',
                 //             'organization',
+                //             'organization.id = projectDraft.ownerOrganizationId OR organization.id = directProjectDraft.ownerOrganizationId'
                 //         )
                 //         .innerJoin(
                 //             'organization.organizationUsers',

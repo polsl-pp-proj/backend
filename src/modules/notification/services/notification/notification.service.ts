@@ -550,18 +550,24 @@ export class NotificationService {
         organizationId: number,
         notificationId: number,
     ) {
-        const updateResult =
-            await this.organizationNotificationRepository.update(
-                {
-                    id: notificationId,
-                    project: {
-                        projectDraft: {
-                            ownerOrganizationId: organizationId,
-                        },
-                    },
-                },
-                { seen: true },
-            );
+        const updateResult = await this.organizationNotificationRepository
+            .createQueryBuilder('organizationNotification')
+            .update()
+            .where('organizationNotification.id = :notificationId')
+            .andWhere(
+                `organizationNotification.id IN (
+                    SELECT "id" 
+                    FROM "organization_notifications" "n"
+                        LEFT JOIN "projects" "p"
+                            ON "n"."project_id" = "p"."id"
+                        LEFT JOIN "project_drafts" "d"
+                            ON "d"."id" = "p"."draft_id"
+                                OR "d"."id" = "n"."project_draft_id"
+                    WHERE "d"."owner_organization_id" = :organizationId)`,
+            )
+            .setParameters({ notificationId, organizationId })
+            .set({ seen: true })
+            .execute();
 
         if (updateResult.affected === 0) {
             throw new RecordNotFoundException('notification_not_found');
@@ -590,18 +596,24 @@ export class NotificationService {
         organizationId: number,
         notificationId: number,
     ) {
-        const updateResult =
-            await this.organizationNotificationRepository.update(
-                {
-                    id: notificationId,
-                    project: {
-                        projectDraft: {
-                            ownerOrganizationId: organizationId,
-                        },
-                    },
-                },
-                { seen: false },
-            );
+        const updateResult = await this.organizationNotificationRepository
+            .createQueryBuilder('organizationNotification')
+            .update()
+            .where('organizationNotification.id = :notificationId')
+            .andWhere(
+                `organizationNotification.id IN (
+                    SELECT "id" 
+                    FROM "organization_notifications" "n"
+                        LEFT JOIN "projects" "p"
+                            ON "n"."project_id" = "p"."id"
+                        LEFT JOIN "project_drafts" "d"
+                            ON "d"."id" = "p"."draft_id"
+                                OR "d"."id" = "n"."project_draft_id"
+                    WHERE "d"."owner_organization_id" = :organizationId)`,
+            )
+            .setParameters({ notificationId, organizationId })
+            .set({ seen: false })
+            .execute();
 
         if (updateResult.affected === 0) {
             throw new RecordNotFoundException('notification_not_found');
@@ -637,15 +649,23 @@ export class NotificationService {
         organizationId: number,
         notificationId: number,
     ) {
-        const deleteResult =
-            await this.organizationNotificationRepository.softDelete({
-                id: notificationId,
-                project: {
-                    projectDraft: {
-                        ownerOrganizationId: organizationId,
-                    },
-                },
-            });
+        const deleteResult = await this.organizationNotificationRepository
+            .createQueryBuilder('organizationNotification')
+            .delete()
+            .where('organizationNotification.id = :notificationId')
+            .andWhere(
+                `organizationNotification.id IN (
+                    SELECT "id" 
+                    FROM "organization_notifications" "n"
+                        LEFT JOIN "projects" "p"
+                            ON "n"."project_id" = "p"."id"
+                        LEFT JOIN "project_drafts" "d"
+                            ON "d"."id" = "p"."draft_id"
+                                OR "d"."id" = "n"."project_draft_id"
+                    WHERE "d"."owner_organization_id" = :organizationId)`,
+            )
+            .setParameters({ notificationId, organizationId })
+            .execute();
 
         if (deleteResult.affected === 0) {
             throw new RecordNotFoundException('notification_not_found');

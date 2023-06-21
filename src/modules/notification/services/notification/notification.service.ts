@@ -52,6 +52,10 @@ export class NotificationService {
         return new Observable<MessageEvent>((subscriber) => {
             const subs: Subscription[] = [];
 
+            const unsubscribe = () => {
+                subs.forEach((sub) => sub.unsubscribe());
+            };
+
             const checkExpiry = () => {
                 console.log('Check expiry');
                 console.log({
@@ -62,7 +66,7 @@ export class NotificationService {
                     console.log({
                         tempUUID,
                     });
-                    subs.forEach((sub) => sub.unsubscribe());
+                    unsubscribe();
                     subscriber.next({
                         type: 'close_connection',
                         data: 'reconnect',
@@ -193,6 +197,10 @@ export class NotificationService {
                     }),
                 );
             });
+
+            return () => {
+                unsubscribe();
+            };
         });
     }
 

@@ -21,6 +21,7 @@ import { CreateNotificationDto } from '../../dtos/create-notification.dto';
 import { OrganizationNotificationType } from '../../enums/organization-notification-type.enum';
 import { NotificationEventType } from '../../types/notification-event-type.type';
 import { ProjectDraft } from 'src/modules/project/entities/project-draft.entity';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class NotificationService {
@@ -35,6 +36,14 @@ export class NotificationService {
         organizations,
         exp,
     }: AuthTokenPayloadDto & { exp: number }): Observable<MessageEvent> {
+        const tempUUID = randomUUID();
+        console.log('1. Prepare notification observable');
+        console.log({
+            tempUUID,
+            userId,
+            organizations,
+            exp: new Date(exp * 1000).toISOString(),
+        });
         const authTokenExpiresAt = new Date(exp * 1000); // close connection after auth token expires
         const userOrganizationIds = organizations.map(
             (org) => org.organizationId,
@@ -44,7 +53,15 @@ export class NotificationService {
             const subs: Subscription[] = [];
 
             const checkExpiry = () => {
+                console.log('Check expiry');
+                console.log({
+                    tempUUID,
+                });
                 if (authTokenExpiresAt.valueOf() < new Date().valueOf()) {
+                    console.log('Token expired');
+                    console.log({
+                        tempUUID,
+                    });
                     subs.forEach((sub) => sub.unsubscribe());
                     subscriber.next({
                         type: 'close_connection',
@@ -57,6 +74,11 @@ export class NotificationService {
             subs.push(
                 this.getNotificationCreated('usr', userId).subscribe(
                     (notification) => {
+                        console.log('Got usr notification:created event');
+                        console.log({
+                            tempUUID,
+                            notification,
+                        });
                         subscriber.next({
                             type: 'notification:created',
                             data: { ...notification, receiver: 'usr' },
@@ -66,6 +88,11 @@ export class NotificationService {
                 ),
                 this.getNotificationSeen('usr', userId).subscribe(
                     (notificationId) => {
+                        console.log('Got usr notification:seen event');
+                        console.log({
+                            tempUUID,
+                            notificationId,
+                        });
                         subscriber.next({
                             type: 'notification:seen',
                             data: { id: notificationId, receiver: 'usr' },
@@ -75,6 +102,11 @@ export class NotificationService {
                 ),
                 this.getNotificationNotSeen('usr', userId).subscribe(
                     (notificationId) => {
+                        console.log('Got usr notification:not-seen event');
+                        console.log({
+                            tempUUID,
+                            notificationId,
+                        });
                         subscriber.next({
                             type: 'notification:not-seen',
                             data: { id: notificationId, receiver: 'usr' },
@@ -84,6 +116,11 @@ export class NotificationService {
                 ),
                 this.getNotificationRemoved('usr', userId).subscribe(
                     (notificationId) => {
+                        console.log('Got usr notification:removed event');
+                        console.log({
+                            tempUUID,
+                            notificationId,
+                        });
                         subscriber.next({
                             type: 'notification:removed',
                             data: { id: notificationId, receiver: 'usr' },
@@ -99,6 +136,11 @@ export class NotificationService {
                         'org',
                         organizationId,
                     ).subscribe((notification) => {
+                        console.log('Got org notification:created event');
+                        console.log({
+                            tempUUID,
+                            notification,
+                        });
                         subscriber.next({
                             type: 'notification:created',
                             data: { ...notification, receiver: 'org' },
@@ -107,6 +149,11 @@ export class NotificationService {
                     }),
                     this.getNotificationSeen('org', organizationId).subscribe(
                         (notificationId) => {
+                            console.log('Got org notification:seen event');
+                            console.log({
+                                tempUUID,
+                                notificationId,
+                            });
                             subscriber.next({
                                 type: 'notification:seen',
                                 data: { id: notificationId, receiver: 'org' },
@@ -118,6 +165,11 @@ export class NotificationService {
                         'org',
                         organizationId,
                     ).subscribe((notificationId) => {
+                        console.log('Got org notification:not-seen event');
+                        console.log({
+                            tempUUID,
+                            notificationId,
+                        });
                         subscriber.next({
                             type: 'notification:not-seen',
                             data: { id: notificationId, receiver: 'org' },
@@ -128,6 +180,11 @@ export class NotificationService {
                         'org',
                         organizationId,
                     ).subscribe((notificationId) => {
+                        console.log('Got org notification:removed event');
+                        console.log({
+                            tempUUID,
+                            notificationId,
+                        });
                         subscriber.next({
                             type: 'notification:removed',
                             data: { id: notificationId, receiver: 'org' },

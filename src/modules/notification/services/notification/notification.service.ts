@@ -37,14 +37,6 @@ export class NotificationService {
         organizations,
         exp,
     }: AuthTokenPayloadDto & { exp: number }): Observable<MessageEvent> {
-        const tempUUID = randomUUID();
-        console.log('1. Prepare notification observable');
-        console.log({
-            tempUUID,
-            userId,
-            organizations,
-            exp: new Date(exp * 1000).toISOString(),
-        });
         const authTokenExpiresAt = new Date(exp * 1000); // close connection after auth token expires
         const userOrganizationIds = organizations.map(
             (org) => org.organizationId,
@@ -58,15 +50,7 @@ export class NotificationService {
             };
 
             const checkExpiry = () => {
-                console.log('Check expiry');
-                console.log({
-                    tempUUID,
-                });
                 if (authTokenExpiresAt.valueOf() < new Date().valueOf()) {
-                    console.log('Token expired');
-                    console.log({
-                        tempUUID,
-                    });
                     unsubscribe();
                     subscriber.next({
                         type: 'close_connection',
@@ -79,11 +63,6 @@ export class NotificationService {
             subs.push(
                 this.getNotificationCreated('usr', userId).subscribe(
                     (notification) => {
-                        console.log('Got usr notification:created event');
-                        console.log({
-                            tempUUID,
-                            notification,
-                        });
                         subscriber.next({
                             type: 'notification:created',
                             data: { ...notification, receiver: 'usr' },
@@ -93,11 +72,6 @@ export class NotificationService {
                 ),
                 this.getNotificationSeen('usr', userId).subscribe(
                     (notificationId) => {
-                        console.log('Got usr notification:seen event');
-                        console.log({
-                            tempUUID,
-                            notificationId,
-                        });
                         subscriber.next({
                             type: 'notification:seen',
                             data: { id: notificationId, receiver: 'usr' },
@@ -107,11 +81,6 @@ export class NotificationService {
                 ),
                 this.getNotificationNotSeen('usr', userId).subscribe(
                     (notificationId) => {
-                        console.log('Got usr notification:not-seen event');
-                        console.log({
-                            tempUUID,
-                            notificationId,
-                        });
                         subscriber.next({
                             type: 'notification:not-seen',
                             data: { id: notificationId, receiver: 'usr' },
@@ -121,11 +90,6 @@ export class NotificationService {
                 ),
                 this.getNotificationRemoved('usr', userId).subscribe(
                     (notificationId) => {
-                        console.log('Got usr notification:removed event');
-                        console.log({
-                            tempUUID,
-                            notificationId,
-                        });
                         subscriber.next({
                             type: 'notification:removed',
                             data: { id: notificationId, receiver: 'usr' },
@@ -141,11 +105,6 @@ export class NotificationService {
                         'org',
                         organizationId,
                     ).subscribe((notification) => {
-                        console.log('Got org notification:created event');
-                        console.log({
-                            tempUUID,
-                            notification,
-                        });
                         subscriber.next({
                             type: 'notification:created',
                             data: { ...notification, receiver: 'org' },
@@ -154,11 +113,6 @@ export class NotificationService {
                     }),
                     this.getNotificationSeen('org', organizationId).subscribe(
                         (notificationId) => {
-                            console.log('Got org notification:seen event');
-                            console.log({
-                                tempUUID,
-                                notificationId,
-                            });
                             subscriber.next({
                                 type: 'notification:seen',
                                 data: { id: notificationId, receiver: 'org' },
@@ -170,11 +124,6 @@ export class NotificationService {
                         'org',
                         organizationId,
                     ).subscribe((notificationId) => {
-                        console.log('Got org notification:not-seen event');
-                        console.log({
-                            tempUUID,
-                            notificationId,
-                        });
                         subscriber.next({
                             type: 'notification:not-seen',
                             data: { id: notificationId, receiver: 'org' },
@@ -185,11 +134,6 @@ export class NotificationService {
                         'org',
                         organizationId,
                     ).subscribe((notificationId) => {
-                        console.log('Got org notification:removed event');
-                        console.log({
-                            tempUUID,
-                            notificationId,
-                        });
                         subscriber.next({
                             type: 'notification:removed',
                             data: { id: notificationId, receiver: 'org' },
@@ -382,8 +326,6 @@ export class NotificationService {
         organizationNotificationRepository = this
             .organizationNotificationRepository,
     ) {
-        console.log('1. Creating Organization Notification');
-        console.log({ data: notificationData });
         await organizationNotificationRepository.manager.transaction(
             async (manager) => {
                 const organizationNotificationRepository =
@@ -400,8 +342,6 @@ export class NotificationService {
                     senderUser: { id: notificationData.userId },
                     type: notificationData.type as unknown as OrganizationNotificationType,
                 });
-                console.log('2. Created Notification entity object');
-                console.log({ notification });
                 if (
                     notification.type ===
                         OrganizationNotificationType.ProjectDraftPublication ||
@@ -413,14 +353,8 @@ export class NotificationService {
                         notification.project as unknown as ProjectDraft;
                     delete notification.project;
                     delete notification.projectId;
-                    console.log(
-                        '3. Updated Notification entity object data for project draft',
-                    );
-                    console.log({ notification });
                 }
                 await organizationNotificationRepository.save(notification);
-                console.log('4. Saved Notification entity object');
-                console.log({ notification });
                 Object.assign(
                     notification,
                     await organizationNotificationRepository.findOne({
@@ -433,8 +367,6 @@ export class NotificationService {
                         },
                     }),
                 );
-                console.log('5. Filled Notification entity object');
-                console.log({ notification });
 
                 await this.sendNotificationCreated(
                     'org',
@@ -464,7 +396,6 @@ export class NotificationService {
                         updatedAt: notification.updatedAt,
                     }),
                 );
-                console.log('6. Sent notification created event');
             },
         );
     }
@@ -772,8 +703,6 @@ export class NotificationService {
         receiverId: number,
         notification: NotificationDto | number,
     ) {
-        console.log('Sending notification event');
-        console.log({ event, receiver, receiverId, notification });
         await this.redisService.publish(
             `notify:${event}:${receiver}:${receiverId}`,
             notification,

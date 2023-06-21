@@ -29,32 +29,11 @@ export class NotificationController {
     constructor(private readonly notificationService: NotificationService) {}
 
     @Sse('events')
-    //@UseGuards(AuthTokenGuard)
-    notificationEvents(): //@User() user: AuthTokenPayloadDto & { exp: number },
-    Observable<MessageEvent> {
-        return this.notificationService
-            .getNotificationObservable({
-                userId: 4,
-                exp: new Date().valueOf() / 1000 + 1000000,
-                emailAddress: '',
-                firstName: '',
-                lastName: '',
-                lastVerifiedAsStudent: new Date().valueOf() - 100,
-                isVerifiedStudent: true,
-                isActive: true,
-                organizations: [
-                    { organizationId: 4, role: OrganizationMemberRole.Owner },
-                    { organizationId: 5, role: OrganizationMemberRole.Member },
-                ],
-                role: UserRole.BasicUser,
-                uuid: 'asdsad',
-            })
-            .pipe(
-                tap((event) => {
-                    console.log('[Controller] Got event');
-                    console.log({ event });
-                }),
-            );
+    @UseGuards(AuthTokenGuard)
+    notificationEvents(
+        @User() user: AuthTokenPayloadDto & { exp: number },
+    ): Observable<MessageEvent> {
+        return this.notificationService.getNotificationObservable(user);
     }
 
     @Get()

@@ -314,6 +314,8 @@ export class NotificationService {
         organizationNotificationRepository = this
             .organizationNotificationRepository,
     ) {
+        console.log('1. Creating Organization Notification');
+        console.log({ data: notificationData });
         await organizationNotificationRepository.manager.transaction(
             async (manager) => {
                 const organizationNotificationRepository =
@@ -330,6 +332,8 @@ export class NotificationService {
                     senderUser: { id: notificationData.userId },
                     type: notificationData.type as unknown as OrganizationNotificationType,
                 });
+                console.log('2. Created Notification entity object');
+                console.log({ notification });
                 if (
                     notification.type ===
                         OrganizationNotificationType.ProjectDraftPublication ||
@@ -341,8 +345,14 @@ export class NotificationService {
                         notification.project as unknown as ProjectDraft;
                     delete notification.project;
                     delete notification.projectId;
+                    console.log(
+                        '3. Updated Notification entity object data for project draft',
+                    );
+                    console.log({ notification });
                 }
                 await organizationNotificationRepository.save(notification);
+                console.log('4. Saved Notification entity object');
+                console.log({ notification });
                 Object.assign(
                     notification,
                     await organizationNotificationRepository.findOne({
@@ -369,6 +379,8 @@ export class NotificationService {
                         },
                     }),
                 );
+                console.log('5. Filled Notification entity object');
+                console.log({ notification });
 
                 await this.sendNotificationCreated(
                     'org',
@@ -398,6 +410,7 @@ export class NotificationService {
                         updatedAt: notification.updatedAt,
                     }),
                 );
+                console.log('6. Sent notification created event');
             },
         );
     }
@@ -693,6 +706,8 @@ export class NotificationService {
         receiverId: number,
         notification: NotificationDto | number,
     ) {
+        console.log('Sending notification event');
+        console.log({ event, receiver, receiverId, notification });
         await this.redisService.publish(
             `notify:${event}:${receiver}:${receiverId}`,
             notification,

@@ -270,8 +270,8 @@ export class ProjectService implements IProjectService {
             try {
                 await this.notificationService.createOrganizationNotification(
                     {
-                        userId: userId,
-                        projectId: projectId,
+                        userId,
+                        projectId,
                         subject: projectMessageDto.subject,
                         message: projectMessageDto.message,
                         type: NotificationType.ProjectMessage,

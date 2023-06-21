@@ -431,20 +431,6 @@ export class NotificationService {
                             },
                             projectDraft: { ownerOrganization: true },
                         },
-                        select: {
-                            project: {
-                                id: true,
-                                name: true,
-                                projectDraft: {
-                                    ownerOrganization: { id: true, name: true },
-                                },
-                            },
-                            projectDraft: {
-                                id: true,
-                                name: true,
-                                ownerOrganization: { id: true, name: true },
-                            },
-                        },
                     }),
                 );
                 console.log('5. Filled Notification entity object');
@@ -503,20 +489,11 @@ export class NotificationService {
                 await userNotificationRepository.save(notification);
                 Object.assign(
                     notification,
-                    userNotificationRepository.findOne({
+                    await userNotificationRepository.findOne({
                         where: { id: notification.id },
                         relations: {
                             project: {
                                 projectDraft: { ownerOrganization: true },
-                            },
-                        },
-                        select: {
-                            project: {
-                                id: true,
-                                name: true,
-                                projectDraft: {
-                                    ownerOrganization: { id: true, name: true },
-                                },
                             },
                         },
                     }),

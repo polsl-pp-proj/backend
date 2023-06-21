@@ -22,22 +22,39 @@ import { RecordNotFoundException } from 'src/exceptions/record-not-found.excepti
 import { OrganizationMemberRole } from 'src/modules/organization/enums/organization-member-role.enum';
 import { validationConfig } from 'src/configs/validation.config';
 import { PaginationDto } from 'src/dtos/pagination.dto';
+import { UserRole } from 'src/modules/user/enums/user-role.enum';
 
 @Controller({ path: 'notification', version: '1' })
 export class NotificationController {
     constructor(private readonly notificationService: NotificationService) {}
 
     @Sse('events')
-    @UseGuards(AuthTokenGuard)
-    notificationEvents(
-        @User() user: AuthTokenPayloadDto & { exp: number },
-    ): Observable<MessageEvent> {
-        return this.notificationService.getNotificationObservable(user).pipe(
-            tap((event) => {
-                console.log('[Controller] Got event');
-                console.log({ event });
-            }),
-        );
+    //@UseGuards(AuthTokenGuard)
+    notificationEvents(): //@User() user: AuthTokenPayloadDto & { exp: number },
+    Observable<MessageEvent> {
+        return this.notificationService
+            .getNotificationObservable({
+                userId: 4,
+                exp: new Date().valueOf() / 1000 + 1000000,
+                emailAddress: '',
+                firstName: '',
+                lastName: '',
+                lastVerifiedAsStudent: new Date().valueOf() - 100,
+                isVerifiedStudent: true,
+                isActive: true,
+                organizations: [
+                    { organizationId: 4, role: OrganizationMemberRole.Owner },
+                    { organizationId: 5, role: OrganizationMemberRole.Member },
+                ],
+                role: UserRole.BasicUser,
+                uuid: 'asdsad',
+            })
+            .pipe(
+                tap((event) => {
+                    console.log('[Controller] Got event');
+                    console.log({ event });
+                }),
+            );
     }
 
     @Get()

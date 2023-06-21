@@ -534,7 +534,7 @@ export class NotificationService {
             .where('organization_notifications.id = :notificationId')
             .andWhere(
                 `organization_notifications.id IN (
-                    SELECT "id" 
+                    SELECT "n"."id" 
                     FROM "organization_notifications" "n"
                         LEFT JOIN "projects" "p"
                             ON "n"."project_id" = "p"."id"
@@ -580,7 +580,7 @@ export class NotificationService {
             .where('organization_notifications.id = :notificationId')
             .andWhere(
                 `organization_notifications.id IN (
-                    SELECT "id" 
+                    SELECT "n"."id" 
                     FROM "organization_notifications" "n"
                         LEFT JOIN "projects" "p"
                             ON "n"."project_id" = "p"."id"
@@ -634,7 +634,7 @@ export class NotificationService {
             .where('organization_notifications.id = :notificationId')
             .andWhere(
                 `organization_notifications.id IN (
-                    SELECT "id" 
+                    SELECT "n"."id" 
                     FROM "organization_notifications" "n"
                         LEFT JOIN "projects" "p"
                             ON "n"."project_id" = "p"."id"

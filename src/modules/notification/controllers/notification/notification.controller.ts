@@ -13,7 +13,7 @@ import {
     UseGuards,
     ValidationPipe,
 } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { User } from 'src/modules/auth/decorators/param/user.decorator';
 import { AuthTokenPayloadDto } from 'src/modules/auth/dtos/auth-token-payload.dto';
 import { AuthTokenGuard } from 'src/modules/auth/guards/auth-token.guard';
@@ -32,7 +32,12 @@ export class NotificationController {
     notificationEvents(
         @User() user: AuthTokenPayloadDto & { exp: number },
     ): Observable<MessageEvent> {
-        return this.notificationService.getNotificationObservable(user);
+        return this.notificationService.getNotificationObservable(user).pipe(
+            tap((event) => {
+                console.log('[Controller] Got event');
+                console.log({ event });
+            }),
+        );
     }
 
     @Get()

@@ -22,6 +22,7 @@ import { OrganizationNotificationType } from '../../enums/organization-notificat
 import { NotificationEventType } from '../../types/notification-event-type.type';
 import { ProjectDraft } from 'src/modules/project/entities/project-draft.entity';
 import { randomUUID } from 'crypto';
+import { OrganizationNotification } from '../../entities/organization-notification.entity';
 
 @Injectable()
 export class NotificationService {
@@ -552,10 +553,10 @@ export class NotificationService {
     ) {
         const updateResult = await this.organizationNotificationRepository
             .createQueryBuilder('organizationNotification')
-            .update()
-            .where('organizationNotification.id = :notificationId')
+            .update('organization_notification')
+            .where('organization_notification.id = :notificationId')
             .andWhere(
-                `organizationNotification.id IN (
+                `organization_notification.id IN (
                     SELECT "id" 
                     FROM "organization_notifications" "n"
                         LEFT JOIN "projects" "p"
@@ -598,10 +599,10 @@ export class NotificationService {
     ) {
         const updateResult = await this.organizationNotificationRepository
             .createQueryBuilder('organizationNotification')
-            .update()
-            .where('organizationNotification.id = :notificationId')
+            .update('organization_notification')
+            .where('organization_notification.id = :notificationId')
             .andWhere(
-                `organizationNotification.id IN (
+                `organization_notification IN (
                     SELECT "id" 
                     FROM "organization_notifications" "n"
                         LEFT JOIN "projects" "p"
@@ -652,9 +653,10 @@ export class NotificationService {
         const deleteResult = await this.organizationNotificationRepository
             .createQueryBuilder('organizationNotification')
             .delete()
-            .where('organizationNotification.id = :notificationId')
+            .from(OrganizationNotification, 'organization_notification')
+            .where('organization_notification.id = :notificationId')
             .andWhere(
-                `organizationNotification.id IN (
+                `organization_notification IN (
                     SELECT "id" 
                     FROM "organization_notifications" "n"
                         LEFT JOIN "projects" "p"

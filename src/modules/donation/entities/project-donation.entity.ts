@@ -29,7 +29,7 @@ export class ProjectDonation {
     @JoinColumn({ name: 'user_id' })
     user: User;
 
-    @Column({ name: 'amount' })
+    @Column({ name: 'amount', type: 'double precision' })
     amount: number;
 
     @Column({ name: 'is_anonymous' })

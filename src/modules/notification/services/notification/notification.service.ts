@@ -4,6 +4,7 @@ import { UserNotificationRepository } from '../../repositories/user-notification
 import { RecordNotFoundException } from 'src/exceptions/record-not-found.exception';
 import { PaginationDto } from 'src/dtos/pagination.dto';
 import {
+    NotificationType,
     OrganizationOnlyNotificationType,
     UserOnlyNotificationType,
 } from '../../enums/notification-type.enum';
@@ -21,8 +22,8 @@ import { CreateNotificationDto } from '../../dtos/create-notification.dto';
 import { OrganizationNotificationType } from '../../enums/organization-notification-type.enum';
 import { NotificationEventType } from '../../types/notification-event-type.type';
 import { ProjectDraft } from 'src/modules/project/entities/project-draft.entity';
-import { randomUUID } from 'crypto';
 import { OrganizationNotification } from '../../entities/organization-notification.entity';
+import { NotificationAnswerDto } from '../../dtos/notification-answer.dto';
 
 @Injectable()
 export class NotificationService {
@@ -404,8 +405,9 @@ export class NotificationService {
         notificationData: CreateNotificationDto & {
             type: UserOnlyNotificationType;
         },
+        userNotificationRepository = this.userNotificationRepository,
     ) {
-        await this.userNotificationRepository.manager.transaction(
+        await userNotificationRepository.manager.transaction(
             async (manager) => {
                 const userNotificationRepository =
                     new UserNotificationRepository(manager.connection, manager);
@@ -450,6 +452,58 @@ export class NotificationService {
                         createdAt: notification.createdAt,
                         updatedAt: notification.updatedAt,
                     }),
+                );
+            },
+        );
+    }
+
+    async answerOrganizationNotificationToUser(
+        organizationId: number,
+        notificationId: number,
+        notificationAnswerDto: NotificationAnswerDto,
+    ) {
+        await this.organizationNotificationRepository.manager.transaction(
+            async (manager) => {
+                const organizationNotificationRepository =
+                    new OrganizationNotificationRepository(
+                        manager.connection,
+                        manager,
+                    );
+                const userNotificationRepository =
+                    new UserNotificationRepository(manager.connection, manager);
+
+                const notification = await organizationNotificationRepository
+                    .createQueryBuilder('organizationNotification')
+                    .where('organizationNotification.id = :notificationId')
+                    .andWhere(
+                        `organizationNotification.id IN (
+                    SELECT "n"."id" 
+                    FROM "organization_notifications" "n"
+                        LEFT JOIN "projects" "p"
+                            ON "n"."project_id" = "p"."id"
+                        LEFT JOIN "project_drafts" "d"
+                            ON "d"."id" = "p"."draft_id"
+                                OR "d"."id" = "n"."project_draft_id"
+                    WHERE "d"."owner_organization_id" = :organizationId)`,
+                    )
+                    .setParameters({ notificationId, organizationId })
+                    .getOne();
+
+                if (!notification) {
+                    throw new RecordNotFoundException('notification_not_found');
+                }
+
+                await this.createUserNotification(
+                    {
+                        message: notificationAnswerDto.message,
+                        subject: `${
+                            notification.subject.startsWith('Re:') ? '' : 'Re: '
+                        }${notification.subject}`,
+                        projectId: notification.projectId,
+                        type: NotificationType.MessageAnswer,
+                        userId: notification.senderUserId,
+                    },
+                    userNotificationRepository,
                 );
             },
         );

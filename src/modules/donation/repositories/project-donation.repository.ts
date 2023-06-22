@@ -37,7 +37,7 @@ export class ProjectDonationRepository extends Repository<ProjectDonation> {
 
     async getLastFunders(projectId: number) {
         return await this.find({
-            where: { projectId },
+            where: { projectId, paymentFinished: true },
             relations: { user: true },
             take: 10,
             order: { createdAt: 'DESC' },
@@ -63,6 +63,7 @@ export class ProjectDonationRepository extends Repository<ProjectDonation> {
                     .andWhere('payment.createdAt >= :date', {
                         date: new Date(new Date().valueOf() - 2678400000),
                     })
+                    .andWhere('payment.paymentFinished = TRUE')
                     .getRawOne<{ amount: number }>()
             ).amount;
 
@@ -71,6 +72,7 @@ export class ProjectDonationRepository extends Repository<ProjectDonation> {
                     .createQueryBuilder('payment')
                     .select('COALESCE(SUM(payment.amount), 0) as "amount"')
                     .where('payment.projectId = :projectId', { projectId })
+                    .andWhere('payment.paymentFinished = TRUE')
                     .getRawOne<{ amount: number }>()
             ).amount;
 

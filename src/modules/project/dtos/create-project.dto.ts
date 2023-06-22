@@ -34,9 +34,15 @@ export class CreateProjectDto {
     fundingObjectives?: string;
 
     @Transform((params) => {
+        console.log('Start TEST');
+        console.log(params);
+
         try {
+            console.log('TEST');
             return JSON.parse(params.value);
         } catch (e) {
+            console.log('TEST error');
+            console.log(e);
             throw new BadRequestException(
                 `${params.key} contains invalid JSON `,
             );

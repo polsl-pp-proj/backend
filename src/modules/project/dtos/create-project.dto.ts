@@ -11,6 +11,7 @@ import {
 import { CreateOpenPositionDto } from './create-open-position.dto';
 import { Transform, Type } from 'class-transformer';
 import { BadRequestException } from '@nestjs/common';
+import { IsOpenPositionCreation } from 'src/decorators/validator/open-position-creation.validator';
 
 export class CreateProjectDto {
     @IsDefined({ message: 'not_defined' })
@@ -42,10 +43,8 @@ export class CreateProjectDto {
             );
         }
     })
-    @IsDefined({ message: 'not_defined' })
+    @IsOpenPositionCreation({ message: 'not_open_position_array' })
     @IsArray({ message: 'not_an_array' })
-    @ValidateNested({ each: true })
-    @Type(() => CreateOpenPositionDto)
     openPositions: CreateOpenPositionDto[];
 
     @Transform((params) => {

@@ -1,4 +1,5 @@
 import {
+    Body,
     Controller,
     Delete,
     ForbiddenException,
@@ -8,6 +9,7 @@ import {
     Param,
     ParseIntPipe,
     Patch,
+    Post,
     Query,
     Sse,
     UseGuards,
@@ -23,6 +25,7 @@ import { OrganizationMemberRole } from 'src/modules/organization/enums/organizat
 import { validationConfig } from 'src/configs/validation.config';
 import { PaginationDto } from 'src/dtos/pagination.dto';
 import { UserRole } from 'src/modules/user/enums/user-role.enum';
+import { NotificationAnswerDto } from '../../dtos/notification-answer.dto';
 
 @Controller({ path: 'notification', version: '1' })
 export class NotificationController {
@@ -47,6 +50,36 @@ export class NotificationController {
             user.userId,
             paginationParams,
         );
+    }
+
+    @Post('user/organization/:organizationId/:notificationId')
+    @UseGuards(AuthTokenGuard)
+    async answerOrganizationNotificationToUser(
+        @User() user: AuthTokenPayloadDto,
+        @Param('organizationId', ParseIntPipe) organizationId: number,
+        @Param('notificationId', ParseIntPipe) notificationId: number,
+        @Body(new ValidationPipe(validationConfig))
+        notificationAnswerDto: NotificationAnswerDto,
+    ) {
+        if (
+            !user.organizations.some(
+                (org) => org.organizationId === organizationId,
+            )
+        ) {
+            throw new ForbiddenException('user_not_in_organization');
+        }
+        try {
+            await this.notificationService.answerOrganizationNotificationToUser(
+                organizationId,
+                notificationId,
+                notificationAnswerDto,
+            );
+        } catch (ex) {
+            if (ex instanceof RecordNotFoundException) {
+                throw new NotFoundException(ex.message);
+            }
+            throw ex;
+        }
     }
 
     @Patch('organization/:organizationId/:notificationId/mark-seen')

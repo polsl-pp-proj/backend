@@ -44,7 +44,7 @@ export class CreateProjectDto {
     })
     @IsDefined({ message: 'not_defined' })
     @IsArray({ message: 'not_an_array' })
-    @ValidateNested()
+    @ValidateNested({ each: true })
     @Type(() => CreateOpenPositionDto)
     openPositions: CreateOpenPositionDto[];
 
